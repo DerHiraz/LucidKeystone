@@ -102,6 +102,7 @@ L["Nothing to see here"] = true
 L["Level"] = true
 L["Time"] = true
 L["Date"] = true
+L["Intime/Overtime Ratio: "] = true
 
 --## About
 L["About"] = true
