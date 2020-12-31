@@ -433,6 +433,8 @@ local function TotalRuns()
     local zones = {375,376,377,378,379,380,381,382}
     local runs = 0
     local levels = 0
+    local win = 0
+    local loss = 0
     local zoneRuns = {}
     local zoneNames = {}
     local zoneLevels = {}
@@ -440,6 +442,8 @@ local function TotalRuns()
 
     for i = 1, #zones do
         runs = runs + db.profile.runs[expansion][season][1][zones[i]] + db.profile.runs[expansion][season][2][zones[i]]
+        win = win + db.profile.runs[expansion][season][1][zones[i]]
+        loss = loss + db.profile.runs[expansion][season][2][zones[i]]
         local dungeonRuns = db.profile.runs[expansion][season][1][zones[i]] + db.profile.runs[expansion][season][2][zones[i]]
         local name = C_ChallengeMode.GetMapUIInfo(zones[i])
         local avgLvl = 0
@@ -452,6 +456,7 @@ local function TotalRuns()
             avgLvl = avgLvl/#db.profile.avglvl[expansion][season][1][zones[i]]
         end
 
+
         avgLvl = string.format("%.1f", avgLvl)
 
         table.insert(zoneNames, name)
@@ -463,11 +468,12 @@ local function TotalRuns()
     end
     levels = levels/#zones
 
-    --return fontColor.yellow:format(" "..name.."\n\n "..L["Avg. Level: "])..string.format("%.1f", avgLvl).."\n"
+    if loss == 0 then loss = 1 end
+    win = string.format("%.2f", win/loss)
 
 
 
-    return fontColor.yellow:format(L["Total Runs: "])..runs, zoneNames, zoneRuns, fontColor.yellow:format(L["Avg. Level: "])..string.format("%.1f", levels), zoneLevels
+    return fontColor.yellow:format(L["Total Runs: "])..runs, zoneNames, zoneRuns, fontColor.yellow:format(L["Avg. Level: "])..string.format("%.1f", levels), zoneLevels, fontColor.yellow:format(L["Intime/Overtime Ratio: "])..win
 end
 
 local function GetTitle(zoneID)
@@ -1257,7 +1263,7 @@ local function AddConfig()
                                     },
                                 },
                             },
-                            InfoSpace = {
+                            InfoSpace1 = {
                                 order = 30,
                                 type = "header",
                                 name = "",
@@ -1289,6 +1295,19 @@ local function AddConfig()
                                         width = 1.6,
                                     },
                                 },
+                            },
+                            InfoSpace2 = {
+                                order = 60,
+                                type = "header",
+                                name = "",
+                                width = "half",
+                            },
+                            WLTitle = {
+                                order = 70,
+                                fontSize = "large",
+                                name = function() return select(6,TotalRuns()) end,
+                                type = "description",
+                                width = "full",
                             },
                         },
                     },
