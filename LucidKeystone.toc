@@ -1,0 +1,16 @@
+## Interface: 90002
+## Version: v0.2.0-Beta
+## Title: Lucid Keystone
+## Notes: Customizable Mythic+ Timer and Objective Tracker
+## Author: Hiraz
+## X-Website: https://www.curseforge.com/wow/addons/lucid-keystone
+## X-Donate: https://www.paypal.com/paypalme/hirazdh
+## SavedVariables: LucidKeystoneDB
+## OptionalDeps: Ace3
+
+Libs\Libs.xml
+Locale\Locales.xml
+
+core.lua
+
+modules\init.xml
