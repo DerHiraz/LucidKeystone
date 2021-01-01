@@ -1204,21 +1204,6 @@ local function AddConfig()
                             [4] = L["Season"].." 4",
                         },
                     },
-                    TotalKeysSpace = {
-                        type = "description",
-                        name = "",
-                        desc = "",
-                        width = 1.2,
-                        order = 3,
-                    },
-                    TotalKeys = {
-                        type = "description",
-                        name = function() return TotalRuns() end,
-                        desc = "",
-                        width = 0.6,
-                        order = 4,
-
-                    },
                     Dungeon1  = dungeonTable[1],
                     Dungeon2  = dungeonTable[2],
                     Dungeon3  = dungeonTable[3],
