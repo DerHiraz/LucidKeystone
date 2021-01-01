@@ -7,7 +7,7 @@
 
 ![Main Window](https://i.gyazo.com/a05d968746c782f9d10679efdba8af52.png)
 
-Description here!
+Lucid Keystone is a custom Mythic+ timer for an advanced display of various timers, deaths and progress. Furthermore, the addon is also designed to display advanced statistics about the finished keystones.
 
 ## Features
  - One
