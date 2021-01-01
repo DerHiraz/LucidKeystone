@@ -80,7 +80,7 @@ local function eventHandler(self, e, ...)
         end
     end
     if e == "CHAT_MSG_PARTY" or e == "CHAT_MSG_PARTY_LEADER" then
-        if select(1, ...) == "!keys" or select(1, ...) == "!Keys" then
+        if (select(1, ...) == "!keys" or select(1, ...) == "!Keys") and db.profile.postCom then
             KeyPost(true)
         end
     end
@@ -90,7 +90,7 @@ local function eventHandler(self, e, ...)
         end
     end
     if e == "CHAT_MSG_GUILD" then
-        if select(1, ...) == "!keys" or select(1, ...) == "!Keys" then
+        if (select(1, ...) == "!keys" or select(1, ...) == "!Keys") and db.profile.postCom then
             KeyPost(true, true)
         end
     end
