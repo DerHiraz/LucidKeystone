@@ -202,7 +202,10 @@ local function bootlegRepeatingTimer()
     if db.profile.start then
         local time = GetElapsedTime()
         local _,_,maxTime = C_ChallengeMode.GetMapUIInfo(C_ChallengeMode.GetActiveChallengeMapID())
-        if maxTime ~= nil then
+        
+        if not maxTime then
+            return
+        else
             local level = C_ChallengeMode.GetActiveKeystoneInfo()
             local f = LucidKeystoneFrame
             local bar = LucidKeystoneFrameBar
