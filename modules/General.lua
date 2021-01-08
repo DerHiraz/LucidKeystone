@@ -94,6 +94,11 @@ local function eventHandler(self, e, ...)
             KeyPost(true, true)
         end
     end
+    if e == "PLAYER_LOGIN" and db.profile.InitTest then
+        message("hi")
+        db.profile.InitTest = false
+    end
+
 end
 
 local function ToggleGeneralFrame()
@@ -107,6 +112,7 @@ local function ToggleGeneralFrame()
     general:RegisterEvent("CHAT_MSG_PARTY")
     general:RegisterEvent("CHAT_MSG_PARTY_LEADER")
     general:RegisterEvent("CHAT_MSG_GUILD")
+    general:RegisterEvent("PLAYER_LOGIN")
 end
 
 function Module.General:OnInitialize()
