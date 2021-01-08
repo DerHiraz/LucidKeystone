@@ -13,3 +13,7 @@
 ## 0003
 
 - fixed Keypost Bug
+
+## 0004
+
+- implemented time waste 
