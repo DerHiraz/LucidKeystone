@@ -42,7 +42,7 @@ L["Fire"] = true
 L["Display"] = true
 L["What do you want to see?"] = true
 L["Boss Counter"] = true
-L["Display you the killed bosses.\n\ne.g.\n[Simple = 3/4]\n[Extended = Name 0/1]"] = true
+L["Displays you the killed bosses.\n\ne.g.\n[Simple = 3/4]\n[Extended = Name 0/1]"] = true
 L["Extended"] = true
 L["Timestamp on Bosskill"] = true
 L["Gives you a timestamp if you kill a boss."] = true
@@ -103,6 +103,12 @@ L["Level"] = true
 L["Time"] = true
 L["Date"] = true
 L["Intime/Overtime Ratio: "] = true
+L["Time Spent in Mythic+"] = true
+L["Days:"] = true
+L["Hours:"] = true
+L["Minutes:"] = true
+L["Seconds:"] = true
+L["Per Run:"] = true
 
 --## About
 L["About"] = true
