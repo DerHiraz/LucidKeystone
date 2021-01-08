@@ -14,6 +14,9 @@
 
 - fixed Keypost Bug
 
-## 0004
+## 0.2.2-Beta
 
-- implemented time waste 
+## 0001
+
+- implemented time waste
+- fixed decent bugs
