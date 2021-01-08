@@ -145,6 +145,7 @@ local defaults = {
         start           = false,
         invertPerc      = false,
         MobPercStep     = true,
+        InitTest        = false,
         background      = 2,
         sparkle         = 3,
         bosses          = 3,
@@ -330,9 +331,10 @@ function Module:SetOption(option, val)
     end
 end
 
-local function TimeFormat(time) 
+local function TimeFormat(time,dayInd)
     local format_minutes = "%.2d:%.2d"
     local format_hours = "%d:%.2d:%.2d"
+    local format_days = "%d:%.2d:%.2d:%.2d"
     local prefix = ""
     if time < 0 then
         time = time * -1
@@ -340,12 +342,20 @@ local function TimeFormat(time)
     end
     local seconds = time % 60 -- seconds/min
     local minutes = math.floor((time / 60) % 60) -- min/hr
-    local hours = math.floor(time / 3600)
-    if hours == 0 then
-        return prefix .. string.format(format_minutes, minutes, seconds)
+    local hours = math.floor((time / 3600) % 24)
+    local days = math.floor(time/86400)
+    
+    if not dayInd then
+        if hours == 0 then
+            return prefix .. string.format(format_minutes, minutes, seconds)
+        else
+            return prefix .. string.format(format_hours, hours, minutes, seconds)
+        end
     else
-        return prefix .. string.format(format_hours, hours, minutes, seconds)
+        return prefix .. string.format(format_days, days, hours, minutes, seconds)
     end
+
+
 end
 
 local function GetStarsSymbol(time, zoneID)
@@ -439,7 +449,6 @@ local function TotalRuns()
     local zoneNames = {}
     local zoneLevels = {}
 
-
     for i = 1, #zones do
         runs = runs + db.profile.runs[expansion][season][1][zones[i]] + db.profile.runs[expansion][season][2][zones[i]]
         win = win + db.profile.runs[expansion][season][1][zones[i]]
@@ -456,7 +465,6 @@ local function TotalRuns()
             avgLvl = avgLvl/#db.profile.avglvl[expansion][season][1][zones[i]]
         end
 
-
         avgLvl = string.format("%.1f", avgLvl)
 
         table.insert(zoneNames, name)
@@ -471,9 +479,45 @@ local function TotalRuns()
     if loss == 0 then loss = 1 end
     win = string.format("%.2f", win/loss)
 
-
-
     return fontColor.yellow:format(L["Total Runs: "])..runs, zoneNames, zoneRuns, fontColor.yellow:format(L["Avg. Level: "])..string.format("%.1f", levels), zoneLevels, fontColor.yellow:format(L["Intime/Overtime Ratio: "])..win
+end
+
+function split(s, delimiter)
+    result = {}
+    for match in (s..delimiter):gmatch("(.-)"..delimiter) do
+        table.insert(result, match)
+    end
+    if #result == 2 then
+        table.insert(result, 1, 0)
+    end
+    return result
+end
+
+local function TimeSpend()
+    local zones = {375,376,377,378,379,380,381,382}
+    local expansion = db.profile.expansion
+    local season = db.profile.season
+    local result = 0
+    local runs = 0
+    local resultPer = 0
+
+    for i = 1, #zones do
+        local duration = db.profile.dungeonHistory[expansion][season][zones[i]].durationTrans
+        for n = 1, #duration do
+            local split = split(duration[n],":")
+            result = result+split[1]*(3600/1)+split[2]*(60/1)+split[3]
+        end
+    end
+    for i = 1, #zones do
+        runs = runs + db.profile.runs[expansion][season][1][zones[i]] + db.profile.runs[expansion][season][2][zones[i]]
+    end
+
+    if runs >= 1 then
+        runs = TimeFormat(result/runs)
+    end
+    result = split(TimeFormat(result,true),":")
+
+    return result, runs
 end
 
 local function GetTitle(zoneID)
@@ -536,6 +580,10 @@ local function GetHistoryTable(zoneID)
     }
     return historyTable
 end
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--  Dungeon loop
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 local zoneTable
 if GetExpansionLevel() == 7 then
@@ -665,6 +713,10 @@ for i = 1, #zoneTable do
     }
     table.insert(dungeonTable, tablefor)
 end
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--  CONFIG MENU
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 local function AddConfig()
@@ -853,7 +905,7 @@ local function AddConfig()
                             bosses = {
                                 type = "select",
                                 name = L["Boss Counter"],
-                                desc = L["Display you the killed bosses.\n\ne.g.\n[Simple = 3/4]\n[Extended = Name 0/1]"],
+                                desc = L["Displays you the killed bosses.\n\ne.g.\n[Simple = 3/4]\n[Extended = Name 0/1]"],
                                 set = function(_, val)
                                     Module:SetOption("bosses", val)
                                     Module:BossesText()
@@ -1162,6 +1214,17 @@ local function AddConfig()
                                 width = 1.2,
                                 order = 60,
                             },
+                            InitTest = {
+                                type = "toggle",
+                                name = "TEST",
+                                desc = "TEST",
+                                set = function(_, val)
+                                    Module:SetOption("InitTest", val)
+                                end,
+                                get = function() return Module:GetOption("InitTest") end,
+                                width = "full",
+                                order = 70,
+                            },
                         },
                     },
                 },
@@ -1294,6 +1357,57 @@ local function AddConfig()
                                 type = "description",
                                 width = "full",
                             },
+                            InfoSpace3 = {
+                                order = 80,
+                                type = "header",
+                                name = "",
+                                width = "half",
+                            },
+                            TS = {
+                                order = 90,
+                                fontSize = "large",
+                                name = fontColor.yellow:format(L["Time Spent in Mythic+"]),
+                                type = "description",
+                                width = "full",
+                            },
+                            TimeSpendTab = {
+                                type = "group",
+                                name = " ",
+                                inline = true,
+                                order = 100,
+                                args = {
+                                    TimeSpendName = {
+                                        order = 10,
+                                        name = L["Days:"].."\n"..L["Hours:"].."\n"..L["Minutes:"].."\n"..L["Seconds:"],
+                                        type = "description",
+                                        width = 0.5,
+                                    },
+                                    TimeSpendTime = {
+                                        order = 20,
+                                        name = function() return table.concat(TimeSpend(), "\n") end,
+                                        type = "description",
+                                        width = 1.6,
+                                    },
+                                    TimeSpendSep = {
+                                        order = 30,
+                                        name = " ",
+                                        type = "description",
+                                        width = "full",
+                                    },
+                                    TimeSpendPerRun = {
+                                        order = 40,
+                                        name = "Ø "..L["Per Run:"],
+                                        type = "description",
+                                        width = 0.5,
+                                    },
+                                    TimeSpendPerRunCount = {
+                                        order = 50,
+                                        name = function() return select(2,TimeSpend()) end,
+                                        type = "description",
+                                        width = 1.6,
+                                    },
+                                },
+                            },
                         },
                     },
                 },
@@ -1378,7 +1492,6 @@ end
 function SlashCmdList.LKt()
     backdroplist[11] = "April Fool"
 end
-
 
 function Module:OnInitialize()
     db = LibStub("AceDB-3.0"):New("LucidKeystoneDB", defaults)
