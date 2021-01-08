@@ -1,5 +1,5 @@
 ## Interface: 90002
-## Version: v0.2.2.0001-Beta
+## Version: v0.2.2.b0002
 ## Title: Lucid Keystone
 ## Notes: Customizable Mythic+ Timer and Objective Tracker
 ## Author: Hiraz
