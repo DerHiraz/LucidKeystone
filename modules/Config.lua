@@ -1222,6 +1222,7 @@ local function AddConfig()
                                     Module:SetOption("InitTest", val)
                                 end,
                                 get = function() return Module:GetOption("InitTest") end,
+                                disabled = true,
                                 width = "full",
                                 order = 70,
                             },
