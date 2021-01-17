@@ -7,6 +7,10 @@ local Module = {
 }
 local db
 
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--  General Tables
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 local msgTable = {
     L["Let the fun begin and good luck!"].."|r",
     L["Okay, lets go!"].."|r",
@@ -19,6 +23,11 @@ local msgTable = {
     L["Keep calm and blame it on the lag."].."|r",
 }
 
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--  Function Section
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Option for Autoplace the Keystone into Podestal
 local function AutoPlaceKey()
     local auto = db.profile.autoPlace
     local instance = IsInInstance()
@@ -39,6 +48,7 @@ local function AutoPlaceKey()
     end
 end
 
+-- Start Message for the Run
 local function GetStartMsg()
     if db.profile.history then
         PlaySound(111365,"Master")
@@ -46,6 +56,8 @@ local function GetStartMsg()
     end
 end
 
+-- Keypost Function
+---- Find Keystone in Bags
 local keystone = nil
 local function KeyPost(force,guild)
         for bag = 0, NUM_BAG_SLOTS do
@@ -67,13 +79,22 @@ local function KeyPost(force,guild)
     end
 end
 
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--  Event Section
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 local function eventHandler(self, e, ...)
+    -- Autoplace Function
     if e == "CHALLENGE_MODE_KEYSTONE_RECEPTABLE_OPEN" then
         AutoPlaceKey()
     end
+
+    -- Start Message Function
     if e == "CHALLENGE_MODE_START" then
         GetStartMsg()
     end
+
+    -- Keypost Function
     if e == "BAG_UPDATE" then
         if db.profile.postCom then
             KeyPost()
@@ -94,6 +115,8 @@ local function eventHandler(self, e, ...)
             KeyPost(true, true)
         end
     end
+
+    -- First Use Function
     if e == "PLAYER_LOGIN" and db.profile.InitTest then
         message("hi")
         db.profile.InitTest = false
@@ -101,6 +124,7 @@ local function eventHandler(self, e, ...)
 
 end
 
+-- Set Events
 local function ToggleGeneralFrame()
     LucidKeystoneGeneralFrame = CreateFrame("Frame", "LucidKeystoneGeneralFrame", UIParent)
     local general = LucidKeystoneGeneralFrame
@@ -115,6 +139,7 @@ local function ToggleGeneralFrame()
     general:RegisterEvent("PLAYER_LOGIN")
 end
 
+--Initialize function
 function Module.General:OnInitialize()
     db = LibStub("AceDB-3.0"):New("LucidKeystoneDB", defaults)
     ToggleGeneralFrame()
