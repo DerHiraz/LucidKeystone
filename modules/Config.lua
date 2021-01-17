@@ -12,6 +12,12 @@ local fontColor = {
     blue    = "|cff009dd5%s|r",
 }
 
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--  Profile Default Settings
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------  Blank Tables
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 local dungeonListInt = {
     [244] = 0,
     [245] = 0,
@@ -111,13 +117,24 @@ local historyListTableBest = {
     [381] = bestListTable,
     [382] = bestListTable,
 }
+local statDB = {
+    deaths = 0,
+    volcanic = 0,
+    pride = 0,
+}
 
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------  Defaults
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 local defaults = {
     global = {
         --global defaults
+        statistic = statDB,
     },
     profile = {
+        --character defaults
+        statistic       = statDB,
         colorit         = {
                             r = 0,
                             g = 0.7,
@@ -128,6 +145,18 @@ local defaults = {
                             r = 1,
                             g = 1,
                             b = 1,
+                            a = 1,
+                        },
+        timerBarColor   = {
+                            r = 0,
+                            g = 0.7,
+                            b = 1,
+                            a = 1,
+                        },
+        mobBarColor     = {
+                            r = 0.5,
+                            g = 1,
+                            b = 0,
                             a = 1,
                         },
         timeStamp       = true,
@@ -142,6 +171,7 @@ local defaults = {
         pridefulAlert   = false,
         postCom         = false,
         autoPost        = false,
+        autoRole        = false,
         start           = false,
         invertPerc      = false,
         MobPercStep     = true,
@@ -271,6 +301,7 @@ local defaults = {
     },
 }
 
+--Backdrop
 local backdroplist = {
     [1] = L["None"],
     [2] = L["Blizzard Default"],
@@ -284,12 +315,17 @@ local backdroplist = {
     [10] = L["Paradox"],
 }
 
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--  Reset Function
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 local function ResetConfig()
     local excludeRuns = db.profile.runs
     local excludeAvg = db.profile.avglvl
     local excludeIntime = db.profile.bestIntime
     local excludeOvertime = db.profile.bestOvertime
     local excludehistory = db.profile.dungeonHistory
+    local excludestats = db.profile.statistic
     db:RegisterDefaults(defaults)
     db:ResetProfile()
     db.profile.runs = excludeRuns
@@ -297,11 +333,12 @@ local function ResetConfig()
     db.profile.bestIntime = excludeIntime
     db.profile.bestOvertime = excludeOvertime
     db.profile.dungeonHistory = excludehistory
+    db.profile.statistic = excludestats
     LibStub("AceConfigRegistry-3.0"):NotifyChange("LucidKeystone")
     StaticPopup_Show("LucidKeystone_ReloadPopup")
+    db.profile.season = C_MythicPlus.GetCurrentSeason()
     Module:ToggleFrames()
 end
-
 
 function Module:GetOption(option)
     return db.profile[option]
@@ -331,6 +368,11 @@ function Module:SetOption(option, val)
     end
 end
 
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--  General Functions
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Timeformats
 local function TimeFormat(time,dayInd)
     local format_minutes = "%.2d:%.2d"
     local format_hours = "%d:%.2d:%.2d"
@@ -354,10 +396,9 @@ local function TimeFormat(time,dayInd)
     else
         return prefix .. string.format(format_days, days, hours, minutes, seconds)
     end
-
-
 end
 
+--Stars
 local function GetStarsSymbol(time, zoneID)
     local _,_,maxTime = C_ChallengeMode.GetMapUIInfo(zoneID)
     if time == 0 then
@@ -373,6 +414,26 @@ local function GetStarsSymbol(time, zoneID)
     end
 end
 
+local function ToggleAutoRole()
+    if db.profile.autoRole then
+        LFDRoleCheckPopupAcceptButton:SetScript("OnShow", function()
+            LFDRoleCheckPopupAcceptButton:Click()
+        end)
+        LFGListApplicationDialog:SetScript("OnShow", function()
+            LFGListApplicationDialog.SignUpButton:Click()
+        end)
+    else
+        LFDRoleCheckPopupAcceptButton:SetScript("OnShow", nil)
+        LFGListApplicationDialog.SignUpButton:SetScript("OnShow", nil)
+    end
+end
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--  Dungeon Tab Information
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Best for Dungeon Intime
 local function dungeonInfo(zoneID)
     local inTimeLevel, inTimeDur, inTimeDate, inTimeStars
     local expansion = db.profile.expansion
@@ -405,6 +466,7 @@ local function dungeonInfo(zoneID)
     .."\n"..fontColor.yellow:format(L["Runs: "])..db.profile.runs[expansion][season][1][zoneID].."  ("..string.format("%.1f", runPerc).."%)"
 end
 
+-- Best for Dungeon Overtime
 local function dungeonInfo2(zoneID)
     local overTimeLevel, overTimeDur, overTimeDate
     local expansion = db.profile.expansion
@@ -429,6 +491,7 @@ local function dungeonInfo2(zoneID)
     .."\n "
 end
 
+-- Runs for Dungeons
 local function dungeonInfo3(zoneID)
     local expansion = db.profile.expansion
     local season = db.profile.season
@@ -437,6 +500,11 @@ local function dungeonInfo3(zoneID)
     return "\n\n"..fontColor.yellow:format(L["Total Runs: "])..runs.."\n\n"
 end
 
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--  Dungeon Tab Total Information for Character
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+--Total Runs
 local function TotalRuns()
     local expansion = db.profile.expansion
     local season = db.profile.season
@@ -482,6 +550,7 @@ local function TotalRuns()
     return fontColor.yellow:format(L["Total Runs: "])..runs, zoneNames, zoneRuns, fontColor.yellow:format(L["Avg. Level: "])..string.format("%.1f", levels), zoneLevels, fontColor.yellow:format(L["Intime/Overtime Ratio: "])..win
 end
 
+-- Simple String split function
 function split(s, delimiter)
     result = {}
     for match in (s..delimiter):gmatch("(.-)"..delimiter) do
@@ -493,6 +562,7 @@ function split(s, delimiter)
     return result
 end
 
+-- Time Spent in MPlus
 local function TimeSpend()
     local zones = {375,376,377,378,379,380,381,382}
     local expansion = db.profile.expansion
@@ -520,6 +590,8 @@ local function TimeSpend()
     return result, runs
 end
 
+-- Title Information for Dungeon
+----Avg. Level for Dungeon
 local function GetTitle(zoneID)
     local expansion = db.profile.expansion
     local season = db.profile.season
@@ -559,6 +631,7 @@ local mapID = {
     [382] = {ShortName = "ToP"}, 
 }
 
+-- Dungeon Runs History as Table in Dungeon Tab
 local function GetHistoryTable(zoneID)
     local expansion = db.profile.expansion
     local season = db.profile.season
@@ -585,6 +658,7 @@ end
 --  Dungeon loop
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+-- Default Dungeon ID's
 local zoneTable
 if GetExpansionLevel() == 7 then
     zoneTable = {244,245,246,247,248,249,250,251,252,353,369,370}
@@ -592,6 +666,8 @@ else
     zoneTable = {375,376,377,378,379,380,381,382}
 end
 local dungeonTable = {}
+
+--Loop for Dungeons in Dungeon Tab
 for i = 1, #zoneTable do
     local ord = i*10
     local tablefor = {
@@ -599,6 +675,7 @@ for i = 1, #zoneTable do
         name = mapID[zoneTable[i]].ShortName,
         order = ord,
         args = {
+            --Portrait
             dungeon = {
                 order = 10,
                 name = "",
@@ -611,6 +688,7 @@ for i = 1, #zoneTable do
                 imageHeight = 64,
                 width = 0.4,
             },
+            --Name for Dungeon
             dungeonText = {
                 order = 20,
                 fontSize = "large",
@@ -620,6 +698,7 @@ for i = 1, #zoneTable do
                 type = "description",
                 width = 2,
             },
+            --Avg. Level
             dungeonText2 = {
                 order = 30,
                 fontSize = "medium",
@@ -629,6 +708,7 @@ for i = 1, #zoneTable do
                 type = "description",
                 width = 1.5,
             },
+            --Best Intime
             dungeonText3 = {
                 order = 40,
                 fontSize = "medium",
@@ -638,6 +718,7 @@ for i = 1, #zoneTable do
                 type = "description",
                 width = 1,
             },
+            --Best Overtime
             dungeonText4 = {
                 order = 50,
                 fontSize = "medium",
@@ -647,12 +728,15 @@ for i = 1, #zoneTable do
                 type = "description",
                 width = "full",
             },
+            --Table for completed Dungeons
             historyRuns = {
                 type = "group",
                 name = L["Dungeon History"],
                 inline = true,
                 order = 60,
                 args = {
+                    --Header
+                    ----Level
                     historylevelT = {
                         order = 1,
                         fontSize = "medium",
@@ -660,6 +744,7 @@ for i = 1, #zoneTable do
                         type = "description",
                         width = 1,
                     },
+                    ----Time
                     historytimeT = {
                         order = 2,
                         fontSize = "medium",
@@ -667,6 +752,7 @@ for i = 1, #zoneTable do
                         type = "description",
                         width = 1,
                     },
+                    ----Date
                     historydateT = {
                         order = 3,
                         fontSize = "medium",
@@ -674,12 +760,14 @@ for i = 1, #zoneTable do
                         name = fontColor.yellow:format(L["Date"]),
                         width = 1,
                     },
+                    -- Seperator
                     historyS = {
                         order = 4,
                         type = "header",
                         name = "",
                         width = "half",
                     },
+                    -- Table Levels
                     historylevel = {
                         order = 10,
                         fontSize = "medium",
@@ -689,6 +777,7 @@ for i = 1, #zoneTable do
                         type = "description",
                         width = 1,
                     },
+                    -- Table Times
                     historytime = {
                         order = 20,
                         fontSize = "medium",
@@ -698,6 +787,7 @@ for i = 1, #zoneTable do
                         type = "description",
                         width = 1,
                     },
+                    -- Table Dates
                     historydate = {
                         order = 30,
                         fontSize = "medium",
@@ -723,6 +813,7 @@ local function AddConfig()
     local options =
     {
         name = function()
+            --Title Info by Addon
             if InterfaceOptionsFrame:IsShown() then
                 return ""
             else
@@ -743,6 +834,7 @@ local function AddConfig()
         get = get_set,
         set = get_set,
         args = {
+            --Header in Options
             logo = {
                 order = 10,
                 type = "description",
@@ -758,6 +850,7 @@ local function AddConfig()
                 inline = true,
                 order = 20,
                 args = {
+                    -- Buttons
                     previewButton = {
                         order = 10,
                         name = L["Preview"],
@@ -801,12 +894,16 @@ local function AddConfig()
                     },
                 },
             },
+            --Tab Section
             styleTab = {
                 type = "group",
                 name = L["Style"],
                 childGroups = "tab",
                 order = 30,
                 args = {
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+----------  Style Tab
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
                     style = {
                         type = "group",
                         name = " ",
@@ -852,6 +949,7 @@ local function AddConfig()
                                     local color = Module:GetOption("colorit")
                                     return color["r"], color["g"], color["b"], color["a"]
                                 end,
+                                disabled = function() return db.profile.background ~= 6 end,
                                 width = 1.2,
                                 order = 40,
                             },
@@ -883,21 +981,128 @@ local function AddConfig()
                     },
                 },
             },
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+----------  Display Tab
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
             displayTab = {
                 type = "group",
                 name = L["Display"],
                 childGroups = "tab", 
                 order = 40,
                 args = {
-                    display = {
+                    displayTimer = {
                         type = "group",
                         name = " ",
                         order = 10,
                         inline = true,
                         args = {
+                            displayTimerHeader = {
+                                order = 10,
+                                name = L["Timer"],
+                                type = "description",
+                                fontSize = "large",
+                                width = "full",
+                            },
+                            mainTimer = {
+                                type = "select",
+                                name = L["Main Timer"],
+                                desc = "",
+                                set = function(_, val)
+                                    Module:SetOption("mainTimer", val)
+                                    Module:TimerText()
+                                end,
+                                get = function() return Module:GetOption("mainTimer") end,
+                                width = 1.2,
+                                order = 20,
+                                values = {
+                                    [1] = L["Time Passed"],
+                                    [2] = L["Time Remaining"],
+                                },
+                            },
+                            TimerBarColor = {
+                                type = "color",
+                                name = L["Timer Bar Color"],
+                                desc = "",
+                                hasAlpha = false,
+                                set = function(_, r, g, b, a)
+                                    Module:SetOption("timerBarColor", { ["r"] = r, ["g"] = g, ["b"] = b, ["a"] = a })
+                                    Module:SetTimerBarColor()
+                                end,
+                                get = function()
+                                    local color = Module:GetOption("timerBarColor")
+                                    return color["r"], color["g"], color["b"], color["a"]
+                                end,
+                                width = 1.2,
+                                order = 30,
+                            },
+                            plusOne = {
+                                type = "toggle",
+                                name = L["Show"].." +1",
+                                desc = "",
+                                set = function(_, val)
+                                    Module:SetOption("plusOne", val)
+                                    Module:PlusTimer()
+                                end,
+                                get = function() return Module:GetOption("plusOne") end,
+                                disabled = function()
+                                    return Module:GetOption("smartTimer")
+                                end,
+                                width = 1,
+                                order = 40,
+                            },
+                            plusTwo = {
+                                type = "toggle",
+                                name = L["Show"].." +2",
+                                desc = "",
+                                set = function(_, val)
+                                    Module:SetOption("plusTwo", val)
+                                    Module:PlusTimer()
+                                end,
+                                get = function() return Module:GetOption("plusTwo") end,
+                                disabled = function()
+                                    return Module:GetOption("smartTimer")
+                                end,
+                                width = 1,
+                                order = 50,
+                            },
+                            plusThree = {
+                                type = "toggle",
+                                name = L["Show"].." +3",
+                                desc = "",
+                                set = function(_, val)
+                                    Module:SetOption("plusThree", val)
+                                    Module:PlusTimer()
+                                end,
+                                get = function() return Module:GetOption("plusThree") end,
+                                disabled = function()
+                                    return Module:GetOption("smartTimer")
+                                end,
+                                width = 1,
+                                order = 60,
+                            },
+                            smartTimer = {
+                                type = "toggle",
+                                name = L["Smart Timer"],
+                                desc = L["You only see the timer to the next possible\nupgrade."],
+                                set = function(_, val)
+                                    Module:SetOption("smartTimer", val)
+                                    Module:PlusTimer()
+                                end,
+                                get = function() return Module:GetOption("smartTimer") end,
+                                width = 1,
+                                order = 70,
+                            },
+                        },
+                    },
+                    displayBosses = {
+                        type = "group",
+                        name = " ",
+                        order = 20,
+                        inline = true,
+                        args = {
                             displayHeader = {
                                 order = 10,
-                                name = L["What do you want to see?"],
+                                name = L["Bosses"],
                                 type = "description",
                                 fontSize = "large",
                                 width = "full",
@@ -934,6 +1139,145 @@ local function AddConfig()
                                 width = 1.2,
                                 order = 30,
                             },
+                        },
+                    },
+                    displayMobs = {
+                        type = "group",
+                        name = " ",
+                        order = 30,
+                        inline = true,
+                        args = {
+                            displayHeaderM = {
+                                order = 10,
+                                name = L["Mob Counter"],
+                                type = "description",
+                                fontSize = "large",
+                                width = "full",
+                            },
+                            mobCount = {
+                                type = "select",
+                                name = L["Mob Counter"],
+                                desc = "",
+                                set = function(_, val)
+                                    Module:SetOption("mobCount", val)
+                                    Module:MobBar()
+                                    Module:BackgroundUpdate()
+                                    Module:BossesText()
+                                    Module:AffixText()
+                                end,
+                                get = function() return Module:GetOption("mobCount") end,
+                                width = 1.2,
+                                order = 20,
+                                values = {
+                                    [1] = L["Text only"],
+                                    [2] = L["Text and Progress Bar"],
+                                },
+                            },
+                            MobBarColor = {
+                                type = "color",
+                                name = L["Mob Bar Color"],
+                                desc = "",
+                                hasAlpha = false,
+                                set = function(_, r, g, b, a)
+                                    Module:SetOption("mobBarColor", { ["r"] = r, ["g"] = g, ["b"] = b, ["a"] = a })
+                                    Module:SetMobBarColor()
+                                end,
+                                get = function()
+                                    local color = Module:GetOption("mobBarColor")
+                                    return color["r"], color["g"], color["b"], color["a"]
+                                end,
+                                disabled = function() return db.profile.mobCount == 1 end,
+                                width = 1.2,
+                                order = 30,
+                            },
+                            invertPerc = {
+                                type = "toggle",
+                                name = L["Invert Progress Bar"],
+                                desc = L["Invert the Progress Bar to count down the percentage."],
+                                set = function(_, val)
+                                    Module:SetOption("invertPerc", val)
+                                    Module:MobBar()
+                                end,
+                                get = function() return Module:GetOption("invertPerc") end,
+                                disabled = function()
+                                    return Module:GetOption("mobCount") == 1
+                                end,
+                                width = 1,
+                                order = 40,
+                            },
+                            MobPercStep = {
+                                type = "toggle",
+                                name = L["Mob Count in Percent"],
+                                desc = L["Shows the Mob Count in Percent instead of the exact Number."],
+                                set = function(_, val)
+                                    Module:SetOption("MobPercStep", val)
+                                    Module:MobUpdateConfig()
+                                end,
+                                get = function() return Module:GetOption("MobPercStep") end,
+                                width = 1,
+                                order = 50,
+                            },
+                        },
+                    },
+                    displayKey = {
+                        type = "group",
+                        name = " ",
+                        order = 40,
+                        inline = true,
+                        args = {
+                            displayHeaderK = {
+                                order = 10,
+                                name = L["Keylevel"],
+                                type = "description",
+                                fontSize = "large",
+                                width = "full",
+                            },
+                            keyColor = {
+                                type = "toggle",
+                                name = L["Raider.IO Keylevel color"],
+                                desc = L["Shows Raider.IO colors as Keylevel."],
+                                set = function(_, val)
+                                    Module:SetOption("keyColor", val)
+                                    Module:KeyLevel()
+                                end,
+                                disabled = function()
+                                    return not IsAddOnLoaded("RaiderIO")
+                                end,
+                                get = function() return Module:GetOption("keyColor") end,
+                                width = 1,
+                                order = 20,
+                            },
+                            customKeyColor = {
+                                type = "color",
+                                name = L["Custom Key Color"],
+                                desc = "",
+                                hasAlpha = false,
+                                set = function(_, r, g, b, a)
+                                    Module:SetOption("customKeyColor", { ["r"] = r, ["g"] = g, ["b"] = b, ["a"] = a })
+                                    Module:KeyLevel()
+                                end,
+                                get = function()
+                                    local color = Module:GetOption("customKeyColor")
+                                    return color["r"], color["g"], color["b"], color["a"]
+                                end,
+                                width = 0.8,
+                                order = 30,
+                            },
+                        },
+                    },
+                    displayOthers = {
+                        type = "group",
+                        name = " ",
+                        order = 40,
+                        inline = true,
+                        args = {
+                            displayHeaderK = {
+                                order = 10,
+                                name = L["Others"],
+                                type = "description",
+                                fontSize = "large",
+                                width = "full",
+                            },
                             affix = {
                                 type = "select",
                                 name = L["Display Affix"],
@@ -954,37 +1298,6 @@ local function AddConfig()
                                     [5] = L["Icon - Right"],
                                 },
                             },
-                            keyColor = {
-                                type = "toggle",
-                                name = L["Raider.IO Keylevel color"],
-                                desc = L["Shows Raider.IO colors as Keylevel."],
-                                set = function(_, val)
-                                    Module:SetOption("keyColor", val)
-                                    Module:KeyLevel()
-                                end,
-                                disabled = function()
-                                    return not IsAddOnLoaded("RaiderIO")
-                                end,
-                                get = function() return Module:GetOption("keyColor") end,
-                                width = 1,
-                                order = 50,
-                            },
-                            customKeyColor = {
-                                type = "color",
-                                name = L["Custom Key Color"],
-                                desc = "",
-                                hasAlpha = false,
-                                set = function(_, r, g, b, a)
-                                    Module:SetOption("customKeyColor", { ["r"] = r, ["g"] = g, ["b"] = b, ["a"] = a })
-                                    Module:KeyLevel()
-                                end,
-                                get = function()
-                                    local color = Module:GetOption("customKeyColor")
-                                    return color["r"], color["g"], color["b"], color["a"]
-                                end,
-                                width = 0.8,
-                                order = 60,
-                            },
                             dungeonName = {
                                 type = "select",
                                 name = L["Show Name of Dungeon"],
@@ -1002,144 +1315,13 @@ local function AddConfig()
                                     [3] = L["Short Name"],
                                 },
                             },
-                            mainTimer = {
-                                type = "select",
-                                name = L["Main Timer"],
-                                desc = "",
-                                set = function(_, val)
-                                    Module:SetOption("mainTimer", val)
-                                    Module:TimerText()
-                                end,
-                                get = function() return Module:GetOption("mainTimer") end,
-                                width = 1.2,
-                                order = 80,
-                                values = {
-                                    [1] = L["Time Passed"],
-                                    [2] = L["Time Remaining"],
-                                },
-                            },
-                            mobCount = {
-                                type = "select",
-                                name = L["Mob Counter"],
-                                desc = "",
-                                set = function(_, val)
-                                    Module:SetOption("mobCount", val)
-                                    Module:MobBar()
-                                    Module:BackgroundUpdate()
-                                    Module:BossesText()
-                                    Module:AffixText()
-                                end,
-                                get = function() return Module:GetOption("mobCount") end,
-                                width = 1.2,
-                                order = 90,
-                                values = {
-                                    [1] = L["Text only"],
-                                    [2] = L["Text and Progress Bar"],
-                                },
-                            },
-                            invertPerc = {
-                                type = "toggle",
-                                name = L["Invert Progress Bar"],
-                                desc = L["Invert the Progress Bar to count down the percentage."],
-                                set = function(_, val)
-                                    Module:SetOption("invertPerc", val)
-                                    Module:MobBar()
-                                end,
-                                get = function() return Module:GetOption("invertPerc") end,
-                                disabled = function()
-                                    return Module:GetOption("mobCount") == 1
-                                end,
-                                width = 1,
-                                order = 91,
-                            },
-                            MobPercStep = {
-                                type = "toggle",
-                                name = L["Mob Count in Percent"],
-                                desc = L["Shows the Mob Count in Percent instead of the exact Number."],
-                                set = function(_, val)
-                                    Module:SetOption("MobPercStep", val)
-                                    Module:MobUpdateConfig()
-                                end,
-                                get = function() return Module:GetOption("MobPercStep") end,
-                                width = 1,
-                                order = 92,
-                            },
-                        },
-                    },
-                    displayText = {
-                        type = "group",
-                        name = " ",
-                        order = 20,
-                        inline = true,
-                        args = {
-                            displaySubText = {
-                                order = 10,
-                                name = fontColor.yellow:format(L["Too many timers? Reduce them."]),
-                                type = "description",
-                                fontSize = "medium",
-                                width = "full",
-                            },
-                            plusOne = {
-                                type = "toggle",
-                                name = L["Show"].." +1",
-                                desc = "",
-                                set = function(_, val)
-                                    Module:SetOption("plusOne", val)
-                                    Module:PlusTimer()
-                                end,
-                                get = function() return Module:GetOption("plusOne") end,
-                                disabled = function()
-                                    return Module:GetOption("smartTimer")
-                                end,
-                                width = 1,
-                                order = 20,
-                            },
-                            plusTwo = {
-                                type = "toggle",
-                                name = L["Show"].." +2",
-                                desc = "",
-                                set = function(_, val)
-                                    Module:SetOption("plusTwo", val)
-                                    Module:PlusTimer()
-                                end,
-                                get = function() return Module:GetOption("plusTwo") end,
-                                disabled = function()
-                                    return Module:GetOption("smartTimer")
-                                end,
-                                width = 1,
-                                order = 30,
-                            },
-                            plusThree = {
-                                type = "toggle",
-                                name = L["Show"].." +3",
-                                desc = "",
-                                set = function(_, val)
-                                    Module:SetOption("plusThree", val)
-                                    Module:PlusTimer()
-                                end,
-                                get = function() return Module:GetOption("plusThree") end,
-                                disabled = function()
-                                    return Module:GetOption("smartTimer")
-                                end,
-                                width = 1,
-                                order = 40,
-                            },
-                            smartTimer = {
-                                type = "toggle",
-                                name = L["Smart Timer"],
-                                desc = L["You only see the timer to the next possible\nupgrade."],
-                                set = function(_, val)
-                                    Module:SetOption("smartTimer", val)
-                                    Module:PlusTimer()
-                                end,
-                                get = function() return Module:GetOption("smartTimer") end,
-                                width = 1,
-                                order = 50,
-                            },
                         },
                     },
                 },
             },
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+----------  General Tab
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
             generalTab = {
                 type = "group",
                 name = L["General"],
@@ -1171,8 +1353,20 @@ local function AddConfig()
                                     Module:SetOption("autoPlace", val)
                                 end,
                                 get = function() return Module:GetOption("autoPlace") end,
-                                width = 1.2,
+                                width = 1,
                                 order = 20,
+                            },
+                            autoRole = {
+                                type = "toggle",
+                                name = L["Auto Rolecheck"],
+                                desc = L["Automatically accept your role at each role check."],
+                                set = function(_, val)
+                                    Module:SetOption("autoRole", val)
+                                    ToggleAutoRole()
+                                end,
+                                get = function() return Module:GetOption("autoRole") end,
+                                width = 1,
+                                order = 30,
                             },
                             pridefulAlert = {
                                 type = "toggle",
@@ -1184,10 +1378,10 @@ local function AddConfig()
                                 get = function() return Module:GetOption("pridefulAlert") end,
                                 disabled = true,
                                 width = 1.2,
-                                order = 30,
+                                order = 40,
                             },
                             sperator = {
-                                order = 40,
+                                order = 50,
                                 name = "",
                                 type = "description",
                                 width = 2,
@@ -1201,7 +1395,7 @@ local function AddConfig()
                                 end,
                                 get = function() return Module:GetOption("postCom") end,
                                 width = 1.2,
-                                order = 50,
+                                order = 60,
                             },
                             autoPost = {
                                 type = "toggle",
@@ -1212,7 +1406,7 @@ local function AddConfig()
                                 end,
                                 get = function() return Module:GetOption("autoPost") end,
                                 width = 1.2,
-                                order = 60,
+                                order = 70,
                             },
                             InitTest = {
                                 type = "toggle",
@@ -1224,12 +1418,15 @@ local function AddConfig()
                                 get = function() return Module:GetOption("InitTest") end,
                                 disabled = true,
                                 width = "full",
-                                order = 70,
+                                order = 80,
                             },
                         },
                     },
                 },
             },
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+----------  Dungeon Tab
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
             dungeonTab = {
                 type = "group",
                 name = L["Dungeons"],
@@ -1247,7 +1444,6 @@ local function AddConfig()
                         width = 0.8,
                         order = 1,
                         values = {
-                            [7] = "Battle for Azeroth",
                             [8] = "Shadowlands",
                         },
                     },
@@ -1413,6 +1609,9 @@ local function AddConfig()
                     },
                 },
             },
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+----------  About Tab
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
             aboutTab = {
                 type = "group",
                 name = L["About"],
@@ -1473,17 +1672,32 @@ local function AddConfig()
             },
         },
     }
+    --Add to Blizzard Interface Options
     local AceConfig = LibStub("AceConfig-3.0")
     local AceConfigDialog = LibStub("AceConfigDialog-3.0")
     AceConfig:RegisterOptionsTable(AddonName, options)
     local frame = AceConfigDialog:AddToBlizOptions(AddonName, "Lucid Keystone", nil)
 end
 
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--  Chat Commands
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Open Addon
 for i, v in pairs({"lk", "lucidkeystone"}) do
 	_G["SLASH_LK"..i] = "/"..v
 end
-for i, v in pairs({"lkcat"}) do
+-- Add April fool
+--[[for i, v in pairs({"lkcat"}) do
 	_G["SLASH_LKt"..i] = "/"..v
+end
+-- Print deaths Statistics
+for i, v in pairs({"lkdeaths"}) do
+	_G["SLASH_LKd"..i] = "/"..v
+end]]
+-- Get M+ playtime
+for i, v in pairs({"lkplayed"}) do
+	_G["SLASH_LKplayed"..i] = "/"..v
 end
 
 function SlashCmdList.LK()
@@ -1493,7 +1707,22 @@ end
 function SlashCmdList.LKt()
     backdroplist[11] = "April Fool"
 end
+function SlashCmdList.LKd()
+    print("Death Counter in M+")
+    print("Global: "..db.profile.statistic.deaths)
+    print("Profile: "..db.global.statistic.deaths)
+    print("----------------------")
+end
+function SlashCmdList.LKplayed()
+    local days = select(1,TimeSpend()[1]).." "..L["days"]
+    local hours = select(1,TimeSpend()[2]).." "..L["hours"]
+    local minutes = select(1,TimeSpend()[3]).." "..L["minutes"]
+    local seconds = select(1,TimeSpend()[4]).." "..L["seconds"]
 
+    SendSystemMessage(L["Time played this Season in M+: "]..days..", "..hours..", "..minutes..", "..seconds)
+end
+
+--Initialize function
 function Module:OnInitialize()
     db = LibStub("AceDB-3.0"):New("LucidKeystoneDB", defaults)
     version = GetAddOnMetadata(AddonName, "Version")
