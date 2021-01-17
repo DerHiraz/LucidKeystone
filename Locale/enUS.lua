@@ -41,6 +41,12 @@ L["Fire"] = true
 --## Display Settings
 L["Display"] = true
 L["What do you want to see?"] = true
+L["Timer"] = true
+L["Bosses"] = true
+L["Keylevel"] = true
+L["Others"] = true
+L["Timer Bar Color"] = true
+L["Mob Bar Color"] = true
 L["Boss Counter"] = true
 L["Displays you the killed bosses.\n\ne.g.\n[Simple = 3/4]\n[Extended = Name 0/1]"] = true
 L["Extended"] = true
@@ -83,6 +89,8 @@ L["Activate |cff87ceeb!keys|r Command"] = true
 L["Link your Key in chat by typing |cff87ceeb!keys|r in party/raid chat."] = true
 L["Autopost your Key"] = true
 L["Autopost your Key after finishing a run."] = true
+L["Auto Rolecheck"] = true
+L["Automatically accept your role at each role check."] = true
 
 --## Dungeons
 L["Dungeons"] = true
@@ -109,6 +117,11 @@ L["Hours:"] = true
 L["Minutes:"] = true
 L["Seconds:"] = true
 L["Per Run:"] = true
+L["days"] = true
+L["hours"] = true
+L["minutes"] = true
+L["seconds"] = true
+L["Time played this Season in M+: "] = true
 
 --## About
 L["About"] = true
