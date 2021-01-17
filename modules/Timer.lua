@@ -8,9 +8,9 @@ local Module = {
 local db
 local activeRun = false
 
---[[
-    Tables
-]]
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--  Preview Defaults
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 local previewSettings = {
     ZoneID      = 381,
@@ -81,10 +81,9 @@ local previewSettings = {
                 },
 }
 
-local fontColor = {
-    yellow  = "|cffffd100%s|r",
-    blue    = "|cff009dd5%s|r",
-}
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--  General Tables and Arrays
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 local imgfile = {
     [1] = "lk_bg_None",
@@ -114,6 +113,11 @@ local sparkleEffect = {
     [11] = {animation = 1135053},
 }
 
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--  Function Section
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Time formating for every Timer in Frame
 local function TimeFormat(time) 
     local format_minutes = "%.2d:%.2d"
     local format_hours = "%d:%.2d:%.2d"
@@ -136,21 +140,7 @@ local function MovableCheck()
     LucidKeystoneFrame:SetMovable(db.profile.unlock)
 end
 
-local function GetStars(time, zoneID)
-    local _,_,maxTime = C_ChallengeMode.GetMapUIInfo(zoneID)
-    if time == 0 then
-        return ""
-    elseif time < maxTime*0.6 then
-        return fontColor.yellow:format("***")
-    elseif time < maxTime*0.8 then
-        return fontColor.yellow:format("**")
-    elseif time < maxTime then
-        return fontColor.yellow:format("*")
-    else
-        return ""
-    end
-end
-
+-- Get Base Score by Raider.IO
 local function GetBaseScore(level)
     local score
     if level <= 10 then
@@ -161,6 +151,7 @@ local function GetBaseScore(level)
     return score
 end
 
+-- Get Score Color by Raider.IO
 local function GetScoreColor(score)
     local ScoreColor
     if (IsAddOnLoaded("RaiderIO")) and db.profile.keyColor then
@@ -173,6 +164,7 @@ local function GetScoreColor(score)
     return ScoreColor
 end
 
+-- Get Time for active Run
 local function GetElapsedTime()
     local _, elapsed_time = GetWorldElapsedTime(1)
     
@@ -183,11 +175,13 @@ local function GetElapsedTime()
     return last_elapsed_time
 end
 
+-- Deaths in active Run
 local function GetDeaths()
     local deaths = C_ChallengeMode.GetDeathCount()
     return deaths or 0
 end
 
+-- Mob Count for active Run
 local function GetMobCount()
     local _,_,steps = C_Scenario.GetStepInfo()
     -- last scenario step is the mob count
@@ -198,10 +192,11 @@ local function GetMobCount()
     return current or 0, total or 1, percent or 0
 end
 
+-- Timer Function for active Run
 local function bootlegRepeatingTimer()
     if db.profile.start then
         local time = GetElapsedTime()
-        local _,_,maxTime = C_ChallengeMode.GetMapUIInfo(C_ChallengeMode.GetActiveChallengeMapID())
+        local _,_,maxTime = C_ChallengeMode.GetMapUIInfo(db.profile.GetActiveChallengeMapID)
         
         if not maxTime then
             return
@@ -210,29 +205,16 @@ local function bootlegRepeatingTimer()
             local f = LucidKeystoneFrame
             local bar = LucidKeystoneFrameBar
             local timeSmall = time
+
+            -- Main Timer
             if db.profile.mainTimer == 2 then
                 time = maxTime-time
             end
             if db.profile.mainTimer == 1 then
                 timeSmall = maxTime-timeSmall
             end
-            if time >= maxTime*0.8 then
-                bar:SetStatusBarColor(1, 0.63, 0,1)
-                f.textTimer:SetTextColor(1, 0.63, 0, 1)
-            end
-            if time >= maxTime*0.95 then
-                bar:SetStatusBarColor(1, 0, 0.08,1)
-            end
-            if db.profile.mainTimer == 1 then
-                if time >= maxTime then
-                    f.textTimer:SetTextColor(1, 0, 0.08, 1)
-                end
-            elseif db.profile.mainTimer == 2 then
-                if timeSmall >= maxTime then
-                    f.textTimer:SetTextColor(1, 0, 0.08, 1)
-                end
-            end
 
+            -- Smart Timer Only
             if db.profile.smartTimer then
                 local timer = time
                 if db.profile.mainTimer == 2 then
@@ -264,6 +246,8 @@ local function bootlegRepeatingTimer()
                 f.textTimerTwo:SetText("+2\n"..TimeFormat(maxTime*0.8-timer))
                 f.textTimerThree:SetText("+3\n"..TimeFormat(maxTime*0.6-timer))
             end
+            
+            -- Set Timer to Frame
             local grave = CreateAtlasMarkup("poi-graveyard-neutral")
             bar:SetMinMaxValues(0,maxTime)
             if db.profile.mainTimer == 1 then
@@ -280,9 +264,12 @@ local function bootlegRepeatingTimer()
     end
 end
 
+-- Bosses Killed in active Run
 local function UpdateBosses()
     local f = LucidKeystoneFrame
     if db.profile.bosses == 2 then
+
+        -- Simple display for Bosses
         local simple = {}
         for i = 1, 10 do
             local _,_,_,kill,killOf = C_Scenario.GetCriteriaInfo(i)
@@ -299,6 +286,8 @@ local function UpdateBosses()
         end
         f.textBosses:SetText(count.."/"..#simple)
     elseif db.profile.bosses == 3 then
+
+        -- Extended display for Bosses
         local extended = {}
         for i = 1, 10 do
             local name,_,_,kill,killOf,_,_,_,_,_,killTime = C_Scenario.GetCriteriaInfo(i)
@@ -319,6 +308,7 @@ local function UpdateBosses()
     end
 end
 
+-- Update mobs in Mobcount
 local function UpdateMobs()
     local current, total = GetMobCount()
     local before = current / total * 100
@@ -340,6 +330,7 @@ local function UpdateMobs()
     end
 end
 
+-- Mobupdate on Preview
 function Module.Config:MobUpdateConfig()
     local current = 256
     local total = 285
@@ -353,6 +344,7 @@ function Module.Config:MobUpdateConfig()
     end
 end
 
+-- Get Dungeon Name
 local function UpdateDungeonName()
     if db.profile.dungeonName == 2 then
         LucidKeystoneFrame.textDungeon:SetText(C_ChallengeMode.GetMapUIInfo(db.profile.GetActiveChallengeMapID))
@@ -361,9 +353,13 @@ local function UpdateDungeonName()
     end
 end
 
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--  Event Handler 
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 local function eventHandler(self, e, ...)
     if e == "CHALLENGE_MODE_START" then
-        db.profile.GetActiveChallengeMapID = C_ChallengeMode.GetActiveChallengeMapID()
+        --db.profile.GetActiveChallengeMapID = C_ChallengeMode.GetActiveChallengeMapID()
         Module.Config.ToggleFrames()
         ObjectiveTrackerFrame:Hide()
         LucidKeystoneFrame:Show()
@@ -387,6 +383,8 @@ local function eventHandler(self, e, ...)
             ObjectiveTrackerFrame:Hide()
             LucidKeystoneFrame:Show()
             bootlegRepeatingTimer()
+            UpdateMobs()
+            UpdateDungeonName()
             UpdateBosses()
         end
         if db.profile.start == false then
@@ -397,21 +395,12 @@ local function eventHandler(self, e, ...)
         end
     end
     if e == "CHALLENGE_MODE_COMPLETED" then
-        local _, level, time, onTime = C_ChallengeMode.GetCompletionInfo()
+        --local _, level, time, onTime = C_ChallengeMode.GetCompletionInfo()
+        local _, level, time = C_ChallengeMode.GetCompletionInfo()
         local f = LucidKeystoneFrame
         local bar = LucidKeystoneFrameBar
-        local expansion = GetExpansionLevel()
-        local season = C_MythicPlus.GetCurrentSeason()
-        local seasonNew
-        if season >= 5 then
-            seasonNew = season - 4
-            season = seasonNew
-        end
-        local runs = db.profile.runs[expansion][season]
         local _,_,maxTime = C_ChallengeMode.GetMapUIInfo(db.profile.GetActiveChallengeMapID)
-        local today = C_DateAndTime.GetCurrentCalendarTime()
         time = time/1000
-        db.profile.start = false
         bar:SetMinMaxValues(0,maxTime)
         bar:SetValue(maxTime-time)
         f.textMobs:SetText("100.00%")
@@ -421,34 +410,8 @@ local function eventHandler(self, e, ...)
         f.textTimerOne:SetText("+1\n"..TimeFormat(maxTime))
         f.textTimerTwo:SetText("+2\n"..TimeFormat(maxTime*0.8-time))
         f.textTimerThree:SetText("+3\n"..TimeFormat(maxTime*0.6-time))
-
-        if onTime then
-            local bestIntime = db.profile.bestIntime[expansion][season][db.profile.GetActiveChallengeMapID]
-
-            runs[1][db.profile.GetActiveChallengeMapID] = runs[1][db.profile.GetActiveChallengeMapID] +1
-            if (bestIntime.level == level and bestIntime.duration > time) or bestIntime.level < level then
-                bestIntime.level = level
-                bestIntime.duration = time
-                bestIntime.date = today.monthDay.."."..today.month.."."..today.year
-            end
-        else
-            local bestOvertime = db.profile.bestOvertime[expansion][season][db.profile.GetActiveChallengeMapID]
-
-            runs[2][db.profile.GetActiveChallengeMapID] = runs[2][db.profile.GetActiveChallengeMapID] +1
-            if (bestOvertime.level == level and bestOvertime.duration > time) or bestOvertime.level < level then
-                bestOvertime.level = level
-                bestOvertime.duration = time
-                bestOvertime.date = today.monthDay.."."..today.month.."."..today.year
-            end
-        end
-        local translit = TimeFormat(time)
-        local stars = GetStars(time,db.profile.GetActiveChallengeMapID)
-        table.insert(db.profile.dungeonHistory[expansion][season][db.profile.GetActiveChallengeMapID].level, 1, "+"..level..stars)
-        table.insert(db.profile.dungeonHistory[expansion][season][db.profile.GetActiveChallengeMapID].durationTrans, 1, translit)
-        table.insert(db.profile.dungeonHistory[expansion][season][db.profile.GetActiveChallengeMapID].date, 1, today.monthDay.."."..today.month.."."..today.year)
-        table.insert(db.profile.avglvl[expansion][season][1][db.profile.GetActiveChallengeMapID],level)
-        db.profile.GetActiveChallengeMapID = nil
     end
+    --Test Event
     --[[if e == "PLAYER_STOPPED_MOVING" then
         -- do test stuff kappa
     end
@@ -468,8 +431,11 @@ local function GetMaxTime()
     return last_max_time
 end
 
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--  Set Frames for Timer
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 --[[
-    Create Frames for the timer
         #Background Frame       = LucidKeystoneFrame
             Level                   = textLevel
             Timer                   = textTimer
@@ -515,6 +481,7 @@ local function ToggleLucidKeystoneFrame()
     bg:RegisterEvent("PLAYER_STARTED_MOVING")
     bg:RegisterEvent("PLAYER_STOPPED_MOVING")
 
+    -- Text Frames
     bg.textLevel = bg:CreateFontString()
     bg.textLevel:SetFont(Addon.FONT_KOZUKA, 38, "OUTLINE")
     bg.textLevel:SetPoint("CENTER",-117,13)
@@ -575,7 +542,7 @@ local function ToggleLucidKeystoneFrame()
     bar:SetClipsChildren(true)
     bar:SetOrientation("HORIZONTAL")
     bar:SetStatusBarTexture(Addon.BAR_PARTICLES)
-    bar:SetStatusBarColor(0,0.7,1,1)
+    bar:SetStatusBarColor(db.profile.timerBarColor.r, db.profile.timerBarColor.g, db.profile.timerBarColor.b, 1)
 
     bar.b = bar:CreateTexture(nil, "BACKGROUND")
     bar.b:SetTexture(Addon.BAR_PARTICLES)
@@ -592,7 +559,7 @@ local function ToggleLucidKeystoneFrame()
     barP:SetMinMaxValues(0,100)
     barP:SetOrientation("HORIZONTAL")
     barP:SetStatusBarTexture(Addon.BAR_PARTICLES)
-    barP:SetStatusBarColor(0.5,1,0,1)
+    barP:SetStatusBarColor(db.profile.mobBarColor.r, db.profile.mobBarColor.g, db.profile.mobBarColor.b, 1)
 
     barP.b = barP:CreateTexture(nil, "BACKGROUND")
     barP.b:SetTexture(Addon.BAR_PARTICLES)
@@ -636,6 +603,11 @@ local function ToggleLucidKeystoneFrame()
     sparkle:SetAlpha(1)
 end
 
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--  Other Functions
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Set Keylevel
 function Module.Config:KeyLevel()
     local level = previewSettings.level
     local f = LucidKeystoneFrame
@@ -644,6 +616,15 @@ function Module.Config:KeyLevel()
     end
 end
 
+-- Set Timer Bar Color
+function Module.Config:SetTimerBarColor()
+    LucidKeystoneFrameBar:SetStatusBarColor(db.profile.timerBarColor.r,db.profile.timerBarColor.g,db.profile.timerBarColor.b,1)
+end
+function Module.Config:SetMobBarColor()
+    LucidKeystoneFrameBarPerc:SetStatusBarColor(db.profile.mobBarColor.r,db.profile.mobBarColor.g,db.profile.mobBarColor.b,1)
+end
+
+-- Set Text for Timers
 function Module.Config:TimerText()
     local maxTime, time, deaths, mobPerc
     if activeRun then
@@ -660,8 +641,7 @@ function Module.Config:TimerText()
     local test = CreateAtlasMarkup("poi-graveyard-neutral")
     local timeSmall = time
     local f = LucidKeystoneFrame
-    local b = LucidKeystoneFrameBar
-    b:SetStatusBarColor(0,0.7,1,1)
+    --b:SetStatusBarColor(0,0.7,1,1)
     if db.profile.mainTimer == 2 then
         time = maxTime-time
     end
@@ -683,6 +663,7 @@ function Module.Config:TimerText()
     end
 end
 
+-- Set the Timers
 function Module.Config:PlusTimer()
     local f = LucidKeystoneFrame
     local maxTime = select(3, C_ChallengeMode.GetMapUIInfo(previewSettings.ZoneID))
@@ -717,6 +698,7 @@ function Module.Config:PlusTimer()
     end
 end
 
+-- Update Bosses
 function Module.Config:BossesText()
     local f = LucidKeystoneFrame
     local offset = 0
@@ -760,6 +742,7 @@ function Module.Config:BossesText()
     end
 end
 
+-- Get Affixes
 function Module.Config:AffixText()
     local f = LucidKeystoneFrame
     local offset = 0
@@ -805,6 +788,7 @@ function Module.Config:AffixText()
     end
 end
 
+-- Get Dungeon Text
 function Module.Config:DungeonText()
     local f = LucidKeystoneFrame
     local name = C_ChallengeMode.GetMapUIInfo(previewSettings.ZoneID)
@@ -841,6 +825,7 @@ function Module.Config:MobBar()
     end
 end
 
+-- Frame Unlock Function
 function Module.Config:UnlockUpdate()
     local f = LucidKeystoneFrame
     if db.profile.unlock then
@@ -882,10 +867,12 @@ function Module.Config:UnlockUpdate()
     end
 end
 
+-- Update Sparkle Effect
 function Module.Config:SparkleUpdate()
     LucidKeystoneFrameSparkle:SetModel(sparkleEffect[db.profile.sparkle].animation)
 end
 
+-- Set Backdrop
 function Module.Config:BackgroundUpdate()
     local todaydate = C_DateAndTime.GetCurrentCalendarTime()
     local today = todaydate.monthDay .. ".".. todaydate.month
@@ -901,6 +888,7 @@ function Module.Config:BackgroundUpdate()
     end
 end
 
+-- General Frame toggle
 function Module.Config.ToggleFrames()
     Module.Config:BackgroundUpdate()
     Module.Config:MobUpdateConfig()
@@ -912,8 +900,11 @@ function Module.Config.ToggleFrames()
     Module.Config:MobBar()
     Module.Config:AffixText()
     Module.Config:PlusTimer()
+    Module.Config:SetTimerBarColor()
+    Module.Config:SetMobBarColor()
 end
 
+-- Frame toggle for Preview
 function Module.Config:ToggleTest()
     Module.Config.ToggleFrames()
     local bg = LucidKeystoneFrame
@@ -927,6 +918,7 @@ function Module.Config:ToggleTest()
     end
 end
 
+--Initialize function
 function Module.Timer:OnInitialize()
     db = LibStub("AceDB-3.0"):New("LucidKeystoneDB", defaults)
     ToggleLucidKeystoneFrame()
