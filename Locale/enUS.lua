@@ -45,6 +45,7 @@ L["Timer"] = true
 L["Bosses"] = true
 L["Keylevel"] = true
 L["Others"] = true
+L["Bar Style"] = true
 L["Timer Bar Color"] = true
 L["Mob Bar Color"] = true
 L["Boss Counter"] = true
@@ -83,6 +84,7 @@ L["Shows the Mob Count in Percent instead of the exact Number."] = true
 --## General Settings
 L["General"] = true
 L["History Mode"] = true
+L["Font"] = true
 L["Keystone Autoplace"] = true
 L["Play Prideful Sound"] = true
 L["Activate |cff87ceeb!keys|r Command"] = true
