@@ -32,4 +32,4 @@ Addon.lk_bg_Cat2        = "Interface\\AddOns\\"..AddonName.."\\media\\Textures\\
 
 local LSM = LibStub("LibSharedMedia-3.0")
 LSM:Register("font", "Kozuka Gothic Light", Addon.FONT_KOZUKA, LSM.LOCALE_BIT_ruRU + LSM.LOCALE_BIT_western)
-LSM:Register("statusbar", "Lucid Particles", Addon.BAR_PARTICLES)
+LSM:Register("statusbar", "Lucid Keystone Particles", Addon.BAR_PARTICLES)
