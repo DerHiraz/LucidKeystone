@@ -175,7 +175,6 @@ local defaults = {
         start           = false,
         invertPerc      = false,
         MobPercStep     = true,
-        InitTest        = false,
         background      = 2,
         sparkle         = 3,
         bosses          = 3,
@@ -184,6 +183,9 @@ local defaults = {
         mainTimer       = 1,
         mobCount        = 1,
         fpoint          = "TOPRIGHT",
+        TimerBarStyle   = "Lucid Keystone Particles",
+        MobBarStyle     = "Lucid Keystone Particles",
+        FontStyle       = "Kozuka Gothic Light",
         fxof            = -140,
         fyof            = 0,
         expansion       = GetExpansionLevel(),
@@ -320,23 +322,26 @@ local backdroplist = {
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 local function ResetConfig()
-    local excludeRuns = db.profile.runs
-    local excludeAvg = db.profile.avglvl
-    local excludeIntime = db.profile.bestIntime
-    local excludeOvertime = db.profile.bestOvertime
-    local excludehistory = db.profile.dungeonHistory
-    local excludestats = db.profile.statistic
+    local exclude = {
+        Runs = db.profile.runs,
+        Avg = db.profile.avglvl,
+        Intime = db.profile.bestIntime,
+        Overtime = db.profile.bestOvertime,
+        history = db.profile.dungeonHistory,
+        stats = db.profile.statistic,
+        season = db.profile.season,
+    }
     db:RegisterDefaults(defaults)
     db:ResetProfile()
-    db.profile.runs = excludeRuns
-    db.profile.avglvl = excludeAvg
-    db.profile.bestIntime = excludeIntime
-    db.profile.bestOvertime = excludeOvertime
-    db.profile.dungeonHistory = excludehistory
-    db.profile.statistic = excludestats
+    db.profile.runs = exclude.Runs
+    db.profile.avglvl = exclude.Avg
+    db.profile.bestIntime = exclude.Intime
+    db.profile.bestOvertime = exclude.Overtime
+    db.profile.dungeonHistory = exclude.history
+    db.profile.statistic = exclude.stats
+    db.profile.season = exclude.season
     LibStub("AceConfigRegistry-3.0"):NotifyChange("LucidKeystone")
     StaticPopup_Show("LucidKeystone_ReloadPopup")
-    db.profile.season = C_MythicPlus.GetCurrentSeason()
     Module:ToggleFrames()
 end
 
@@ -1035,6 +1040,25 @@ local function AddConfig()
                                 width = 1.2,
                                 order = 30,
                             },
+                            TimerBarStyle = {
+                                order = 40,
+                                name = L["Bar Style"],
+                                type = "select",
+                                width = 1.2,
+                                dialogControl = "LSM30_Statusbar",
+                                values = _G.AceGUIWidgetLSMlists.statusbar,
+                                set = function(_, val)
+                                    Module:SetOption("TimerBarStyle", val)
+                                    Module:UpdateBars()
+                                end,
+                                get = function() return Module:GetOption("TimerBarStyle") end,
+                            },
+                            TimerSpace = {
+                                order = 50,
+                                name = " ",
+                                type = "description",
+                                width = 2,
+                            },
                             plusOne = {
                                 type = "toggle",
                                 name = L["Show"].." +1",
@@ -1048,7 +1072,7 @@ local function AddConfig()
                                     return Module:GetOption("smartTimer")
                                 end,
                                 width = 1,
-                                order = 40,
+                                order = 60,
                             },
                             plusTwo = {
                                 type = "toggle",
@@ -1063,7 +1087,7 @@ local function AddConfig()
                                     return Module:GetOption("smartTimer")
                                 end,
                                 width = 1,
-                                order = 50,
+                                order = 70,
                             },
                             plusThree = {
                                 type = "toggle",
@@ -1078,7 +1102,7 @@ local function AddConfig()
                                     return Module:GetOption("smartTimer")
                                 end,
                                 width = 1,
-                                order = 60,
+                                order = 80,
                             },
                             smartTimer = {
                                 type = "toggle",
@@ -1090,7 +1114,7 @@ local function AddConfig()
                                 end,
                                 get = function() return Module:GetOption("smartTimer") end,
                                 width = 1,
-                                order = 70,
+                                order = 90,
                             },
                         },
                     },
@@ -1190,6 +1214,28 @@ local function AddConfig()
                                 width = 1.2,
                                 order = 30,
                             },
+                            MobBarStyle = {
+                                order = 40,
+                                name = L["Bar Style"],
+                                type = "select",
+                                width = 1.2,
+                                dialogControl = "LSM30_Statusbar",
+                                values = _G.AceGUIWidgetLSMlists.statusbar,
+                                set = function(_, val)
+                                    Module:SetOption("MobBarStyle", val)
+                                    Module:UpdateBars()
+                                end,
+                                get = function() return Module:GetOption("MobBarStyle") end,
+                                disabled = function()
+                                    return Module:GetOption("mobCount") == 1
+                                end,
+                            },
+                            MobSpace = {
+                                order = 50,
+                                name = " ",
+                                type = "description",
+                                width = 2,
+                            },
                             invertPerc = {
                                 type = "toggle",
                                 name = L["Invert Progress Bar"],
@@ -1203,7 +1249,7 @@ local function AddConfig()
                                     return Module:GetOption("mobCount") == 1
                                 end,
                                 width = 1,
-                                order = 40,
+                                order = 60,
                             },
                             MobPercStep = {
                                 type = "toggle",
@@ -1215,7 +1261,7 @@ local function AddConfig()
                                 end,
                                 get = function() return Module:GetOption("MobPercStep") end,
                                 width = 1,
-                                order = 50,
+                                order = 70,
                             },
                         },
                     },
@@ -1345,6 +1391,12 @@ local function AddConfig()
                                 width = 1.2,
                                 order = 10,
                             },
+                            speratorGeneral1 = {
+                                order = 20,
+                                name = "",
+                                type = "description",
+                                width = 2,
+                            },
                             autoPlace = {
                                 type = "toggle",
                                 name = L["Keystone Autoplace"],
@@ -1353,8 +1405,8 @@ local function AddConfig()
                                     Module:SetOption("autoPlace", val)
                                 end,
                                 get = function() return Module:GetOption("autoPlace") end,
-                                width = 1,
-                                order = 20,
+                                width = 1.2,
+                                order = 30,
                             },
                             autoRole = {
                                 type = "toggle",
@@ -1365,26 +1417,8 @@ local function AddConfig()
                                     ToggleAutoRole()
                                 end,
                                 get = function() return Module:GetOption("autoRole") end,
-                                width = 1,
-                                order = 30,
-                            },
-                            pridefulAlert = {
-                                type = "toggle",
-                                name = L["Play Prideful Sound"].." (WIP)",
-                                desc = "",
-                                set = function(_, val)
-                                    Module:SetOption("pridefulAlert", val)
-                                end,
-                                get = function() return Module:GetOption("pridefulAlert") end,
-                                disabled = true,
                                 width = 1.2,
                                 order = 40,
-                            },
-                            sperator = {
-                                order = 50,
-                                name = "",
-                                type = "description",
-                                width = 2,
                             },
                             postCom = {
                                 type = "toggle",
@@ -1408,17 +1442,26 @@ local function AddConfig()
                                 width = 1.2,
                                 order = 70,
                             },
-                            InitTest = {
-                                type = "toggle",
-                                name = "TEST",
-                                desc = "TEST",
+                        },
+                    },
+                    generalFont = {
+                        type = "group",
+                        name = " ",
+                        order = 20,
+                        inline = true,
+                        args = {
+                            FontStyle = {
+                                order = 10,
+                                name = L["Font"],
+                                type = "select",
+                                width = 1.2,
+                                dialogControl = "LSM30_Font",
+                                values = _G.AceGUIWidgetLSMlists.font,
                                 set = function(_, val)
-                                    Module:SetOption("InitTest", val)
+                                    Module:SetOption("FontStyle", val)
+                                    Module:UpdateFonts()
                                 end,
-                                get = function() return Module:GetOption("InitTest") end,
-                                disabled = true,
-                                width = "full",
-                                order = 80,
+                                get = function() return Module:GetOption("FontStyle") end,
                             },
                         },
                     },
@@ -1690,11 +1733,11 @@ end
 -- Add April fool
 --[[for i, v in pairs({"lkcat"}) do
 	_G["SLASH_LKt"..i] = "/"..v
-end
+end]]
 -- Print deaths Statistics
 for i, v in pairs({"lkdeaths"}) do
 	_G["SLASH_LKd"..i] = "/"..v
-end]]
+end
 -- Get M+ playtime
 for i, v in pairs({"lkplayed"}) do
 	_G["SLASH_LKplayed"..i] = "/"..v
@@ -1730,4 +1773,5 @@ function Module:OnInitialize()
     notes = GetAddOnMetadata(AddonName, "Notes")
     title = GetAddOnMetadata(AddonName, "Title")
     AddConfig()
+    db.profile.initTest = nil
 end
