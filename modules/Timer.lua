@@ -316,10 +316,10 @@ local function UpdateMobs()
     local strBefore = string.format("|c%s%.2f%%|r", colorBefore, before)
     local f = LucidKeystoneFrame
     if db.profile.MobPercStep then
-        f.textMobs:SetFont(Addon.FONT_KOZUKA, 15, "OUTLINE")
+        f.textMobs:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 15, "OUTLINE")
         f.textMobs:SetText(strBefore)
     else
-        f.textMobs:SetFont(Addon.FONT_KOZUKA, 13, "OUTLINE")
+        f.textMobs:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 13, "OUTLINE")
         f.textMobs:SetText(current.." / "..total)
     end
     local bar = LucidKeystoneFrameBarPerc
@@ -336,10 +336,10 @@ function Module.Config:MobUpdateConfig()
     local total = 285
     local f = LucidKeystoneFrame
     if db.profile.MobPercStep then
-        f.textMobs:SetFont(Addon.FONT_KOZUKA, 15, "OUTLINE")
+        f.textMobs:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 15, "OUTLINE")
         f.textMobs:SetText("89.72%")
     else
-        f.textMobs:SetFont(Addon.FONT_KOZUKA, 13, "OUTLINE")
+        f.textMobs:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 13, "OUTLINE")
         f.textMobs:SetText(current.." / "..total)
     end
 end
@@ -483,32 +483,32 @@ local function ToggleLucidKeystoneFrame()
 
     -- Text Frames
     bg.textLevel = bg:CreateFontString()
-    bg.textLevel:SetFont(Addon.FONT_KOZUKA, 38, "OUTLINE")
+    bg.textLevel:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle],38,"OUTLINE")
     bg.textLevel:SetPoint("CENTER",-117,13)
     bg.textTimer = bg:CreateFontString()
-    bg.textTimer:SetFont(Addon.FONT_KOZUKA, 26, "OUTLINE")
+    bg.textTimer:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 26, "OUTLINE")
     bg.textTimer:SetTextColor(0, 0.72, 1, 1)
     bg.textTimer:SetPoint("LEFT",208,32)
     bg.textTimer:SetJustifyH("LEFT");
     bg.textTimerSmall = bg:CreateFontString()
-    bg.textTimerSmall:SetFont(Addon.FONT_KOZUKA, 12, "OUTLINE")
+    bg.textTimerSmall:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 12, "OUTLINE")
     bg.textTimerSmall:SetTextColor(1, 1, 1, 1)
     bg.textTimerSmall:SetPoint("LEFT",290,24)
     bg.textTimerSmall:SetJustifyH("LEFT");
     bg.textDeaths = bg:CreateFontString()
-    bg.textDeaths:SetFont(Addon.FONT_KOZUKA, 14, "OUTLINE")
+    bg.textDeaths:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 14, "OUTLINE")
     bg.textDeaths:SetTextColor(0.7, 0, 0.1, 1)
     bg.textDeaths:SetPoint("CENTER",111,30)
     bg.textMobs = bg:CreateFontString()
-    bg.textMobs:SetFont(Addon.FONT_KOZUKA, 15, "OUTLINE")
+    bg.textMobs:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 15, "OUTLINE")
     bg.textMobs:SetTextColor(1, 1, 1, 1)
     bg.textMobs:SetPoint("CENTER",111,0)
     bg.textBosses = bg:CreateFontString()
-    bg.textBosses:SetFont(Addon.FONT_KOZUKA, 12, "OUTLINE")
+    bg.textBosses:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 12, "OUTLINE")
     bg.textBosses:SetTextColor(1, 1, 1, 1)
     bg.textBosses:SetJustifyH("LEFT");
     bg.textDungeon = bg:CreateFontString()
-    bg.textDungeon:SetFont(Addon.FONT_KOZUKA, 14, "OUTLINE")
+    bg.textDungeon:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 14, "OUTLINE")
     bg.textDungeon:SetTextColor(1, 1, 1, 1)
     bg.textDungeon:SetJustifyH("CENTER");
     bg.textAffix = bg:CreateFontString()
@@ -516,15 +516,15 @@ local function ToggleLucidKeystoneFrame()
     bg.textAffix:SetJustifyH("CENTER");
 
     bg.textTimerOne = bg:CreateFontString()
-    bg.textTimerOne:SetFont(Addon.FONT_KOZUKA, 14, "OUTLINE")
+    bg.textTimerOne:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 14, "OUTLINE")
     bg.textTimerOne:SetTextColor(1, 1, 1, 1)
     bg.textTimerOne:SetPoint("CENTER",-60,-5)
     bg.textTimerTwo = bg:CreateFontString()
-    bg.textTimerTwo:SetFont(Addon.FONT_KOZUKA, 14, "OUTLINE")
+    bg.textTimerTwo:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 14, "OUTLINE")
     bg.textTimerTwo:SetTextColor(1, 1, 1, 1)
     bg.textTimerTwo:SetPoint("CENTER",-6,-5)
     bg.textTimerThree = bg:CreateFontString()
-    bg.textTimerThree:SetFont(Addon.FONT_KOZUKA, 14, "OUTLINE")
+    bg.textTimerThree:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 14, "OUTLINE")
     bg.textTimerThree:SetTextColor(1, 1, 1, 1)
     bg.textTimerThree:SetPoint("CENTER",48,-5)
 
@@ -541,7 +541,8 @@ local function ToggleLucidKeystoneFrame()
     bar:SetValue(maxTime-previewSettings.time)
     bar:SetClipsChildren(true)
     bar:SetOrientation("HORIZONTAL")
-    bar:SetStatusBarTexture(Addon.BAR_PARTICLES)
+    --bar:SetStatusBarTexture(Addon.BAR_PARTICLES)
+    bar:SetStatusBarTexture(AceGUIWidgetLSMlists.statusbar[db.profile.TimerBarStyle])
     bar:SetStatusBarColor(db.profile.timerBarColor.r, db.profile.timerBarColor.g, db.profile.timerBarColor.b, 1)
 
     bar.b = bar:CreateTexture(nil, "BACKGROUND")
@@ -558,7 +559,8 @@ local function ToggleLucidKeystoneFrame()
     barP:SetHeight(12)
     barP:SetMinMaxValues(0,100)
     barP:SetOrientation("HORIZONTAL")
-    barP:SetStatusBarTexture(Addon.BAR_PARTICLES)
+    --barP:SetStatusBarTexture(Addon.BAR_PARTICLES)
+    barP:SetStatusBarTexture(AceGUIWidgetLSMlists.statusbar[db.profile.MobBarStyle])
     barP:SetStatusBarColor(db.profile.mobBarColor.r, db.profile.mobBarColor.g, db.profile.mobBarColor.b, 1)
 
     barP.b = barP:CreateTexture(nil, "BACKGROUND")
@@ -654,10 +656,10 @@ function Module.Config:TimerText()
         f.textTimerSmall:SetText(TimeFormat(timeSmall))
         f.textDeaths:SetText(test.." "..deaths.."\n-"..TimeFormat(deaths*5))
         if db.profile.MobPercStep then
-            f.textMobs:SetFont(Addon.FONT_KOZUKA, 15, "OUTLINE")
+            f.textMobs:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 15, "OUTLINE")
             f.textMobs:SetText(mobPerc.."%")
         else
-            f.textMobs:SetFont(Addon.FONT_KOZUKA, 13, "OUTLINE")
+            f.textMobs:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 13, "OUTLINE")
             f.textMobs:SetText(256 .." / ".. 285)
         end
     end
@@ -753,7 +755,7 @@ function Module.Config:AffixText()
         offset = 15
     end
     if db.profile.affix == 2 then
-        f.textAffix:SetFont(Addon.FONT_KOZUKA, 11, "OUTLINE")
+        f.textAffix:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 11, "OUTLINE")
         f.textAffix:SetPoint("CENTER",0,-66+offset)
         for ids = 1, #wAffix do
             local id = wAffix[ids].id
@@ -768,22 +770,22 @@ function Module.Config:AffixText()
             table.insert(affixTable, "|T"..id..":0|t ") 
         end
         if db.profile.affix == 3 then
-            f.textAffix:SetFont(Addon.FONT_KOZUKA, 16, "OUTLINE")
+            f.textAffix:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 16, "OUTLINE")
             f.textAffix:SetPoint("CENTER",0,-66+offset)
             f.textAffix:SetText(table.concat(affixTable, " "))
         end
         if db.profile.affix == 4 then
-            f.textAffix:SetFont(Addon.FONT_KOZUKA, 22, "OUTLINE")
+            f.textAffix:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 22, "OUTLINE")
             f.textAffix:SetPoint("CENTER",-164,4)
             f.textAffix:SetText(table.concat(affixTable, "\n"))
         end
         if db.profile.affix == 5 then
-            f.textAffix:SetFont(Addon.FONT_KOZUKA, 22, "OUTLINE")
+            f.textAffix:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 22, "OUTLINE")
             f.textAffix:SetPoint("CENTER",165,4)
             f.textAffix:SetText(table.concat(affixTable, "\n"))
         end
     else
-        f.textAffix:SetFont(Addon.FONT_KOZUKA, 11, "OUTLINE")
+        f.textAffix:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 11, "OUTLINE")
         f.textAffix:SetText("")
     end
 end
@@ -872,6 +874,29 @@ function Module.Config:SparkleUpdate()
     LucidKeystoneFrameSparkle:SetModel(sparkleEffect[db.profile.sparkle].animation)
 end
 
+-- Update Bar Styles
+function Module.Config:UpdateBars()
+    LucidKeystoneFrameBar:SetStatusBarTexture(AceGUIWidgetLSMlists.statusbar[db.profile.TimerBarStyle])
+    LucidKeystoneFrameBarPerc:SetStatusBarTexture(AceGUIWidgetLSMlists.statusbar[db.profile.MobBarStyle])
+end
+
+-- Update Timer Font
+function Module.Config:UpdateFonts()
+    local f = LucidKeystoneFrame
+    f.textLevel:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle],38,"OUTLINE")
+
+    f.textTimer:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 26, "OUTLINE")
+    f.textTimerSmall:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 12, "OUTLINE")
+    f.textDeaths:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 14, "OUTLINE")
+    f.textMobs:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 15, "OUTLINE")
+    f.textBosses:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 12, "OUTLINE")
+    f.textDungeon:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 14, "OUTLINE")
+    f.textTimerOne:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 14, "OUTLINE")
+    f.textTimerTwo:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 14, "OUTLINE")
+    f.textTimerThree:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 14, "OUTLINE")
+    Module.Config:AffixText()
+end
+
 -- Set Backdrop
 function Module.Config:BackgroundUpdate()
     local todaydate = C_DateAndTime.GetCurrentCalendarTime()
@@ -894,7 +919,6 @@ function Module.Config.ToggleFrames()
     Module.Config:MobUpdateConfig()
     Module.Config:SparkleUpdate()
     Module.Config:KeyLevel()
-    Module.Config:TimerText()
     Module.Config:BossesText()
     Module.Config:DungeonText()
     Module.Config:MobBar()
@@ -902,6 +926,9 @@ function Module.Config.ToggleFrames()
     Module.Config:PlusTimer()
     Module.Config:SetTimerBarColor()
     Module.Config:SetMobBarColor()
+    Module.Config:UpdateBars()
+    Module.Config:UpdateFonts()
+    Module.Config:TimerText()
 end
 
 -- Frame toggle for Preview
