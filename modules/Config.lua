@@ -1733,11 +1733,11 @@ end
 -- Add April fool
 --[[for i, v in pairs({"lkcat"}) do
 	_G["SLASH_LKt"..i] = "/"..v
-end]]
+end
 -- Print deaths Statistics
 for i, v in pairs({"lkdeaths"}) do
 	_G["SLASH_LKd"..i] = "/"..v
-end
+end]]
 -- Get M+ playtime
 for i, v in pairs({"lkplayed"}) do
 	_G["SLASH_LKplayed"..i] = "/"..v
