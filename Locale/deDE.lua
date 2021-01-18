@@ -45,6 +45,7 @@ L["Timer"]                                                                      
 L["Bosses"]                                                                         = "Bosse"
 L["Keylevel"]                                                                       = "Schlüssel Stufe"
 L["Others"]                                                                         = "Anderes"
+L["Bar Style"]                                                                      = "Balkenart"
 L["Timer Bar Color"]                                                                = "Timer Balkenfarbe"
 L["Mob Bar Color"]                                                                  = "Mob Balkenfarbe"
 L["Boss Counter"]                                                                   = "Bossanzeige"
@@ -83,6 +84,7 @@ L["Shows the Mob Count in Percent instead of the exact Number."]                
 --## General Settings
 L["General"]                                                                = "Allgemein"
 L["History Mode"]                                                           = "History Modus"
+L["Font"]                                                                   = "Schriftart"
 L["Keystone Autoplace"]                                                     = "Automatisch Schlüsselstein setzen"
 L["Play Prideful Sound"]                                                    = "Spiele einen Ton bei Affix \"Stolz\""
 L["Activate |cff87ceeb!keys|r Command"]                                     = "Aktiviere |cff87ceeb!keys|r Befehl"
