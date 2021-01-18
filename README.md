@@ -19,6 +19,6 @@ Lucid Keystone is a custom Mythic+ timer for an advanced display of various time
     - Statistics sorted by every dungeon
     - Overview about your runs in every Season
  
- ## Slash Commands
+## Slash Commands
  - /lucidkeystone
  - /lk
