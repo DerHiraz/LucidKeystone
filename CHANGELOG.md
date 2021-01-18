@@ -1,31 +1,5 @@
 # CHANGELOG
 
-## 0.2.1-Beta
-
-## 0001
-
-- inital release.
-
-## 0002
-
-- Removed multi Information
-
-## 0003
-
-- fixed Keypost Bug
-
-## 0.2.2-Beta
-
-## 0001
-
-- implemented time waste
-- fixed decent bugs
-
-## 0002
-
-- fixed some bugs
-- added more stats on total tab
-
 ## 0.3.0-Beta
 
 ## 0001
@@ -39,3 +13,12 @@
 - fixed colorchange if low time reached
 - fixed reset bug
 - disabled some options if not needed
+
+## 0.3.1-RC
+
+## 0001
+
+- fixed bug that the season wasnt reseted correctly after Reset to Default
+- added default bar option
+- added default font option
+- removed unused options
