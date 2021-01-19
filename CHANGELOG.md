@@ -2,7 +2,7 @@
 
 ## 0.3.0-Beta
 
-## 0001
+### 0001
 
 - added new stats
 - Auto Rolecheck implemented
@@ -16,9 +16,18 @@
 
 ## 0.3.1-RC
 
-## 0001
+### 0001
 
 - fixed bug that the season wasnt reseted correctly after Reset to Default
 - added default bar option
 - added default font option
 - removed unused options
+
+### 0002
+
+- added a new progress bar texture
+
+## 1.0.0
+
+- Initial release
+- fixed a display issue while in preview
