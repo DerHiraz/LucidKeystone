@@ -10,6 +10,7 @@ local db, version, author, notes, title
 local fontColor = {
     yellow  = "|cffffd100%s|r",
     blue    = "|cff009dd5%s|r",
+    lucid   = "|cff71478E%s|r",
 }
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -917,7 +918,7 @@ local function AddConfig()
                         args = {
                             styleHeader = {
                                 order = 10,
-                                name = L["Choose your own Style"],
+                                name = fontColor.lucid:format(L["Choose your own Style"]),
                                 type = "description",
                                 fontSize = "large",
                                 width = "full",
@@ -1003,7 +1004,7 @@ local function AddConfig()
                         args = {
                             displayTimerHeader = {
                                 order = 10,
-                                name = L["Timer"],
+                                name = fontColor.lucid:format(L["Timer"]),
                                 type = "description",
                                 fontSize = "large",
                                 width = "full",
@@ -1126,7 +1127,7 @@ local function AddConfig()
                         args = {
                             displayHeader = {
                                 order = 10,
-                                name = L["Bosses"],
+                                name = fontColor.lucid:format(L["Bosses"]),
                                 type = "description",
                                 fontSize = "large",
                                 width = "full",
@@ -1173,7 +1174,7 @@ local function AddConfig()
                         args = {
                             displayHeaderM = {
                                 order = 10,
-                                name = L["Mob Counter"],
+                                name = fontColor.lucid:format(L["Mob Counter"]),
                                 type = "description",
                                 fontSize = "large",
                                 width = "full",
@@ -1273,7 +1274,7 @@ local function AddConfig()
                         args = {
                             displayHeaderK = {
                                 order = 10,
-                                name = L["Keylevel"],
+                                name = fontColor.lucid:format(L["Keylevel"]),
                                 type = "description",
                                 fontSize = "large",
                                 width = "full",
@@ -1319,7 +1320,7 @@ local function AddConfig()
                         args = {
                             displayHeaderK = {
                                 order = 10,
-                                name = L["Others"],
+                                name = fontColor.lucid:format(L["Others"]),
                                 type = "description",
                                 fontSize = "large",
                                 width = "full",

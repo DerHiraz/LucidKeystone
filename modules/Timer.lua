@@ -815,6 +815,9 @@ end
 
 function Module.Config:MobBar()
     local bar = LucidKeystoneFrameBarPerc
+    maxTime = select(3, C_ChallengeMode.GetMapUIInfo(previewSettings.ZoneID))
+    LucidKeystoneFrameBar:SetMinMaxValues(0,maxTime)
+    LucidKeystoneFrameBar:SetValue(maxTime-previewSettings.time)
     if db.profile.mobCount == 1 then
         bar:Hide()
     else

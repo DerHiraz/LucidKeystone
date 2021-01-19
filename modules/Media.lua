@@ -5,6 +5,7 @@ Addon.LOGO_LOCATION     = "Interface\\AddOns\\"..AddonName.."\\media\\Textures\\
 Addon.LOGO              = "Interface\\AddOns\\"..AddonName.."\\media\\Textures\\logo"
 Addon.FONT_KOZUKA       = "Interface\\AddOns\\"..AddonName.."\\media\\Fonts\\KozGoPr6N-Light.ttf"
 Addon.BAR_PARTICLES     = "Interface\\AddOns\\"..AddonName.."\\media\\Statusbars\\particles"
+Addon.BAR_DREAM         = "Interface\\AddOns\\"..AddonName.."\\media\\Statusbars\\dream"
 
 --Backgrounds
 Addon.lk_bg_None1       = "Interface\\AddOns\\"..AddonName.."\\media\\Textures\\lk_None"
@@ -33,3 +34,4 @@ Addon.lk_bg_Cat2        = "Interface\\AddOns\\"..AddonName.."\\media\\Textures\\
 local LSM = LibStub("LibSharedMedia-3.0")
 LSM:Register("font", "Kozuka Gothic Light", Addon.FONT_KOZUKA, LSM.LOCALE_BIT_ruRU + LSM.LOCALE_BIT_western)
 LSM:Register("statusbar", "Lucid Keystone Particles", Addon.BAR_PARTICLES)
+LSM:Register("statusbar", "Lucid Keystone Dream", Addon.BAR_DREAM)
