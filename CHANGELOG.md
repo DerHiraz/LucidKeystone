@@ -6,7 +6,7 @@
 
 - added new stats
 - Auto Rolecheck implemented
-- added "/lkplayed" to get playtime for M+ in chat
+- added ``/lkplayed`` to get playtime for M+ in chat
 - added options to recolor bars
 - fixed nil value if a run was left before finished
 - reworked display tab in options
@@ -31,3 +31,10 @@
 
 - Initial release
 - fixed a display issue while in preview
+
+## 1.0.1
+
+- changed Slash Command ``/lkplayed`` to ``/lk played``
+- added Slash Command ``/lk version``, ``/lk preview`` and ``/lk help``
+- initiated Autorole option
+- added some more tooltip information in options
