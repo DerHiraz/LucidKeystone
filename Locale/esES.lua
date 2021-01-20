@@ -11,9 +11,18 @@ L["Version Check"]                                                              
 L["Check for updates."]                                                                     = "Check for updates."
 L["Reset to Defaults"]                                                                      = "Reset to Defaults"
 L["Reset all options to their default values."]                                             = "Reset all options to their default values."
+L["This does not affect your Dungeon stats."]                                               = "This does not affect your Dungeon stats."
 L["You really want reset to defaults?"]                                                     = "You really want reset to defaults?"
 L["Unlock"]                                                                                 = "Unlock"
 L["Lock or unlock the window"]                                                              = "Lock or unlock the window"
+
+--## Slash Commands
+L["played"]                                                                                 = "played"
+L["preview"]                                                                                = "preview"
+L["version"]                                                                                = "version"
+L["help"]                                                                                   = "help"
+L["Lucid Keystone Commands:"]                                                               = "Lucid Keystone Commands:"
+L["Invalid Command. Type \"/lk help\" to see all Lucid Keystone Commands."]                 = "Invalid Command. Type \"/lk help\" to see all Lucid Keystone Commands."
 
 --## Style Settings
 L["Style"]                                                                                  = "Style"

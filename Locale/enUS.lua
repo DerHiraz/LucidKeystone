@@ -9,9 +9,18 @@ L["Version Check"] = true
 L["Check for updates."] = true
 L["Reset to Defaults"] = true
 L["Reset all options to their default values."] = true
+L["This does not affect your Dungeon stats."] = true
 L["You really want reset to defaults?"] = true
 L["Unlock"] = true
 L["Lock or unlock the window"] = true
+
+--## Slash Commands
+L["played"] = true
+L["preview"] = true
+L["version"] = true
+L["help"] = true
+L["Lucid Keystone Commands:"] = true
+L["Invalid Command. Type \"/lk help\" to see all Lucid Keystone Commands."] = true
 
 --## Style Settings
 L["Style"] = true
