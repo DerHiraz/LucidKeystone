@@ -10,6 +10,7 @@ local db, version, author, notes, title
 local fontColor = {
     yellow  = "|cffffd100%s|r",
     blue    = "|cff009dd5%s|r",
+    red     = "|cffe22b2a%s|r",
     lucid   = "|cff71478E%s|r",
 }
 
@@ -609,7 +610,7 @@ local function GetTitle(zoneID)
     if #db.profile.avglvl[expansion][season][1][zoneID] ~= 0 then
         avgLvl = avgLvl/#db.profile.avglvl[expansion][season][1][zoneID]
     end
-    return fontColor.yellow:format(" "..name.."\n\n "..L["Avg. Level: "])..string.format("%.1f", avgLvl).."\n"
+    return fontColor.yellow:format(" "..name.."\n\n "..L["Avg. Level: "])..string.format("%.1f", avgLvl).."\n", name
 end
 
 local mapID = {
@@ -627,9 +628,9 @@ local mapID = {
     [369] = {ShortName = "Yard"},
     [370] = {ShortName = "Work"},
     -- Shadowlands
-    [375] = {ShortName = "MoTS"},
+    [375] = {ShortName = "Mists"},
     [376] = {ShortName = "NW"},
-    [377] = {ShortName = "OS"},
+    [377] = {ShortName = "DOS"},
     [378] = {ShortName = "HoA"},
     [379] = {ShortName = "PF"},
     [380] = {ShortName = "SD"},
@@ -679,6 +680,7 @@ for i = 1, #zoneTable do
     local tablefor = {
         type = "group",
         name = mapID[zoneTable[i]].ShortName,
+        desc = function() return select(2,GetTitle(zoneTable[i])) end, 
         order = ord,
         args = {
             --Portrait
@@ -881,7 +883,7 @@ local function AddConfig()
                         order = 30,
                         name = L["Reset to Defaults"],
                         confirm = true,
-                        confirmText = L["You really want reset to defaults?"].."\n",
+                        confirmText = L["You really want reset to defaults?"].."\n\n"..fontColor.red:format(L["This does not affect your Dungeon stats."]),
                         desc = L["Reset all options to their default values."],
                         type = "execute",
                         func = function() ResetConfig() end,
@@ -1740,15 +1742,29 @@ for i, v in pairs({"lkdeaths"}) do
 	_G["SLASH_LKd"..i] = "/"..v
 end]]
 -- Get M+ playtime
-for i, v in pairs({"lkplayed"}) do
-	_G["SLASH_LKplayed"..i] = "/"..v
-end
 
-function SlashCmdList.LK()
-    ACD:SetDefaultSize(AddonName, 648, 570)
-    ACD:Open(AddonName)
+function SlashCmdList.LK(msg)
+    if msg == "" then
+        ACD:SetDefaultSize(AddonName, 648, 570)
+        ACD:Open(AddonName)
+    elseif msg == L["played"] or msg == "played" then
+        local days = select(1,TimeSpend()[1]).." "..L["days"]
+        local hours = select(1,TimeSpend()[2]).." "..L["hours"]
+        local minutes = select(1,TimeSpend()[3]).." "..L["minutes"]
+        local seconds = select(1,TimeSpend()[4]).." "..L["seconds"]
+
+        SendSystemMessage(L["Time played this Season in M+: "]..days..", "..hours..", "..minutes..", "..seconds)
+    elseif msg == L["preview"] or msg == "preview" then
+        Module:ToggleTest()
+    elseif msg == L["version"] or msg == "version" then
+        SendSystemMessage(L["Version: "]..version)
+    elseif msg == L["hilfe"] or msg == "help" then
+        SendSystemMessage(L["Lucid Keystone Commands:"].."\n/lk\n/lk "..L["played"].."\n/lk "..L["version"].."\n/lk "..L["preview"])
+    else
+        SendSystemMessage(L["Invalid Command. Type \"/lk help\" to see all Lucid Keystone Commands."])
+    end
 end
-function SlashCmdList.LKt()
+--[[function SlashCmdList.LKt()
     backdroplist[11] = "April Fool"
 end
 function SlashCmdList.LKd()
@@ -1756,15 +1772,7 @@ function SlashCmdList.LKd()
     print("Global: "..db.profile.statistic.deaths)
     print("Profile: "..db.global.statistic.deaths)
     print("----------------------")
-end
-function SlashCmdList.LKplayed()
-    local days = select(1,TimeSpend()[1]).." "..L["days"]
-    local hours = select(1,TimeSpend()[2]).." "..L["hours"]
-    local minutes = select(1,TimeSpend()[3]).." "..L["minutes"]
-    local seconds = select(1,TimeSpend()[4]).." "..L["seconds"]
-
-    SendSystemMessage(L["Time played this Season in M+: "]..days..", "..hours..", "..minutes..", "..seconds)
-end
+end]]
 
 --Initialize function
 function Module:OnInitialize()
@@ -1774,5 +1782,6 @@ function Module:OnInitialize()
     notes = GetAddOnMetadata(AddonName, "Notes")
     title = GetAddOnMetadata(AddonName, "Title")
     AddConfig()
+    ToggleAutoRole()
     db.profile.initTest = nil
 end
