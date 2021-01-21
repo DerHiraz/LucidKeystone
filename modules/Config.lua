@@ -1736,18 +1736,15 @@ end
 -- Add April fool
 --[[for i, v in pairs({"lkcat"}) do
 	_G["SLASH_LKt"..i] = "/"..v
-end
--- Print deaths Statistics
-for i, v in pairs({"lkdeaths"}) do
-	_G["SLASH_LKd"..i] = "/"..v
 end]]
--- Get M+ playtime
 
 function SlashCmdList.LK(msg)
     if msg == "" then
+        -- Open Config
         ACD:SetDefaultSize(AddonName, 648, 570)
         ACD:Open(AddonName)
     elseif msg == L["played"] or msg == "played" then
+        -- Get M+ Time played in Chat
         local days = select(1,TimeSpend()[1]).." "..L["days"]
         local hours = select(1,TimeSpend()[2]).." "..L["hours"]
         local minutes = select(1,TimeSpend()[3]).." "..L["minutes"]
@@ -1755,23 +1752,26 @@ function SlashCmdList.LK(msg)
 
         SendSystemMessage(L["Time played this Season in M+: "]..days..", "..hours..", "..minutes..", "..seconds)
     elseif msg == L["preview"] or msg == "preview" then
+        -- Load Preview
         Module:ToggleTest()
     elseif msg == L["version"] or msg == "version" then
+        -- Get Version in Chat
         SendSystemMessage(L["Version: "]..version)
     elseif msg == L["hilfe"] or msg == "help" then
+        -- Get all Commands in Chat
         SendSystemMessage(L["Lucid Keystone Commands:"].."\n/lk\n/lk "..L["played"].."\n/lk "..L["version"].."\n/lk "..L["preview"])
+    elseif msg == "deaths" then
+        -- Get Deaths Overall
+        print("Death Counter in M+")
+        print("Profile: "..db.global.statistic.deaths)
+        print("----------------------")
     else
+        -- Get Error Msg
         SendSystemMessage(L["Invalid Command. Type \"/lk help\" to see all Lucid Keystone Commands."])
     end
 end
 --[[function SlashCmdList.LKt()
     backdroplist[11] = "April Fool"
-end
-function SlashCmdList.LKd()
-    print("Death Counter in M+")
-    print("Global: "..db.profile.statistic.deaths)
-    print("Profile: "..db.global.statistic.deaths)
-    print("----------------------")
 end]]
 
 --Initialize function
