@@ -62,6 +62,10 @@ L["Displays you the killed bosses.\n\ne.g.\n[Simple = 3/4]\n[Extended = Name 0/1
 L["Extended"] = true
 L["Timestamp on Bosskill"] = true
 L["Gives you a timestamp if you kill a boss."] = true
+L["Best Boss Kill Time"] = true
+L["Shows you the best Kill time for the the current or the next highest Level."] = true
+L["Absolute"] = true
+L["Relative"] = true
 L["Display Affix"] = true
 L["Display you the current active affix of your run."] = true
 L["Text"] = true
@@ -89,6 +93,9 @@ L["Invert Progress Bar"] = true
 L["Invert the Progress Bar to count down the percentage."] = true
 L["Mob Count in Percent"] = true
 L["Shows the Mob Count in Percent instead of the exact Number."] = true
+L["Current Pull"] = true
+L["Get the current Pull Percentage / Count gain."] = true
+L["After Pull"] = true
 
 --## General Settings
 L["General"] = true
@@ -172,3 +179,8 @@ L["Btw, the key is not a lie."] = true
 L["Leeeeeeeeeeeeeeeroy!"] = true
 L["Millions of years of evolution vs. your fist... lets go!"] = true
 L["Keep calm and blame it on the lag."] = true
+L["If the Key don't scare your, then it's too low."] = true
+L["Don't stop until you're Proud."] = true
+L["Keep in mind, you only fail when you wipe."] = true
+L["Don't forget to stay hydrated."] = true
+L["Play. Kill. Deplete. Repeat."] = true
