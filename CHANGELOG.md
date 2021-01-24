@@ -15,3 +15,7 @@
 ## 1.0.2
 
 - fixed a nil value for SharedMedia Lib
+
+## 1.0.3
+
+- added Current Pull Count
