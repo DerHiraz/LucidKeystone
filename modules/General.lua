@@ -21,6 +21,11 @@ local msgTable = {
     L["Leeeeeeeeeeeeeeeroy!"].."|r",
     L["Millions of years of evolution vs. your fist... lets go!"].."|r",
     L["Keep calm and blame it on the lag."].."|r",
+    L["If the Key don't scare your, then it's too low."],
+    L["Don't stop until you're Proud."],
+    L["Keep in mind, you only fail when you wipe."],
+    L["Don't forget to stay hydrated."],
+    L["Play. Kill. Deplete. Repeat."],
 }
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

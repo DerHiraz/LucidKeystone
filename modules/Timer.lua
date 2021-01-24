@@ -18,6 +18,7 @@ local previewSettings = {
     level       = 16,
     deaths      = 7,
     mobPerc     = 89.72,
+    mobCurPerc  = 2.64,
     bosses      = {
                 "|cff777777"..L["Johnny Awesome defeated"].."   1/1   |cff4cff00|r", 
                 "|cff777777"..L["Innocent Cat defeated"].."   1/1   |cff4cff00|r", 
@@ -84,6 +85,33 @@ local previewSettings = {
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --  General Tables and Arrays
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Addon.MDTdungeon = {
+        [1663] = 30, -- Halls of Atonement
+        [1664] = 30, -- Halls of Atonement
+        [1665] = 30, -- Halls of Atonement
+        [1666] = 35, -- The Necrotic Wake
+        [1667] = 35, -- The Necrotic Wake
+        [1668] = 35, -- The Necrotic Wake
+        [1669] = 31, -- Mists Of Tirna Scithe
+        [1674] = 32, -- Plaguefall
+        [1697] = 32, -- Plaguefall
+        [1675] = 33, -- Sanguine Depths
+        [1676] = 33, -- Sanguine Depths
+        [1677] = 29, -- De Other Side
+        [1678] = 29, -- De Other Side
+        [1679] = 29, -- De Other Side
+        [1680] = 29, -- De Other Side
+        [1683] = 36, -- Theater Of Pain
+        [1684] = 36, -- Theater Of Pain
+        [1685] = 36, -- Theater Of Pain
+        [1686] = 36, -- Theater Of Pain
+        [1687] = 36, -- Theater Of Pain
+        [1692] = 34, -- Spires Of Ascension
+        [1693] = 34, -- Spires Of Ascension
+        [1694] = 34, -- Spires Of Ascension
+        [1695] = 34, -- Spires Of Ascension
+}
 
 local imgfile = {
     [1] = "lk_bg_None",
@@ -185,7 +213,8 @@ end
 local function GetMobCount()
     local _,_,steps = C_Scenario.GetStepInfo()
     -- last scenario step is the mob count
-    local percent, total,_,_,current = select(4, C_Scenario.GetCriteriaInfo(steps))
+    --local percent, total,_,_,current = select(4, C_Scenario.GetCriteriaInfo(steps))
+    local _, _, _, percent, total, _, _, current = C_Scenario.GetCriteriaInfo(steps)
     if current then
         current = tonumber(string.sub(current, 1, string.len(current) - 1))
     end
@@ -289,6 +318,8 @@ local function UpdateBosses()
 
         -- Extended display for Bosses
         local extended = {}
+        local level = C_ChallengeMode.GetActiveKeystoneInfo()
+        local mapID = db.profile.GetActiveChallengeMapID
         for i = 1, 10 do
             local name,_,_,kill,killOf,_,_,_,_,_,killTime = C_Scenario.GetCriteriaInfo(i)
             local _, selina = GetWorldElapsedTime(1)
@@ -296,9 +327,12 @@ local function UpdateBosses()
                 name = name.."   "..kill.."/"..killOf
                 if kill == killOf then
                     name = "|cff777777"..name
+                    if db.profile.dungeonBestBoss[mapID][level][i].duration > (selina - killTime) then
+                        db.profile.dungeonBestBoss[mapID][level][i].duration = selina - killTime
+                    end
                     if db.profile.timeStamp then
                         killTime = date("%M:%S", selina - killTime)
-                        name = name.."   |cff4cff00"..killTime
+                        name = name.."   |cff4cff00"..killTime.."|cff4fc3f7"
                     end
                 end
                 table.insert(extended, name.."|r")
@@ -312,15 +346,30 @@ end
 local function UpdateMobs()
     local current, total = GetMobCount()
     local before = current / total * 100
+    local new = ""
     local colorBefore = "FFffffff"
+    local colorGreen = "ff4cff00"
     local strBefore = string.format("|c%s%.2f%%|r", colorBefore, before)
+    local cur = string.format("\n|c%s+%.2f%%|r", colorGreen, db.profile.currentPullCount)
+    local cur2 = string.format("\n|c%s%.2f%%|r", colorGreen, db.profile.currentPullCount+before)
     local f = LucidKeystoneFrame
+
     if db.profile.MobPercStep then
+        if db.profile.MobPullConf == 2 and db.profile.currentPullCount > 0 then
+            strBefore = strBefore..cur
+        elseif db.profile.MobPullConf == 3 and db.profile.currentPullCount > 0 then
+            strBefore = strBefore..cur2
+        end
         f.textMobs:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 15, "OUTLINE")
         f.textMobs:SetText(strBefore)
     else
+        if db.profile.MobPullConf == 2 and db.profile.currentPullCount > 0 then
+            new = string.format("\n|c%s+%d|r", colorGreen, db.profile.currentPullCount)
+        elseif db.profile.MobPullConf == 3 and db.profile.currentPullCount > 0 then
+            new = string.format("\n|c%s%d|r", colorGreen, db.profile.currentPullCount+current)
+        end
         f.textMobs:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 13, "OUTLINE")
-        f.textMobs:SetText(current.." / "..total)
+        f.textMobs:SetText(current.." / "..total..new)
     end
     local bar = LucidKeystoneFrameBarPerc
     if db.profile.invertPerc then
@@ -364,6 +413,7 @@ local function eventHandler(self, e, ...)
         ObjectiveTrackerFrame:Hide()
         LucidKeystoneFrame:Show()
         db.profile.start = true
+        db.profile.currentPull = 0.0
         UpdateDungeonName()
         bootlegRepeatingTimer()
     end
@@ -410,7 +460,46 @@ local function eventHandler(self, e, ...)
         f.textTimerOne:SetText("+1\n"..TimeFormat(maxTime))
         f.textTimerTwo:SetText("+2\n"..TimeFormat(maxTime*0.8-time))
         f.textTimerThree:SetText("+3\n"..TimeFormat(maxTime*0.6-time))
+        db.profile.currentPull = 0.0
     end
+    if e == "COMBAT_LOG_EVENT_UNFILTERED" and db.profile.start and db.profile.MobPullConf ~= 1 and IsAddOnLoaded("MythicDungeonTools") then
+        db.profile.currentPull = 0.0
+    
+        for i = 1, 40 do
+            local unit = "nameplate"..i
+            if UnitExists(unit) and UnitAffectingCombat(unit) then
+                
+                local weight = nil
+                local preset = MDT:GetCurrentPreset()
+                local isTeeming = MDT:IsPresetTeeming(preset)
+                local npcIdStr = select(6, strsplit("-", UnitGUID(unit)))
+                local npcId = tonumber(npcIdStr or "0") or 0
+                local count, max, maxTeeming = MDT:GetEnemyForces(npcId)
+
+                if (count ~= nil and max ~= nil and maxTeeming ~= nil) then
+                    if (isTeeming) then
+                        weight = count/maxTeeming
+                    else
+                        weight = count/max
+                    end
+                    weight = weight*100
+                    if db.profile.MobPercStep then
+                        if (weight and weight > 0) then
+                                db.profile.currentPull = db.profile.currentPull+weight
+                        end
+                    else
+                        db.profile.currentPull = db.profile.currentPull+count
+                    end
+                end
+            end
+        end
+        db.profile.currentPullCount = db.profile.currentPull
+        UpdateMobs()
+    end
+    if e == "PLAYER_REGEN_ENABLED" and db.profile.start and db.profile.MobPullConf then
+            db.profile.currentPull = 0.0
+    end
+
     --Test Event
     --[[if e == "PLAYER_STOPPED_MOVING" then
         -- do test stuff kappa
@@ -480,6 +569,8 @@ local function ToggleLucidKeystoneFrame()
     bg:RegisterEvent("CHALLENGE_MODE_COMPLETED")
     bg:RegisterEvent("PLAYER_STARTED_MOVING")
     bg:RegisterEvent("PLAYER_STOPPED_MOVING")
+    bg:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+    bg:RegisterEvent("PLAYER_REGEN_ENABLED")
 
     -- Text Frames
     bg.textLevel = bg:CreateFontString()
@@ -489,12 +580,12 @@ local function ToggleLucidKeystoneFrame()
     bg.textTimer:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 26, "OUTLINE")
     bg.textTimer:SetTextColor(0, 0.72, 1, 1)
     bg.textTimer:SetPoint("LEFT",208,32)
-    bg.textTimer:SetJustifyH("LEFT");
+    bg.textTimer:SetJustifyH("LEFT")
     bg.textTimerSmall = bg:CreateFontString()
     bg.textTimerSmall:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 12, "OUTLINE")
     bg.textTimerSmall:SetTextColor(1, 1, 1, 1)
     bg.textTimerSmall:SetPoint("LEFT",290,24)
-    bg.textTimerSmall:SetJustifyH("LEFT");
+    bg.textTimerSmall:SetJustifyH("LEFT")
     bg.textDeaths = bg:CreateFontString()
     bg.textDeaths:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 14, "OUTLINE")
     bg.textDeaths:SetTextColor(0.7, 0, 0.1, 1)
@@ -502,18 +593,18 @@ local function ToggleLucidKeystoneFrame()
     bg.textMobs = bg:CreateFontString()
     bg.textMobs:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 15, "OUTLINE")
     bg.textMobs:SetTextColor(1, 1, 1, 1)
-    bg.textMobs:SetPoint("CENTER",111,0)
+    bg.textMobs:SetPoint("CENTER",111,-2)
     bg.textBosses = bg:CreateFontString()
     bg.textBosses:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 12, "OUTLINE")
     bg.textBosses:SetTextColor(1, 1, 1, 1)
-    bg.textBosses:SetJustifyH("LEFT");
+    bg.textBosses:SetJustifyH("LEFT")
     bg.textDungeon = bg:CreateFontString()
     bg.textDungeon:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 14, "OUTLINE")
     bg.textDungeon:SetTextColor(1, 1, 1, 1)
-    bg.textDungeon:SetJustifyH("CENTER");
+    bg.textDungeon:SetJustifyH("CENTER")
     bg.textAffix = bg:CreateFontString()
     bg.textAffix:SetTextColor(1, 1, 1, 1)
-    bg.textAffix:SetJustifyH("CENTER");
+    bg.textAffix:SetJustifyH("CENTER")
 
     bg.textTimerOne = bg:CreateFontString()
     bg.textTimerOne:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 14, "OUTLINE")
@@ -839,14 +930,14 @@ function Module.Config:UnlockUpdate()
             f:SetScript("OnMouseDown", function(self, button)
                 if button == "LeftButton" and not self.isMoving then
                 MovableCheck()
-                self:StartMoving();
-                self.isMoving = true;
+                self:StartMoving()
+                self.isMoving = true
                 end
             end)
             f:SetScript("OnMouseUp", function(self, button)
                 if button == "LeftButton" and self.isMoving then
-                self:StopMovingOrSizing();
-                self.isMoving = false;
+                self:StopMovingOrSizing()
+                self.isMoving = false
                 db.profile.fpoint = select(1, f:GetPoint())
                 db.profile.fxof = select(4, f:GetPoint())
                 db.profile.fyof = select(5, f:GetPoint())
@@ -854,8 +945,8 @@ function Module.Config:UnlockUpdate()
             end)
             f:SetScript("OnHide", function(self)
                 if ( self.isMoving ) then
-                self:StopMovingOrSizing();
-                self.isMoving = false;
+                self:StopMovingOrSizing()
+                self.isMoving = false
                 end
             end)
         else

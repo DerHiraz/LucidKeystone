@@ -20,6 +20,7 @@ local fontColor = {
 ------  Blank Tables
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+
 local dungeonListInt = {
     [244] = 0,
     [245] = 0,
@@ -68,6 +69,39 @@ local bestList = {
     level       = 0,
     duration    = 100000,
     date        = 0,
+}
+local levelBossTiming = {
+    [1] = {duration = 100000},
+    [2] = {duration = 100000},
+    [3] = {duration = 100000},
+    [4] = {duration = 100000},
+    [5] = {duration = 100000},
+}
+local levelBossTimingBest = {}
+for i = 1, 35 do
+    levelBossTimingBest[i] = levelBossTiming
+end
+local dungeonBestBossT = {
+    [244] = levelBossTimingBest,
+    [245] = levelBossTimingBest,
+    [246] = levelBossTimingBest,
+    [247] = levelBossTimingBest,
+    [248] = levelBossTimingBest,
+    [249] = levelBossTimingBest,
+    [250] = levelBossTimingBest,
+    [251] = levelBossTimingBest,
+    [252] = levelBossTimingBest,
+    [353] = levelBossTimingBest,
+    [369] = levelBossTimingBest,
+    [370] = levelBossTimingBest,
+    [375] = levelBossTimingBest,
+    [376] = levelBossTimingBest,
+    [377] = levelBossTimingBest,
+    [378] = levelBossTimingBest,
+    [379] = levelBossTimingBest,
+    [380] = levelBossTimingBest,
+    [381] = levelBossTimingBest,
+    [382] = levelBossTimingBest,
 }
 local dungeonListTableBest = {
     [244] = bestList,
@@ -184,6 +218,8 @@ local defaults = {
         dungeonName     = 1,
         mainTimer       = 1,
         mobCount        = 1,
+        MobPullConf     = 1,
+        bestBefore      = 2,
         fpoint          = "TOPRIGHT",
         TimerBarStyle   = "Lucid Keystone Particles",
         MobBarStyle     = "Lucid Keystone Particles",
@@ -192,6 +228,7 @@ local defaults = {
         fyof            = 0,
         expansion       = GetExpansionLevel(),
         season          = C_MythicPlus.GetCurrentSeason(),
+        dungeonBestBoss = dungeonBestBossT,
         runs            = {
                             [7] = { --expansion
                                 [1] = { -- season
@@ -876,7 +913,9 @@ local function AddConfig()
                         type = "execute",
                         confirm = true,
                         confirmText = fontColor.yellow:format(L["Version Check"]).."\n\n\n"..version.."\n ",
-                        func = function() return end,
+                        func = function()
+                            return
+                        end,
                         width = 0.8,
                     },
                     resetButton = {
@@ -1166,6 +1205,23 @@ local function AddConfig()
                                 width = 1.2,
                                 order = 30,
                             },
+                            --[[bestBefore = {
+                                type = "select",
+                                name = L["Best Boss Kill Time"],
+                                desc = L["Shows you the best Kill time for the the current or the next highest Level."],
+                                set = function(_, val)
+                                    Module:SetOption("bestBefore", val)
+                                    Module:BossesText()
+                                end,
+                                get = function() return Module:GetOption("bestBefore") end,
+                                width = 1.2,
+                                order = 40,
+                                values = {
+                                    [1] = L["None"],
+                                    [2] = L["Absolute"],
+                                    [3] = L["Relative"],
+                                },
+                            },]]
                         },
                     },
                     displayMobs = {
@@ -1217,8 +1273,33 @@ local function AddConfig()
                                 width = 1.2,
                                 order = 30,
                             },
-                            MobBarStyle = {
+                            MobPullConf = {
+                                type = "select",
+                                name = L["Current Pull"],
+                                desc = L["Get the current Pull Percentage / Count gain."],
+                                set = function(_, val)
+                                    Module:SetOption("MobPullConf", val)
+                                end,
+                                get = function() return Module:GetOption("MobPullConf") end,
+                                disabled = function()
+                                    return not  IsAddOnLoaded("MythicDungeonTools")
+                                end,
+                                values = {
+                                    [1] = L["None"],
+                                    [2] = L["Current Pull"],
+                                    [3] = L["After Pull"],
+                                },
+                                width = 1.2,
                                 order = 40,
+                            },
+                            MobSpace1 = {
+                                order = 50,
+                                name = " ",
+                                type = "description",
+                                width = 2,
+                            },
+                            MobBarStyle = {
+                                order = 60,
                                 name = L["Bar Style"],
                                 type = "select",
                                 width = 1.2,
@@ -1233,8 +1314,8 @@ local function AddConfig()
                                     return Module:GetOption("mobCount") == 1
                                 end,
                             },
-                            MobSpace = {
-                                order = 50,
+                            MobSpac2 = {
+                                order = 70,
                                 name = " ",
                                 type = "description",
                                 width = 2,
@@ -1252,7 +1333,7 @@ local function AddConfig()
                                     return Module:GetOption("mobCount") == 1
                                 end,
                                 width = 1,
-                                order = 60,
+                                order = 80,
                             },
                             MobPercStep = {
                                 type = "toggle",
@@ -1264,7 +1345,7 @@ local function AddConfig()
                                 end,
                                 get = function() return Module:GetOption("MobPercStep") end,
                                 width = 1,
-                                order = 70,
+                                order = 90,
                             },
                         },
                     },
@@ -1757,14 +1838,23 @@ function SlashCmdList.LK(msg)
     elseif msg == L["version"] or msg == "version" then
         -- Get Version in Chat
         SendSystemMessage(L["Version: "]..version)
-    elseif msg == L["hilfe"] or msg == "help" then
+    elseif msg == L["help"] or msg == "help" then
         -- Get all Commands in Chat
         SendSystemMessage(L["Lucid Keystone Commands:"].."\n/lk\n/lk "..L["played"].."\n/lk "..L["version"].."\n/lk "..L["preview"])
+    --[[elseif msg == "test" then
+        local level = 17
+        local map = 382
+        print("Get Best for +"..level.." "..mapID[map].ShortName)
+        print("1:  "..db.profile.dungeonBestBoss[map][level][1].duration)
+        print("2:  "..db.profile.dungeonBestBoss[map][level][2].duration)
+        print("3:  "..db.profile.dungeonBestBoss[map][level][3].duration)
+        print("4:  "..db.profile.dungeonBestBoss[map][level][4].duration)
+        print("5:  "..db.profile.dungeonBestBoss[map][level][5].duration)
     elseif msg == "deaths" then
         -- Get Deaths Overall
         print("Death Counter in M+")
         print("Profile: "..db.global.statistic.deaths)
-        print("----------------------")
+        print("----------------------")]]
     else
         -- Get Error Msg
         SendSystemMessage(L["Invalid Command. Type \"/lk help\" to see all Lucid Keystone Commands."])
