@@ -20,7 +20,6 @@ local fontColor = {
 ------  Blank Tables
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
 local dungeonListInt = {
     [244] = 0,
     [245] = 0,
@@ -77,10 +76,44 @@ local levelBossTiming = {
     [4] = {duration = 100000},
     [5] = {duration = 100000},
 }
-local levelBossTimingBest = {}
-for i = 1, 35 do
-    levelBossTimingBest[i] = levelBossTiming
-end
+
+local levelBossTimingBest = {
+    [1]  = levelBossTiming,
+    [2]  = levelBossTiming,
+    [3]  = levelBossTiming,
+    [4]  = levelBossTiming,
+    [5]  = levelBossTiming,
+    [6]  = levelBossTiming,
+    [7]  = levelBossTiming,
+    [8]  = levelBossTiming,
+    [9]  = levelBossTiming,
+    [10] = levelBossTiming,
+    [11] = levelBossTiming,
+    [12] = levelBossTiming,
+    [13] = levelBossTiming,
+    [14] = levelBossTiming,
+    [15] = levelBossTiming,
+    [16] = levelBossTiming,
+    [17] = levelBossTiming,
+    [18] = levelBossTiming,
+    [19] = levelBossTiming,
+    [20] = levelBossTiming,
+    [21] = levelBossTiming,
+    [22] = levelBossTiming,
+    [23] = levelBossTiming,
+    [24] = levelBossTiming,
+    [25] = levelBossTiming,
+    [26] = levelBossTiming,
+    [27] = levelBossTiming,
+    [28] = levelBossTiming,
+    [29] = levelBossTiming,
+    [30] = levelBossTiming,
+    [31] = levelBossTiming,
+    [32] = levelBossTiming,
+    [33] = levelBossTiming,
+    [34] = levelBossTiming,
+    [35] = levelBossTiming,
+}
 local dungeonBestBossT = {
     [244] = levelBossTimingBest,
     [245] = levelBossTimingBest,
@@ -218,7 +251,7 @@ local defaults = {
         dungeonName     = 1,
         mainTimer       = 1,
         mobCount        = 1,
-        MobPullConf     = 1,
+        MobPullConf     = 3,
         bestBefore      = 2,
         fpoint          = "TOPRIGHT",
         TimerBarStyle   = "Lucid Keystone Particles",
@@ -369,6 +402,7 @@ local function ResetConfig()
         history = db.profile.dungeonHistory,
         stats = db.profile.statistic,
         season = db.profile.season,
+        bestBoss = db.profile.dungeonBestBoss,
     }
     db:RegisterDefaults(defaults)
     db:ResetProfile()
@@ -379,6 +413,7 @@ local function ResetConfig()
     db.profile.dungeonHistory = exclude.history
     db.profile.statistic = exclude.stats
     db.profile.season = exclude.season
+    db.profile.dungeonBestBoss = exclude.bestBoss
     LibStub("AceConfigRegistry-3.0"):NotifyChange("LucidKeystone")
     StaticPopup_Show("LucidKeystone_ReloadPopup")
     Module:ToggleFrames()
@@ -469,6 +504,44 @@ local function ToggleAutoRole()
     else
         LFDRoleCheckPopupAcceptButton:SetScript("OnShow", nil)
         LFGListApplicationDialog.SignUpButton:SetScript("OnShow", nil)
+    end
+end
+
+local function CheckForTimings()
+    local check = db.profile.dungeonBestBoss
+    if check[375][1][1].duration == 100000 then
+        check[375][1][1].duration = 509
+        check[375][1][2].duration = 1108
+        check[375][1][3].duration = 1781
+        check[376][1][1].duration = 349
+        check[376][1][2].duration = 1076
+        check[376][1][3].duration = 1803
+        check[376][1][4].duration = 2101
+        check[377][1][1].duration = 760
+        check[377][1][2].duration = 1409
+        check[377][1][3].duration = 1980
+        check[377][1][4].duration = 2445
+        check[378][1][1].duration = 921
+        check[378][1][2].duration = 1243
+        check[378][1][3].duration = 1523
+        check[378][1][4].duration = 1843
+        check[379][1][1].duration = 438
+        check[379][1][2].duration = 1233
+        check[379][1][3].duration = 1692
+        check[379][1][4].duration = 2232
+        check[380][1][1].duration = 421
+        check[380][1][2].duration = 1329
+        check[380][1][3].duration = 1693
+        check[380][1][4].duration = 2401
+        check[381][1][1].duration = 401
+        check[381][1][2].duration = 1466
+        check[381][1][3].duration = 1773
+        check[381][1][4].duration = 2284
+        check[382][1][1].duration = 161
+        check[382][1][2].duration = 1269
+        check[382][1][3].duration = 766
+        check[382][1][4].duration = 2013
+        check[382][1][5].duration = 2194
     end
 end
 
@@ -1205,7 +1278,7 @@ local function AddConfig()
                                 width = 1.2,
                                 order = 30,
                             },
-                            --[[bestBefore = {
+                            bestBefore = {
                                 type = "select",
                                 name = L["Best Boss Kill Time"],
                                 desc = L["Shows you the best Kill time for the the current or the next highest Level."],
@@ -1221,7 +1294,7 @@ local function AddConfig()
                                     [2] = L["Absolute"],
                                     [3] = L["Relative"],
                                 },
-                            },]]
+                            },
                         },
                     },
                     displayMobs = {
@@ -1279,6 +1352,7 @@ local function AddConfig()
                                 desc = L["Get the current Pull Percentage / Count gain."],
                                 set = function(_, val)
                                     Module:SetOption("MobPullConf", val)
+                                    Module:MobUpdateConfig()
                                 end,
                                 get = function() return Module:GetOption("MobPullConf") end,
                                 disabled = function()
@@ -1819,7 +1893,8 @@ end
 	_G["SLASH_LKt"..i] = "/"..v
 end]]
 
-function SlashCmdList.LK(msg)
+function SlashCmdList.LK(msg,editbox)
+    local _, _, cmd, args = string.find(msg, "%s?(%w+)%s?(.*)")
     if msg == "" then
         -- Open Config
         ACD:SetDefaultSize(AddonName, 648, 570)
@@ -1841,9 +1916,9 @@ function SlashCmdList.LK(msg)
     elseif msg == L["help"] or msg == "help" then
         -- Get all Commands in Chat
         SendSystemMessage(L["Lucid Keystone Commands:"].."\n/lk\n/lk "..L["played"].."\n/lk "..L["version"].."\n/lk "..L["preview"])
-    --[[elseif msg == "test" then
-        local level = 17
-        local map = 382
+    --[[elseif cmd == "test" then
+        local level = tonumber(args)
+        local map = 381
         print("Get Best for +"..level.." "..mapID[map].ShortName)
         print("1:  "..db.profile.dungeonBestBoss[map][level][1].duration)
         print("2:  "..db.profile.dungeonBestBoss[map][level][2].duration)
@@ -1853,7 +1928,7 @@ function SlashCmdList.LK(msg)
     elseif msg == "deaths" then
         -- Get Deaths Overall
         print("Death Counter in M+")
-        print("Profile: "..db.global.statistic.deaths)
+        print("Profile: "..db.profile.statistic.deaths) 
         print("----------------------")]]
     else
         -- Get Error Msg
@@ -1873,5 +1948,5 @@ function Module:OnInitialize()
     title = GetAddOnMetadata(AddonName, "Title")
     AddConfig()
     ToggleAutoRole()
-    db.profile.initTest = nil
+    CheckForTimings()
 end

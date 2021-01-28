@@ -146,14 +146,18 @@ local sparkleEffect = {
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- Time formating for every Timer in Frame
-local function TimeFormat(time) 
+local function TimeFormat(time,plus) 
     local format_minutes = "%.2d:%.2d"
     local format_hours = "%d:%.2d:%.2d"
     local prefix = " "
+    if plus then
+        prefix = "+"
+    end
     if time < 0 then
         time = time * -1
         prefix = "-"
     end
+
     local seconds = time % 60 -- seconds/min
     local minutes = math.floor((time / 60) % 60) -- min/hr
     local hours = math.floor(time / 3600)
@@ -296,6 +300,7 @@ end
 -- Bosses Killed in active Run
 local function UpdateBosses()
     local f = LucidKeystoneFrame
+    local before = db.profile.bestBeforeStart
     if db.profile.bosses == 2 then
 
         -- Simple display for Bosses
@@ -331,8 +336,23 @@ local function UpdateBosses()
                         db.profile.dungeonBestBoss[mapID][level][i].duration = selina - killTime
                     end
                     if db.profile.timeStamp then
+                        local before = 100000
+                        local plus = false
+                        if db.profile.bestBefore == 2 then
+                            before = db.profile.bestBeforeStart[i]
+                        elseif db.profile.bestBefore == 3 and db.profile.bestBeforeStart[i] < 100000 then
+                            before = selina - killTime - db.profile.bestBeforeStart[i]
+                            plus = true
+                        end
+
+                        if before < 100000 then
+                            before = "  ["..TimeFormat(before,plus).."]|r"
+                        else
+                            before = "|r"
+                        end
+                        
                         killTime = date("%M:%S", selina - killTime)
-                        name = name.."   |cff4cff00"..killTime.."|cff4fc3f7"
+                        name = name.."   |cff4cff00"..killTime.."|cff4fc3f7"..before
                     end
                 end
                 table.insert(extended, name.."|r")
@@ -348,10 +368,10 @@ local function UpdateMobs()
     local before = current / total * 100
     local new = ""
     local colorBefore = "FFffffff"
-    local colorGreen = "ff4cff00"
+    local colorInd = "ff4cff00"
     local strBefore = string.format("|c%s%.2f%%|r", colorBefore, before)
-    local cur = string.format("\n|c%s+%.2f%%|r", colorGreen, db.profile.currentPullCount)
-    local cur2 = string.format("\n|c%s%.2f%%|r", colorGreen, db.profile.currentPullCount+before)
+    local cur = string.format("\n|c%s+%.2f%%|r", colorInd, db.profile.currentPullCount)
+    local cur2 = string.format("\n|c%s%.2f%%|r", colorInd, db.profile.currentPullCount+before)
     local f = LucidKeystoneFrame
 
     if db.profile.MobPercStep then
@@ -364,9 +384,9 @@ local function UpdateMobs()
         f.textMobs:SetText(strBefore)
     else
         if db.profile.MobPullConf == 2 and db.profile.currentPullCount > 0 then
-            new = string.format("\n|c%s+%d|r", colorGreen, db.profile.currentPullCount)
+            new = string.format("\n|c%s+%d|r", colorInd, db.profile.currentPullCount)
         elseif db.profile.MobPullConf == 3 and db.profile.currentPullCount > 0 then
-            new = string.format("\n|c%s%d|r", colorGreen, db.profile.currentPullCount+current)
+            new = string.format("\n|c%s%d|r", colorInd, db.profile.currentPullCount+current)
         end
         f.textMobs:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 13, "OUTLINE")
         f.textMobs:SetText(current.." / "..total..new)
@@ -383,13 +403,27 @@ end
 function Module.Config:MobUpdateConfig()
     local current = 256
     local total = 285
+    local mobPerc = previewSettings.mobPerc
+    local mobCurPerc = previewSettings.mobCurPerc
     local f = LucidKeystoneFrame
     if db.profile.MobPercStep then
         f.textMobs:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 15, "OUTLINE")
-        f.textMobs:SetText("89.72%")
+        if db.profile.MobPullConf == 2 then
+            f.textMobs:SetText(mobPerc.."%\n|cff4cff00+"..mobCurPerc.."%|r")
+        elseif db.profile.MobPullConf == 3 then
+            f.textMobs:SetText(mobPerc.."%\n|cff4cff00"..mobCurPerc+mobPerc.."%|r")
+        else
+            f.textMobs:SetText(mobPerc.."%")
+        end
     else
         f.textMobs:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 13, "OUTLINE")
-        f.textMobs:SetText(current.." / "..total)
+        if db.profile.MobPullConf == 2 then
+            f.textMobs:SetText(current.." / "..total.."\n|cff4cff00+8|r")
+        elseif db.profile.MobPullConf == 3 then
+            f.textMobs:SetText(current.." / "..total.."\n|cff4cff00264|r")
+        else
+            f.textMobs:SetText(current.." / "..total)
+        end
     end
 end
 
@@ -402,20 +436,48 @@ local function UpdateDungeonName()
     end
 end
 
+local function GetBestBefore()
+    local level = C_ChallengeMode.GetActiveKeystoneInfo()
+    local mapID = db.profile.GetActiveChallengeMapID
+    local newLevel = 1
+    db.profile.bestBeforeStart = {}
+    for i = 1, 10 do
+        local _,_,_,_,killOf = C_Scenario.GetCriteriaInfo(i)
+        if killOf == 1 then
+            local before
+            for n = 1, level do
+                if db.profile.dungeonBestBoss[mapID][n][i].duration < 100000 then
+                    newLevel = n
+                end
+            end
+            if db.profile.dungeonBestBoss[mapID][newLevel][i].duration < 100000 then
+                before = db.profile.dungeonBestBoss[mapID][newLevel][i].duration
+            else
+                before = 100000
+            end
+            table.insert(db.profile.bestBeforeStart, before)
+        end
+    end
+end
+
+
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --  Event Handler 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 local function eventHandler(self, e, ...)
     if e == "CHALLENGE_MODE_START" then
-        --db.profile.GetActiveChallengeMapID = C_ChallengeMode.GetActiveChallengeMapID()
         Module.Config.ToggleFrames()
         ObjectiveTrackerFrame:Hide()
         LucidKeystoneFrame:Show()
         db.profile.start = true
         db.profile.currentPull = 0.0
+        db.profile.currentPullCount = 0.0
+        db.profile.GetActiveChallengeMapID = C_ChallengeMode.GetActiveChallengeMapID()
         UpdateDungeonName()
         bootlegRepeatingTimer()
+        UpdateBosses()
+        GetBestBefore()
     end
     if (e == "SCENARIO_CRITERIA_UPDATE" or e == "CHALLENGE_MODE_START") and db.profile.start then
         UpdateMobs()
@@ -503,6 +565,7 @@ local function eventHandler(self, e, ...)
     --Test Event
     --[[if e == "PLAYER_STOPPED_MOVING" then
         -- do test stuff kappa
+        GetBestBefore()
     end
     if e == "PLAYER_STARTED_MOVING" then
         -- do test stuff kappa
@@ -730,9 +793,11 @@ function Module.Config:TimerText()
         time = previewSettings.time
         deaths = previewSettings.deaths
         mobPerc = previewSettings.mobPerc
+        mobCurPerc = previewSettings.mobCurPerc
     end
     local test = CreateAtlasMarkup("poi-graveyard-neutral")
     local timeSmall = time
+    local mobPercPlus = ""
     local f = LucidKeystoneFrame
     --b:SetStatusBarColor(0,0.7,1,1)
     if db.profile.mainTimer == 2 then
@@ -748,7 +813,13 @@ function Module.Config:TimerText()
         f.textDeaths:SetText(test.." "..deaths.."\n-"..TimeFormat(deaths*5))
         if db.profile.MobPercStep then
             f.textMobs:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 15, "OUTLINE")
-            f.textMobs:SetText(mobPerc.."%")
+            if db.profile.MobPullConf == 2 then
+                f.textMobs:SetText(mobPerc.."%\n|cff4cff00+"..mobCurPerc.."%|r")
+            elseif db.profile.MobPullConf == 3 then
+                f.textMobs:SetText(mobPerc.."%\n|cff4cff00"..mobCurPerc+mobPerc.."%|r")
+            else
+                f.textMobs:SetText(mobPerc.."%")
+            end
         else
             f.textMobs:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 13, "OUTLINE")
             f.textMobs:SetText(256 .." / ".. 285)

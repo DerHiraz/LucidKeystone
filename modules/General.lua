@@ -28,6 +28,23 @@ local msgTable = {
     L["Play. Kill. Deplete. Repeat."],
 }
 
+local loot = {
+    [2] = 187,
+    [3] = 190,
+    [4] = 194,
+    [5] = 194,
+    [6] = 197,
+    [7] = 200,
+    [8] = 200,
+    [9] = 200,
+    [10] = 203,
+    [11] = 203,
+    [12] = 207,
+    [13] = 207,
+    [14] = 207,
+    [15] = 210,
+}
+
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --  Function Section
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -63,13 +80,20 @@ end
 
 -- Keypost Function
 ---- Find Keystone in Bags
+local keyID = {
+    [138019] = true, -- Legion
+    [158923] = true, -- BfA
+    [180653] = true, -- Shadowlands
+    [151086] = true, -- Tournament
+}
+
 local keystone = nil
 local function KeyPost(force,guild)
         for bag = 0, NUM_BAG_SLOTS do
             local numSlots = GetContainerNumSlots(bag)
             for slot = 1, numSlots do
-                if (GetContainerItemID(bag, slot) == 158923) or (GetContainerItemID(bag, slot) == 180653) then
-                    local link = GetContainerItemLink(bag, slot)
+                local link, _, _, itemID = select(7, GetContainerItemInfo(bag, slot))
+                if keyID[itemID] then
                     if force or (keystone and keystone ~= link) then
                         if guild then
                             SendChatMessage(link, "GUILD")
@@ -83,6 +107,42 @@ local function KeyPost(force,guild)
             end
     end
 end
+
+local function OnTooltipSetItem(tooltip, ...)
+    name, link = GameTooltip:GetItem()
+    if (link == nil) then return end
+    local itemString = string.match(link, "item[%-?%d:]+")
+    local id = tonumber(string.match(link, "^.-:(%d+):"))
+
+
+
+
+    if id and id == 180653 then
+        if not lineAdded then
+            --tooltip:AddLine(" ") --blank line
+            --tooltip:AddLine("blablabla")
+            lineAdded = true
+        end
+    end
+end
+
+local function OnTooltipCleared(tooltip, ...) lineAdded = false end
+
+local function SetHyperlink_Hook(self, hyperlink, text, button)
+
+    local itemString = string.match(hyperlink, "item[%-?%d:]+")
+    local id = tonumber(string.match(link, "^.-:(%d+):"))
+
+    if id and id == 180653 then
+        --ItemRefTooltip:AddLine(" ") --blank line
+        --ItemRefTooltip:AddLine("MyNoteTest")
+        ItemRefTooltip:Show()
+    end
+
+end
+GameTooltip:HookScript("OnTooltipSetItem", OnTooltipSetItem)
+GameTooltip:HookScript("OnTooltipCleared", OnTooltipCleared)
+hooksecurefunc("ChatFrame_OnHyperlinkShow", SetHyperlink_Hook)
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --  Event Section
