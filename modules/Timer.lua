@@ -46,9 +46,9 @@ local previewSettings = {
                 [369] = {shortName = "Yard"},
                 [370] = {shortName = "Work"},
                 --Shadowlands
-                [375] = {shortName = "MoTS"},
+                [375] = {shortName = "Mists"},
                 [376] = {shortName = "NW"},
-                [377] = {shortName = "OS"},
+                [377] = {shortName = "DOS"},
                 [378] = {shortName = "HoA"},
                 [379] = {shortName = "PF"},
                 [380] = {shortName = "SD"},
@@ -231,6 +231,8 @@ local function bootlegRepeatingTimer()
         local time = GetElapsedTime()
         local _,_,maxTime = C_ChallengeMode.GetMapUIInfo(db.profile.GetActiveChallengeMapID)
         
+        db.profile.GetCurrentTime = TimeFormat(time).."/"..TimeFormat(maxTime)
+
         if not maxTime then
             return
         else
@@ -319,6 +321,7 @@ local function UpdateBosses()
             end
         end
         f.textBosses:SetText(count.."/"..#simple)
+        db.profile.GetBossesMSG = count.."/"..#simple
     elseif db.profile.bosses == 3 then
 
         -- Extended display for Bosses
@@ -338,9 +341,9 @@ local function UpdateBosses()
                     if db.profile.timeStamp then
                         local before = 100000
                         local plus = false
-                        if db.profile.bestBefore == 2 then
+                        if db.profile.bestBefore == 2 or db.profile.bestBefore == 4 then
                             before = db.profile.bestBeforeStart[i]
-                        elseif db.profile.bestBefore == 3 and db.profile.bestBeforeStart[i] < 100000 then
+                        elseif (db.profile.bestBefore == 3 or db.profile.bestBefore == 5) and db.profile.bestBeforeStart[i] < 100000 then
                             before = selina - killTime - db.profile.bestBeforeStart[i]
                             plus = true
                         end
@@ -358,6 +361,7 @@ local function UpdateBosses()
                 table.insert(extended, name.."|r")
             end
         end
+        --she's the girl i fell in love with
         f.textBosses:SetText(table.concat(extended, "|r\n"))
     end
 end
@@ -373,6 +377,7 @@ local function UpdateMobs()
     local cur = string.format("\n|c%s+%.2f%%|r", colorInd, db.profile.currentPullCount)
     local cur2 = string.format("\n|c%s%.2f%%|r", colorInd, db.profile.currentPullCount+before)
     local f = LucidKeystoneFrame
+    db.profile.GetPull = string.format("%.2f",before)
 
     if db.profile.MobPercStep then
         if db.profile.MobPullConf == 2 and db.profile.currentPullCount > 0 then
@@ -445,9 +450,11 @@ local function GetBestBefore()
         local _,_,_,_,killOf = C_Scenario.GetCriteriaInfo(i)
         if killOf == 1 then
             local before
-            for n = 1, level do
-                if db.profile.dungeonBestBoss[mapID][n][i].duration < 100000 then
-                    newLevel = n
+            if db.profile.bestBefore == 2 or db.profile.bestBefore == 3 then
+                for n = 1, level do
+                    if db.profile.dungeonBestBoss[mapID][n][i].duration < 100000 then
+                        newLevel = n
+                    end
                 end
             end
             if db.profile.dungeonBestBoss[mapID][newLevel][i].duration < 100000 then

@@ -9,6 +9,7 @@ local db, version, author, notes, title
 
 local fontColor = {
     yellow  = "|cffffd100%s|r",
+    green   = "|cff4cff00%s|r",
     blue    = "|cff009dd5%s|r",
     red     = "|cffe22b2a%s|r",
     lucid   = "|cff71478E%s|r",
@@ -244,6 +245,13 @@ local defaults = {
         start           = false,
         invertPerc      = false,
         MobPercStep     = true,
+        SendMSGEnable   = false,
+        SendMSGLevel    = true,
+        SendMSGName     = true,
+        SendMSGTime     = true,
+        SendMSGForces   = true,
+        SendMSGBosses   = true,
+        SendMSGDeaths   = true,
         background      = 2,
         sparkle         = 3,
         bosses          = 3,
@@ -252,7 +260,7 @@ local defaults = {
         mainTimer       = 1,
         mobCount        = 1,
         MobPullConf     = 3,
-        bestBefore      = 2,
+        bestBefore      = 4,
         fpoint          = "TOPRIGHT",
         TimerBarStyle   = "Lucid Keystone Particles",
         MobBarStyle     = "Lucid Keystone Particles",
@@ -615,6 +623,41 @@ local function dungeonInfo3(zoneID)
 
     local runs = db.profile.runs[expansion][season][1][zoneID] + db.profile.runs[expansion][season][2][zoneID]
     return "\n\n"..fontColor.yellow:format(L["Total Runs: "])..runs.."\n\n"
+end
+
+local function SendMSG()
+    local enable = ""
+    local level = ""
+    local name = ""
+    local time = ""
+    local forces = ""
+    local bosses = ""
+    local deaths = ""
+
+    if db.profile.SendMSGEnable then
+        enable = "\n"..L["I'm busy in Mythic Plus"]
+        if db.profile.SendMSGLevel then
+            level = " - +16"
+        end
+        if db.profile.SendMSGName then
+            name = " - "..C_ChallengeMode.GetMapUIInfo(381)
+        end
+        if db.profile.SendMSGTime then
+            time = " - 25:29/39:00"
+        end
+        if db.profile.SendMSGForces then
+            forces = " - 89.72"..L["% of Trash"]
+        end
+        if db.profile.SendMSGBosses then
+            bosses = " - 3/4 "..L["bosses defeated"]
+        end
+        if db.profile.SendMSGDeaths then
+            deaths = " - 7 "..L["deaths"]
+        end
+        return enable..level..name..time..forces..bosses..deaths
+    else
+        return enable
+    end
 end
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1291,8 +1334,10 @@ local function AddConfig()
                                 order = 40,
                                 values = {
                                     [1] = L["None"],
-                                    [2] = L["Absolute"],
-                                    [3] = L["Relative"],
+                                    [2] = L["Best Absolute"],
+                                    [3] = L["Best Relative"],
+                                    [4] = L["Just Intime Absolute"],
+                                    [5] = L["Just Intime Relative"],
                                 },
                             },
                         },
@@ -1497,7 +1542,7 @@ local function AddConfig()
                                 values = {
                                     [1] = L["None"],
                                     [2] = L["Text"],
-                                    [3] = L["Icon - Button"],
+                                    [3] = L["Icon - Bottom"],
                                     [4] = L["Icon - Left"],
                                     [5] = L["Icon - Right"],
                                 },
@@ -1620,6 +1665,113 @@ local function AddConfig()
                                     Module:UpdateFonts()
                                 end,
                                 get = function() return Module:GetOption("FontStyle") end,
+                            },
+                        },
+                    },
+                    sendMSG = {
+                        type = "group",
+                        name = L["Send Automatic whisper while doing Mythic Plus"],
+                        order = 30,
+                        inline = true,
+                        args = {
+                            SendMSGEnable = {
+                                order = 10,
+                                name = function()
+                                    if db.profile.SendMSGEnable then
+                                        return fontColor.green:format(L["Enable"])
+                                    else
+                                        return fontColor.red:format(L["Enable"])
+                                    end
+                                end,
+                                type = "toggle",
+                                width = 0.5,
+                                set = function(_, val)
+                                    Module:SetOption("SendMSGEnable", val)
+                                end,
+                                get = function() return Module:GetOption("SendMSGEnable") end,
+                            },
+                            SendMSGsperator1 = {
+                                order = 20,
+                                name = "",
+                                type = "description",
+                                width = 2,
+                            },
+                            SendMSGLevel = {
+                                order = 30,
+                                name = L["Send Keystone Level"],
+                                type = "toggle",
+                                width = 1.2,
+                                set = function(_, val)
+                                    Module:SetOption("SendMSGLevel", val)
+                                end,
+                                get = function() return Module:GetOption("SendMSGLevel") end,
+                                disabled = function() return db.profile.SendMSGEnable == false end,
+                            },
+                            SendMSGName = {
+                                order = 40,
+                                name = L["Send Dungeon Name"],
+                                type = "toggle",
+                                width = 1.2,
+                                set = function(_, val)
+                                    Module:SetOption("SendMSGName", val)
+                                end,
+                                get = function() return Module:GetOption("SendMSGName") end,
+                                disabled = function() return db.profile.SendMSGEnable == false end,
+                            },
+                            SendMSGTime = {
+                                order = 50,
+                                name = L["Send current Time"],
+                                type = "toggle",
+                                width = 1.2,
+                                set = function(_, val)
+                                    Module:SetOption("SendMSGTime", val)
+                                end,
+                                get = function() return Module:GetOption("SendMSGTime") end,
+                                disabled = function() return db.profile.SendMSGEnable == false end,
+                            },
+                            SendMSGForces = {
+                                order = 60,
+                                name = L["Send Enemy Forces"],
+                                type = "toggle",
+                                width = 1.2,
+                                set = function(_, val)
+                                    Module:SetOption("SendMSGForces", val)
+                                end,
+                                get = function() return Module:GetOption("SendMSGForces") end,
+                                disabled = function() return db.profile.SendMSGEnable == false end,
+                            },
+                            SendMSGBosses = {
+                                order = 70,
+                                name = L["Send Boss Progress"],
+                                type = "toggle",
+                                width = 1.2,
+                                set = function(_, val)
+                                    Module:SetOption("SendMSGBosses", val)
+                                end,
+                                get = function() return Module:GetOption("SendMSGBosses") end,
+                                disabled = function() return db.profile.SendMSGEnable == false end,
+                            },
+                            SendMSGDeaths = {
+                                order = 80,
+                                name = L["Send Deaths"],
+                                type = "toggle",
+                                width = 1.2,
+                                set = function(_, val)
+                                    Module:SetOption("SendMSGDeaths", val)
+                                end,
+                                get = function() return Module:GetOption("SendMSGDeaths") end,
+                                disabled = function() return db.profile.SendMSGEnable == false end,
+                            },
+                            SendMSGPreview = {
+                                order = 90,
+                                name = fontColor.yellow:format(L["Preview Message"]),
+                                type = "input",
+                                get = function()
+                                    return SendMSG()
+                                end,
+                                multiline = 1,
+                                disabled = true,
+                                width = 2.5,
                             },
                         },
                     },

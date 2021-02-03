@@ -11,6 +11,8 @@ local db
 --  General Tables
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+local SpamProtection = {}
+
 local msgTable = {
     L["Let the fun begin and good luck!"].."|r",
     L["Okay, lets go!"].."|r",
@@ -44,6 +46,10 @@ local loot = {
     [14] = 207,
     [15] = 210,
 }
+local ChatThrottle = {
+    whisper = {},
+    bnet    = {},
+}
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --  Function Section
@@ -76,6 +82,52 @@ local function GetStartMsg()
         PlaySound(111365,"Master")
         SELECTED_CHAT_FRAME:AddMessage("|cffff80ff[|cff4859A8Lucid Keystone|cffff80ff]: "..msgTable[math.random(1, #msgTable)]);
     end
+end
+
+local function GetBusyMsg()
+    local level = ""
+    local dname = ""
+    local time = ""
+    local bosses = ""
+    local forces = ""
+    local deaths = ""
+
+    local simple = {}
+    for i = 1, 10 do
+        local _,_,_,kill,killOf = C_Scenario.GetCriteriaInfo(i)
+        if killOf == 1 then
+            table.insert(simple, kill)
+        end
+    end
+
+    local count = 0
+    for _,v in ipairs(simple) do
+        if v == 1 then
+            count = count + 1
+        end
+    end
+    local GetBossesMSG = count.."/"..#simple
+
+    if db.profile.SendMSGLevel then
+        level = " - +"..C_ChallengeMode.GetActiveKeystoneInfo()
+    end
+    if db.profile.SendMSGName then
+        name = " - "..C_ChallengeMode.GetMapUIInfo(db.profile.GetActiveChallengeMapID)
+    end
+    if db.profile.SendMSGTime then
+        time = " - "..db.profile.GetCurrentTime
+    end
+    if db.profile.SendMSGForces then
+        forces = " - "..db.profile.GetPull..L["% of Trash"]
+    end
+    if db.profile.SendMSGBosses then
+        bosses = " - "..GetBossesMSG.." "..L["bosses defeated"]
+    end
+    if db.profile.SendMSGDeaths then
+        deaths = " - "..C_ChallengeMode.GetDeathCount().." "..L["deaths"]
+    end
+
+    return L["I'm busy in Mythic Plus"]..level..name..time..forces..bosses..deaths
 end
 
 -- Keypost Function
@@ -114,9 +166,6 @@ local function OnTooltipSetItem(tooltip, ...)
     local itemString = string.match(link, "item[%-?%d:]+")
     local id = tonumber(string.match(link, "^.-:(%d+):"))
 
-
-
-
     if id and id == 180653 then
         if not lineAdded then
             --tooltip:AddLine(" ") --blank line
@@ -140,9 +189,9 @@ local function SetHyperlink_Hook(self, hyperlink, text, button)
     end
 
 end
-GameTooltip:HookScript("OnTooltipSetItem", OnTooltipSetItem)
-GameTooltip:HookScript("OnTooltipCleared", OnTooltipCleared)
-hooksecurefunc("ChatFrame_OnHyperlinkShow", SetHyperlink_Hook)
+--GameTooltip:HookScript("OnTooltipSetItem", OnTooltipSetItem)
+--GameTooltip:HookScript("OnTooltipCleared", OnTooltipCleared)
+--hooksecurefunc("ChatFrame_OnHyperlinkShow", SetHyperlink_Hook)
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --  Event Section
@@ -167,7 +216,11 @@ local function eventHandler(self, e, ...)
     end
     if e == "CHAT_MSG_PARTY" or e == "CHAT_MSG_PARTY_LEADER" then
         if (select(1, ...) == "!keys" or select(1, ...) == "!Keys") and db.profile.postCom then
-            KeyPost(true)
+            local time = GetTime()
+            if not ChatThrottle.keypostParty or time-ChatThrottle.keypostParty > 30 then
+                ChatThrottle.keypostParty = time
+                KeyPost(true)
+            end
         end
     end
     if e == "CHALLENGE_MODE_COMPLETED" then
@@ -177,7 +230,11 @@ local function eventHandler(self, e, ...)
     end
     if e == "CHAT_MSG_GUILD" then
         if (select(1, ...) == "!keys" or select(1, ...) == "!Keys") and db.profile.postCom then
-            KeyPost(true, true)
+            local time = GetTime()
+            if not ChatThrottle.keypostGuild or time-ChatThrottle.keypostGuild > 30 then
+                ChatThrottle.keypostGuild = time
+                KeyPost(true, true)
+            end
         end
     end
 
@@ -187,6 +244,34 @@ local function eventHandler(self, e, ...)
         db.profile.InitTest = false
     end
 
+    if e == "CHAT_MSG_WHISPER" and db.profile.SendMSGEnable and db.profile.start then
+        local _,playerName = ...
+        local time = GetTime()
+        local msg = GetBusyMsg()
+
+        local name = GetUnitName("PLAYER").."-"..GetRealmName()
+        if playerName ~= name then
+            if not UnitInParty(playerName) and (not ChatThrottle.whisper[playerName] or time-ChatThrottle.whisper[playerName] >= 180) then
+                ChatThrottle.whisper[playerName] = time
+                SendChatMessage(msg,"whisper", nil, playerName)
+            end
+        --[[else        
+            ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(frame, event, message, sender, ...)
+                if message == L["I'm busy in Mythic Keystone"] then
+                    return true -- hide this message
+                end
+            end)]]
+        end
+    end
+    if e == "CHAT_MSG_BN_WHISPER" and db.profile.SendMSGEnable and db.profile.start then
+        local bnSenderID = select(13,...)
+        local time = GetTime()
+        local msg = GetBusyMsg()
+        if not ChatThrottle.bnet[bnSenderID] or time-ChatThrottle.bnet[bnSenderID] >= 20 then
+            ChatThrottle.bnet[bnSenderID] = time
+            BNSendWhisper(bnSenderID, msg)
+        end
+    end
 end
 
 -- Set Events
@@ -202,6 +287,8 @@ local function ToggleGeneralFrame()
     general:RegisterEvent("CHAT_MSG_PARTY_LEADER")
     general:RegisterEvent("CHAT_MSG_GUILD")
     general:RegisterEvent("PLAYER_LOGIN")
+    general:RegisterEvent("CHAT_MSG_WHISPER")
+    general:RegisterEvent("CHAT_MSG_BN_WHISPER")
 end
 
 --Initialize function
