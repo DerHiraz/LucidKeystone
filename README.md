@@ -9,15 +9,29 @@
 
 Lucid Keystone is a custom Mythic+ timer for an advanced display of various timers, deaths and progress. Furthermore, the addon is also designed to display advanced statistics about the finished keystones.
 
+No matter if you have just started with "Mythic Plus" or if you have been with it for a long time. Display only what is important to you personally for Mythic Plus.
+
+The statistics show you exactly which keys you can improve or how well you have completed the respective keys.
+
 ## Features
 ### Different options to personalize the timer
 - 9 different Backdrops
 - Sparkle effects on Timerbar
-- See only what you want to see
+- Timer for all Upgrades
+- different displays for Bosses
+- Change fonts
+- Scale the Timer
+- Get more information then the default Timer
+- Raider.IO support with colors
+- Mythic Dungeon Tools support with Current Pull Trash Count
 ### Get your Statistics
 - Saves every completed run
 - Statistics sorted by every dungeon
 - Overview about your runs in every Season
+### Make things easier
+- Keystone Autoplacer
+- Auto Rolecheck
+- DND Message while doing Mythic Plus
  
 ## Slash Commands
 ### Main Commands
@@ -27,3 +41,12 @@ Lucid Keystone is a custom Mythic+ timer for an advanced display of various time
 - /lk played
 - /lk preview
 - /lk version
+
+## How do I reset my Statistics?
+``Reset to defaults`` only reset your general Settings. But if you really want to reset your statistic here is how you do it:
+### Step 1
+Activate devtools with ``/lk devtools`` command
+### Step 2
+Go to Lucid Keystone Config Tab ``Profiles``
+### Step 3
+Click on ``Hardreset`` and confirm the Reset

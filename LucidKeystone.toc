@@ -1,10 +1,11 @@
 ## Interface: 90002
-## Version: v1.0.5
+## Version: v1.0.6b
 ## Title: Lucid Keystone
 ## Notes: Customizable Mythic+ Timer, Objective Tracker and Season Statistics
 ## Author: Hiraz
 ## X-Website: https://www.curseforge.com/wow/addons/lucid-keystone
 ## X-Donate: https://www.paypal.com/donate?hosted_button_id=THUXDXB6U2H9E
+## X-Twitch: https://www.twitch.tv/derhiraz
 ## SavedVariables: LucidKeystoneDB
 ## OptionalDeps: Ace3
 
