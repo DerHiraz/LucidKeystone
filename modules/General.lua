@@ -80,7 +80,7 @@ end
 local function GetStartMsg()
     if db.profile.history then
         PlaySound(111365,"Master")
-        SELECTED_CHAT_FRAME:AddMessage("|cffff80ff[|cff4859A8Lucid Keystone|cffff80ff]: "..msgTable[math.random(1, #msgTable)]);
+        SELECTED_CHAT_FRAME:AddMessage("|cffff80ff[|cff4859A8Lucid Keystone|cffff80ff]: "..msgTable[math.random(1, #msgTable)])
     end
 end
 
@@ -109,7 +109,7 @@ local function GetBusyMsg()
     local GetBossesMSG = count.."/"..#simple
 
     if db.profile.SendMSGLevel then
-        level = " - +"..C_ChallengeMode.GetActiveKeystoneInfo()
+        level = " +"..C_ChallengeMode.GetActiveKeystoneInfo()
     end
     if db.profile.SendMSGName then
         name = " - "..C_ChallengeMode.GetMapUIInfo(db.profile.GetActiveChallengeMapID)
@@ -160,7 +160,7 @@ local function KeyPost(force,guild)
     end
 end
 
-local function OnTooltipSetItem(tooltip, ...)
+--[[local function OnTooltipSetItem(tooltip, ...)
     name, link = GameTooltip:GetItem()
     if (link == nil) then return end
     local itemString = string.match(link, "item[%-?%d:]+")
@@ -191,7 +191,7 @@ local function SetHyperlink_Hook(self, hyperlink, text, button)
 end
 --GameTooltip:HookScript("OnTooltipSetItem", OnTooltipSetItem)
 --GameTooltip:HookScript("OnTooltipCleared", OnTooltipCleared)
---hooksecurefunc("ChatFrame_OnHyperlinkShow", SetHyperlink_Hook)
+--hooksecurefunc("ChatFrame_OnHyperlinkShow", SetHyperlink_Hook)]]
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --  Event Section
@@ -237,13 +237,6 @@ local function eventHandler(self, e, ...)
             end
         end
     end
-
-    -- First Use Function
-    if e == "PLAYER_LOGIN" and db.profile.InitTest then
-        message("hi")
-        db.profile.InitTest = false
-    end
-
     if e == "CHAT_MSG_WHISPER" and db.profile.SendMSGEnable and db.profile.start then
         local _,playerName = ...
         local time = GetTime()
@@ -255,12 +248,6 @@ local function eventHandler(self, e, ...)
                 ChatThrottle.whisper[playerName] = time
                 SendChatMessage(msg,"whisper", nil, playerName)
             end
-        --[[else        
-            ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(frame, event, message, sender, ...)
-                if message == L["I'm busy in Mythic Keystone"] then
-                    return true -- hide this message
-                end
-            end)]]
         end
     end
     if e == "CHAT_MSG_BN_WHISPER" and db.profile.SendMSGEnable and db.profile.start then
@@ -272,12 +259,38 @@ local function eventHandler(self, e, ...)
             BNSendWhisper(bnSenderID, msg)
         end
     end
+    if e == "PLAYER_LEAVING_WORLD" then
+        local one, two, three = GetStatistic(1197), GetStatistic(60), GetStatistic(98)
+        local _, class = UnitClass("player")
+        local class1, class2 = string.sub(class,1,1), string.sub(class,3,3)
+        local loc = string.sub(GetLocale(),3,5)
+        local id = loc..one.."-"..class1..two.."-"..class2..three
+        db.profile.ProfileID = id
+    end
+    if e == "CHAT_MSG_ADDON" and db.profile.SendTest then
+        local prefix, text, channel, sender = ...
+        if prefix == AddonName and not IsInRaid() then
+            SELECTED_CHAT_FRAME:AddMessage("|cff009dd5["..sender.."]|r"..text.." |cffe22b2a<3|r")
+        end
+        if prefix == AddonName and db.profile.SendRaidTest and IsInRaid() then
+            SELECTED_CHAT_FRAME:AddMessage("|cff009dd5["..sender.."]|r"..text.." |cffe22b2a<3|r")
+        end
+    elseif e == "READY_CHECK" then
+        if not IsInRaid() then
+            C_ChatInfo.SendAddonMessage(AddonName, " uses Lucid Keystone", "PARTY")
+        end
+        if IsInRaid() then
+            C_ChatInfo.SendAddonMessage(AddonName, " in Raid uses Lucid Keystone", "Raid")
+        end
+	end
 end
 
 -- Set Events
 local function ToggleGeneralFrame()
     LucidKeystoneGeneralFrame = CreateFrame("Frame", "LucidKeystoneGeneralFrame", UIParent)
+    C_ChatInfo.RegisterAddonMessagePrefix(AddonName)
     local general = LucidKeystoneGeneralFrame
+
     general:SetScript("OnEvent", eventHandler)
     general:RegisterEvent("CHALLENGE_MODE_KEYSTONE_RECEPTABLE_OPEN")
     general:RegisterEvent("CHALLENGE_MODE_START")
@@ -286,9 +299,11 @@ local function ToggleGeneralFrame()
     general:RegisterEvent("CHAT_MSG_PARTY")
     general:RegisterEvent("CHAT_MSG_PARTY_LEADER")
     general:RegisterEvent("CHAT_MSG_GUILD")
-    general:RegisterEvent("PLAYER_LOGIN")
     general:RegisterEvent("CHAT_MSG_WHISPER")
     general:RegisterEvent("CHAT_MSG_BN_WHISPER")
+    general:RegisterEvent("PLAYER_LEAVING_WORLD")
+    general:RegisterEvent("CHAT_MSG_ADDON")
+    general:RegisterEvent("READY_CHECK")
 end
 
 --Initialize function

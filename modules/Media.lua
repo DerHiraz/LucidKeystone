@@ -3,9 +3,17 @@ local AddonName, Addon = ...
 --Logo
 Addon.LOGO_LOCATION     = "Interface\\AddOns\\"..AddonName.."\\media\\Textures\\lk_logo"
 Addon.LOGO              = "Interface\\AddOns\\"..AddonName.."\\media\\Textures\\logo"
+
+--Fonts
 Addon.FONT_KOZUKA       = "Interface\\AddOns\\"..AddonName.."\\media\\Fonts\\KozGoPr6N-Light.ttf"
+Addon.FONT_FIRA         = "Interface\\AddOns\\"..AddonName.."\\media\\Fonts\\FiraMono-Medium.ttf"
+
+--Bars
 Addon.BAR_PARTICLES     = "Interface\\AddOns\\"..AddonName.."\\media\\Statusbars\\particles"
 Addon.BAR_DREAM         = "Interface\\AddOns\\"..AddonName.."\\media\\Statusbars\\dream"
+
+--Sounds
+Addon.SOUND_DEATH       = "Interface\\AddOns\\"..AddonName.."\\media\\Sounds\\StopDeath.ogg"
 
 --Backgrounds
 Addon.lk_bg_None1       = "Interface\\AddOns\\"..AddonName.."\\media\\Textures\\lk_None"
@@ -32,6 +40,8 @@ Addon.lk_bg_Cat1        = "Interface\\AddOns\\"..AddonName.."\\media\\Textures\\
 Addon.lk_bg_Cat2        = "Interface\\AddOns\\"..AddonName.."\\media\\Textures\\lk_Cat2"
 
 local LSM = LibStub("LibSharedMedia-3.0")
-LSM:Register("font", "Kozuka Gothic Light", Addon.FONT_KOZUKA, LSM.LOCALE_BIT_ruRU + LSM.LOCALE_BIT_western)
+LSM:Register("font", "Kozuka Gothic Light", Addon.FONT_KOZUKA, LSM.LOCALE_BIT_ruRU + LSM.LOCALE_BIT_western + LSM.LOCALE_BIT_zhCN + LSM.LOCALE_BIT_zhTW + LSM.LOCALE_BIT_koKR)
+LSM:Register("font", "Fira Mono Medium", Addon.FONT_FIRA, LSM.LOCALE_BIT_ruRU + LSM.LOCALE_BIT_western)
 LSM:Register("statusbar", "Lucid Keystone Particles", Addon.BAR_PARTICLES)
 LSM:Register("statusbar", "Lucid Keystone Dream", Addon.BAR_DREAM)
+LSM:Register("sound", "Stop Death", Addon.SOUND_DEATH)

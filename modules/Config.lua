@@ -13,6 +13,7 @@ local fontColor = {
     blue    = "|cff009dd5%s|r",
     red     = "|cffe22b2a%s|r",
     lucid   = "|cff71478E%s|r",
+    grey    = "|cff787878%s|r",
 }
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -192,6 +193,7 @@ local statDB = {
     volcanic = 0,
     pride = 0,
 }
+local LucidProfileList = {""}
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ------  Defaults
@@ -238,7 +240,7 @@ local defaults = {
         history         = true,
         autoPlace       = true,
         unlock          = false,
-        pridefulAlert   = false,
+        pridefulAlertT  = true,
         postCom         = false,
         autoPost        = false,
         autoRole        = false,
@@ -252,6 +254,8 @@ local defaults = {
         SendMSGForces   = true,
         SendMSGBosses   = true,
         SendMSGDeaths   = true,
+        devtools        = false,
+        Changed         = true,
         background      = 2,
         sparkle         = 3,
         bosses          = 3,
@@ -261,14 +265,17 @@ local defaults = {
         mobCount        = 1,
         MobPullConf     = 3,
         bestBefore      = 4,
+        ScaleStyle      = 1,
         fpoint          = "TOPRIGHT",
         TimerBarStyle   = "Lucid Keystone Particles",
         MobBarStyle     = "Lucid Keystone Particles",
         FontStyle       = "Kozuka Gothic Light",
+        pridefulAlertSound = "Stop Death",
+        importFrom      = "",
         fxof            = -140,
         fyof            = 0,
         expansion       = GetExpansionLevel(),
-        season          = C_MythicPlus.GetCurrentSeason(),
+        season          = 1,
         dungeonBestBoss = dungeonBestBossT,
         runs            = {
                             [7] = { --expansion
@@ -401,7 +408,51 @@ local backdroplist = {
 --  Reset Function
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-local function ResetConfig()
+local function ResetConfig(hardReset)
+    if hardReset then
+        local Changed = db.profile.Changed
+        local ProfileID = db.profile.ProfileID
+        db:RegisterDefaults(defaults)
+        db:ResetProfile()
+        db.profile.Changed = Changed
+        db.profile.ProfileID = ProfileID
+        SendSystemMessage(L["Everything in Lucid Keystone was wiped painfully!"])
+    else
+        local exclude = {
+            Runs = db.profile.runs,
+            Avg = db.profile.avglvl,
+            Intime = db.profile.bestIntime,
+            Overtime = db.profile.bestOvertime,
+            history = db.profile.dungeonHistory,
+            stats = db.profile.statistic,
+            season = db.profile.season,
+            bestBoss = db.profile.dungeonBestBoss,
+            from = db.profile.importFrom,
+            Changed = db.profile.Changed,
+            ProfileID = db.profile.ProfileID,
+        }
+        db:RegisterDefaults(defaults)
+        db:ResetProfile()
+        db.profile.runs = exclude.Runs
+        db.profile.avglvl = exclude.Avg
+        db.profile.bestIntime = exclude.Intime
+        db.profile.bestOvertime = exclude.Overtime
+        db.profile.dungeonHistory = exclude.history
+        db.profile.statistic = exclude.stats
+        db.profile.season = exclude.season
+        db.profile.dungeonBestBoss = exclude.bestBoss
+        db.profile.importFrom = exclude.from
+        db.profile.Changed = exclude.Changed
+        db.profile.ProfileID = exclude.ProfileID
+        SendSystemMessage("Reset completed")
+    end
+    LibStub("AceConfigRegistry-3.0"):NotifyChange("LucidKeystone")
+    StaticPopup_Show("LucidKeystone_ReloadPopup")
+    Module:ToggleFrames()
+end
+
+local function CopyProfile()
+    local name = GetUnitName("PLAYER").." - "..GetRealmName()
     local exclude = {
         Runs = db.profile.runs,
         Avg = db.profile.avglvl,
@@ -411,9 +462,18 @@ local function ResetConfig()
         stats = db.profile.statistic,
         season = db.profile.season,
         bestBoss = db.profile.dungeonBestBoss,
+        from = db.profile.importFrom,
+        Changed = db.profile.Changed,
+        ProfileID = db.profile.ProfileID,
+        start = db.profile.start,
+        currentPull = db.profile.currentPull,
+        currentPullCount = db.profile.currentPullCount,
+        PullCheck = db.profile.PullCheck,
+        KillTimes = db.profile.KillTimes,
+        sound = db.profile.sound,
+        GetActiveChallengeMapID = db.profile.GetActiveChallengeMapID,
     }
-    db:RegisterDefaults(defaults)
-    db:ResetProfile()
+    db:CopyProfile(LucidProfileList[db.profile.ProfileSet])
     db.profile.runs = exclude.Runs
     db.profile.avglvl = exclude.Avg
     db.profile.bestIntime = exclude.Intime
@@ -422,9 +482,18 @@ local function ResetConfig()
     db.profile.statistic = exclude.stats
     db.profile.season = exclude.season
     db.profile.dungeonBestBoss = exclude.bestBoss
+    db.profile.importFrom = exclude.from
+    db.profile.Changed = exclude.Changed
+    db.profile.ProfileID = exclude.ProfileID
+    db.profile.start = exclude.start
+    db.profile.currentPull = exclude.currentPull
+    db.profile.currentPullCount = exclude.currentPullCount
+    db.profile.PullCheck = exclude.PullCheck
+    db.profile.KillTimes = exclude.KillTimes
+    db.profile.sound = exclude.sound
+    db.profile.GetActiveChallengeMapID = exclude.GetActiveChallengeMapID
     LibStub("AceConfigRegistry-3.0"):NotifyChange("LucidKeystone")
     StaticPopup_Show("LucidKeystone_ReloadPopup")
-    Module:ToggleFrames()
 end
 
 function Module:GetOption(option)
@@ -454,10 +523,50 @@ function Module:SetOption(option, val)
         end
     end
 end
+-- Check Char Changes
+local function CheckCharChanges()
+    local name = GetUnitName("PLAYER").." - "..GetRealmName()
+    if not db.profile.Changed then
+        local ProfileNames = {}
+        local one, two, three = GetStatistic(1197), GetStatistic(60), GetStatistic(98)
+        local _, class = UnitClass("player")
+        local class1, class2 = string.sub(class,1,1), string.sub(class,3,3)
+        local loc = string.sub(GetLocale(),3,5)
+        local id = loc..one.."-"..class1..two.."-"..class2..three
+        for k,_ in pairs(LucidKeystoneDB.profiles) do
+            if k ~= name then
+                table.insert(ProfileNames, k)
+            end
+        end
+
+        for i = 1, #ProfileNames do
+            if id == LucidKeystoneDB.profiles[ProfileNames[i]].ProfileID then
+                db:CopyProfile(ProfileNames[i])
+                db:DeleteProfile(ProfileNames[i])
+                LibStub("AceConfigRegistry-3.0"):NotifyChange("LucidKeystone")
+                StaticPopup_Show("LucidKeystone_ReloadPopup")
+            end
+        end
+        db.profile.Changed = true
+    end
+end
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --  General Functions
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-- Event handler
+local function eventHandler(self, e, ...)
+    if e == "PLAYER_ENTERING_WORLD" then
+        local isLogin, isReload = ...
+        if isLogin then
+            CheckCharChanges()
+        end
+        if (isLogin or isReload) and not db.profile.FontStyle then
+            db.profile.FontStyle = "Kozuka Gothic Light"
+        end
+    end
+end
 
 -- Timeformats
 local function TimeFormat(time,dayInd)
@@ -515,6 +624,20 @@ local function ToggleAutoRole()
     end
 end
 
+local function OnInitProfiles()
+    LucidKeystoneConfigFrame = CreateFrame("Frame", "LucidKeystoneConfigFrame", UIParent)
+    db.profile.ProfileSet = 1
+    db.profile.ProfileReason = 1
+    for k,_ in pairs(LucidKeystoneDB.profiles) do
+        table.insert(LucidProfileList,k)
+    end
+    local config = LucidKeystoneConfigFrame
+
+    config:SetScript("OnEvent", eventHandler)
+    config:RegisterEvent("PLAYER_ENTERING_WORLD")
+    config:RegisterEvent("ADDON_LOADED")
+end
+
 local function CheckForTimings()
     local check = db.profile.dungeonBestBoss
     if check[375][1][1].duration == 100000 then
@@ -552,7 +675,6 @@ local function CheckForTimings()
         check[382][1][5].duration = 2194
     end
 end
-
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --  Dungeon Tab Information
@@ -637,7 +759,7 @@ local function SendMSG()
     if db.profile.SendMSGEnable then
         enable = "\n"..L["I'm busy in Mythic Plus"]
         if db.profile.SendMSGLevel then
-            level = " - +16"
+            level = " +16"
         end
         if db.profile.SendMSGName then
             name = " - "..C_ChallengeMode.GetMapUIInfo(381)
@@ -649,7 +771,7 @@ local function SendMSG()
             forces = " - 89.72"..L["% of Trash"]
         end
         if db.profile.SendMSGBosses then
-            bosses = " - 3/4 "..L["bosses defeated"]
+            bosses = " - 2/4 "..L["bosses defeated"]
         end
         if db.profile.SendMSGDeaths then
             deaths = " - 7 "..L["deaths"]
@@ -781,14 +903,14 @@ local mapID = {
     [369] = {ShortName = "Yard"},
     [370] = {ShortName = "Work"},
     -- Shadowlands
-    [375] = {ShortName = "Mists"},
-    [376] = {ShortName = "NW"},
-    [377] = {ShortName = "DOS"},
-    [378] = {ShortName = "HoA"},
-    [379] = {ShortName = "PF"},
-    [380] = {ShortName = "SD"},
-    [381] = {ShortName = "SoA"},
-    [382] = {ShortName = "ToP"}, 
+    [375] = {ShortName = L["Mists"]},
+    [376] = {ShortName = L["NW"]},
+    [377] = {ShortName = L["DOS"]},
+    [378] = {ShortName = L["HoA"]},
+    [379] = {ShortName = L["PF"]},
+    [380] = {ShortName = L["SD"]},
+    [381] = {ShortName = L["SoA"]},
+    [382] = {ShortName = L["ToP"]}, 
 }
 
 -- Dungeon Runs History as Table in Dungeon Tab
@@ -1003,13 +1125,21 @@ local function AddConfig()
                 image = Addon.LOGO_LOCATION,
                 imageWidth = 256,
                 imageHeight = 64,
-                width = 1.6
+                width = 1.6,
+            },
+            devText = {
+                order = 20,
+                type = "description",
+                name = fontColor.lucid:format("\n\n"..L["Devtools enabled"]),
+                hidden = function() return not db.profile.devtools end,
+                fontSize = "large",
+                width = 0.8,
             },
             preview = {
                 type = "group",
                 name = " ",
                 inline = true,
-                order = 20,
+                order = 30,
                 args = {
                     -- Buttons
                     previewButton = {
@@ -1466,6 +1596,48 @@ local function AddConfig()
                                 width = 1,
                                 order = 90,
                             },
+                            MobsS = {
+                                order = 100,
+                                type = "header",
+                                name = "",
+                                width = "half",
+                            },
+                            pridefulAlertT = {
+                                type = "toggle",
+                                name = L["Play Prideful Sound"],
+                                desc = "",
+                                set = function(_, val)
+                                    Module:SetOption("pridefulAlertT", val)
+                                end,
+                                get = function() return Module:GetOption("pridefulAlertT") end,
+                                disabled = function()
+                                    return not  IsAddOnLoaded("MythicDungeonTools")
+                                end,
+                                width = 1,
+                                order = 110,
+                            },
+                            MobSpac4 = {
+                                order = 120,
+                                name = " ",
+                                type = "description",
+                                width = 2,
+                            },
+                            pridefulAlertSound = {
+                                order = 130,
+                                name = L["Sound"],
+                                type = "select",
+                                width = 1.2,
+                                dialogControl = "LSM30_Sound",
+                                values = _G.AceGUIWidgetLSMlists.sound,
+                                set = function(_, val)
+                                    Module:SetOption("pridefulAlertSound", val)
+                                    PlaySoundFile(AceGUIWidgetLSMlists.sound[db.profile.pridefulAlertSound], "Master")
+                                end,
+                                get = function() return Module:GetOption("pridefulAlertSound") end,
+                                disabled = function()
+                                    return not Module:GetOption("pridefulAlertT")
+                                end,
+                            },
                         },
                     },
                     displayKey = {
@@ -1647,7 +1819,7 @@ local function AddConfig()
                             },
                         },
                     },
-                    generalFont = {
+                    generalSettings = {
                         type = "group",
                         name = " ",
                         order = 20,
@@ -1666,6 +1838,22 @@ local function AddConfig()
                                 end,
                                 get = function() return Module:GetOption("FontStyle") end,
                             },
+                            ScaleStyle = {
+                                type = "range",
+                                order = 20,
+                                width = 1.2,
+                                descStyle = "",
+                                name = L["Scale Timer"],
+                                set = function(_, val)
+                                    Module:SetOption("ScaleStyle", val)
+                                    Module:Scale()
+                                    Module:SparkleUpdate()
+                                end,
+                                get = function() return Module:GetOption("ScaleStyle") end,
+                                min = 0.5,
+                                max = 1.5,
+                                step = 0.01,
+                            },
                         },
                     },
                     sendMSG = {
@@ -1676,13 +1864,7 @@ local function AddConfig()
                         args = {
                             SendMSGEnable = {
                                 order = 10,
-                                name = function()
-                                    if db.profile.SendMSGEnable then
-                                        return fontColor.green:format(L["Enable"])
-                                    else
-                                        return fontColor.red:format(L["Enable"])
-                                    end
-                                end,
+                                name = L["Enable"],
                                 type = "toggle",
                                 width = 0.5,
                                 set = function(_, val)
@@ -1797,7 +1979,7 @@ local function AddConfig()
                         width = 0.8,
                         order = 1,
                         values = {
-                            [8] = "Shadowlands",
+                            [8] = L["Shadowlands"],
                         },
                     },
                     season = {
@@ -2019,7 +2201,140 @@ local function AddConfig()
                                 end,
                                 width = "full",
                             },
+                            aboutTwitch = {
+                                order = 70,
+                                name = fontColor.yellow:format("Twitch: "),
+                                type = "input",
+                                get = function()
+                                    return GetAddOnMetadata(AddonName, "X-Twitch")
+                                end,
+                                width = "full",
+                            },
                         },
+                    },
+                    historyA = {
+                        order = 20,
+                        type = "header",
+                        name = "",
+                        width = "half",
+                    },
+                    SpecialThanks = {
+                        order = 30,
+                        name = fontColor.yellow:format(L["Special Thanks"]),
+                        type = "description",
+                        width = "full",
+                    },
+                    SpecialThanksN1 = {
+                        order = 40,
+                        name = function() return " - Pull bei Eins"..fontColor.grey:format(" ("..L["Guild on EU-Thrall"]..")") end,
+                        type = "description",
+                        width = "full",
+                    },
+                    SpecialThanksN2 = {
+                        order = 50,
+                        name = function() return " - SoulAwaken"..fontColor.grey:format(" ("..L["zhCN Translation"]..")") end,
+                        type = "description",
+                        width = "full",
+                    },
+                    SpecialThanksN3 = {
+                        order = 60,
+                        name = function() return " - SoulAwaken"..fontColor.grey:format(" ("..L["zhTW Translation"]..")") end,
+                        type = "description",
+                        width = "full",
+                    },
+                },
+            },
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+----------  Profile Tab
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+            ProfileTab = {
+                type = "group",
+                name = fontColor.blue:format(L["Profiles"]),
+                childGroups = "tab",
+                order = 80,
+                args = {
+                    ProfileTitle = {
+                        order = 10,
+                        name = fontColor.lucid:format(L["Copy Profile"]),
+                        type = "description",
+                        width = "full",
+                        fontSize = "large",
+                    },
+                    ProfileDesc = {
+                        order = 20,
+                        name = L["Copy the settings from one existing profile into the currently active profile"],
+                        type = "description",
+                        width = "full",
+                    },
+                    ProfileSet = {
+                        order = 30,
+                        name = L["Copy from"],
+                        type = "select",
+                        width = 1.2,
+                        set = function(_, val)
+                            Module:SetOption("ProfileSet", val)
+                        end,
+                        get = function() return Module:GetOption("ProfileSet") end,
+                        values = LucidProfileList,
+                    },
+                    ProfileButton = {
+                        order = 40,
+                        name = function()
+                            local name = GetUnitName("PLAYER").." - "..GetRealmName()
+                            if db.profile.ProfileSet == 1 or LucidProfileList[db.profile.ProfileSet] == name then
+                                return fontColor.grey:format(L["Copy Profile"])
+                            else
+                                return L["Copy Profile"]
+                            end
+                        end,
+                        desc = "",
+                        type = "execute",
+                        func = function()
+                            CopyProfile()
+                            Module:ToggleFrames()
+                        end,
+                        disabled = function()
+                            local name = GetUnitName("PLAYER").." - "..GetRealmName()
+                            if db.profile.ProfileSet == 1 or LucidProfileList[db.profile.ProfileSet] == name then
+                                return true
+                            else
+                                return false
+                            end
+                        end,
+                        width = 0.8,
+                    },
+                    historyP = {
+                        order = 50,
+                        type = "header",
+                        name = "",
+                        width = "half",
+                        hidden = function() return not db.profile.devtools end,
+                    },
+                    ProfileIDdisplay = {
+                        order = 60,
+                        name = function()
+                            if db.profile.ProfileID then
+                                return fontColor.yellow:format("Lucid Keystone CharacterID: ")..db.profile.ProfileID.."\n "
+                            else
+                                return fontColor.yellow:format("Lucid Keystone CharacterID: \n ")
+                            end
+                        end,
+                        type = "description",
+                        width = "full",
+                        hidden = function() return not db.profile.devtools end,
+                    },
+                    ProfileHardReset = {
+                        order = 70,
+                        name = fontColor.red:format(L["Hardreset"]),
+                        desc = "",
+                        type = "execute",
+                        confirm = true,
+                        confirmText = fontColor.red:format(L["Are you sure to Reset everything in Lucid Keystone, even your Dungeon statistics?"].."\n\n"..L["This cannot be undone!"]),
+                        func = function()
+                            ResetConfig(true)
+                        end,
+                        hidden = function() return not db.profile.devtools end,
+                        width = 1,
                     },
                 },
             },
@@ -2040,10 +2355,6 @@ end
 for i, v in pairs({"lk", "lucidkeystone"}) do
 	_G["SLASH_LK"..i] = "/"..v
 end
--- Add April fool
---[[for i, v in pairs({"lkcat"}) do
-	_G["SLASH_LKt"..i] = "/"..v
-end]]
 
 function SlashCmdList.LK(msg,editbox)
     local _, _, cmd, args = string.find(msg, "%s?(%w+)%s?(.*)")
@@ -2068,37 +2379,68 @@ function SlashCmdList.LK(msg,editbox)
     elseif msg == L["help"] or msg == "help" then
         -- Get all Commands in Chat
         SendSystemMessage(L["Lucid Keystone Commands:"].."\n/lk\n/lk "..L["played"].."\n/lk "..L["version"].."\n/lk "..L["preview"])
-    --[[elseif cmd == "test" then
-        local level = tonumber(args)
-        local map = 381
-        print("Get Best for +"..level.." "..mapID[map].ShortName)
-        print("1:  "..db.profile.dungeonBestBoss[map][level][1].duration)
-        print("2:  "..db.profile.dungeonBestBoss[map][level][2].duration)
-        print("3:  "..db.profile.dungeonBestBoss[map][level][3].duration)
-        print("4:  "..db.profile.dungeonBestBoss[map][level][4].duration)
-        print("5:  "..db.profile.dungeonBestBoss[map][level][5].duration)
-    elseif msg == "deaths" then
+    elseif msg == "test" and db.profile.devtools then
+        -- Do things
+        print(L["Nothing to see here"])
+    elseif msg == "deaths" and db.profile.devtools then
         -- Get Deaths Overall
         print("Death Counter in M+")
         print("Profile: "..db.profile.statistic.deaths) 
-        print("----------------------")]]
+        print("----------------------")
+    elseif msg == "devtools" then
+        -- Activate Devtools
+        if db.profile.devtools then
+            db.profile.devtools = false
+            SendSystemMessage(L["Lucid Keystone Devtools DISABLED"])
+        else
+            db.profile.devtools = true
+            SendSystemMessage(L["Lucid Keystone Devtools ENABLED"])
+        end
+        LibStub("AceConfigRegistry-3.0"):NotifyChange("LucidKeystone")
+        StaticPopup_Show("LucidKeystone_ReloadPopup")
+    elseif msg == "Cat" and db.profile.devtools then
+        -- Get April fool
+        if not backdroplist[11] then
+            backdroplist[11] = "April Fool"
+        else
+            backdroplist[11] = nil
+        end
+    elseif msg == "send" and db.profile.devtools then
+        -- Test function - who uses the addon in party
+        if db.profile.SendTest then
+            db.profile.SendTest = false
+            print("Addon msg disabled")
+        else
+            db.profile.SendTest = true
+            print("Addon msg enabled")
+        end
+    elseif msg == "sendraid" and db.profile.devtools then
+        -- Test function - who uses the addon in raid
+        if db.profile.SendRaidTest then
+            db.profile.SendRaidTest = false
+            print("Addon msg Raid disabled")
+        else
+            db.profile.SendRaidTest = true
+            print("Addon msg Raid enabled")
+        end
     else
         -- Get Error Msg
         SendSystemMessage(L["Invalid Command. Type \"/lk help\" to see all Lucid Keystone Commands."])
     end
 end
---[[function SlashCmdList.LKt()
-    backdroplist[11] = "April Fool"
-end]]
+
 
 --Initialize function
 function Module:OnInitialize()
     db = LibStub("AceDB-3.0"):New("LucidKeystoneDB", defaults)
+    LSM = LibStub:GetLibrary("LibSharedMedia-3.0");
     version = GetAddOnMetadata(AddonName, "Version")
     author = GetAddOnMetadata(AddonName, "Author")
     notes = GetAddOnMetadata(AddonName, "Notes")
     title = GetAddOnMetadata(AddonName, "Title")
+    db.profile.pridefulAlert = nil
     AddConfig()
     ToggleAutoRole()
+    OnInitProfiles()
     CheckForTimings()
 end

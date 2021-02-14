@@ -22,14 +22,26 @@ local previewSettings = {
     bosses      = {
                 "|cff777777"..L["Johnny Awesome defeated"].."   1/1   |cff4cff00|r", 
                 "|cff777777"..L["Innocent Cat defeated"].."   1/1   |cff4cff00|r", 
-                "|cff777777"..L["Pink fluffy Unicorn defeated"].."   1/1   |cff4cff00|r", 
-                L["Hello Kitty defeated"].."   0/1",
+                "|r|r"..L["Pink fluffy Unicorn defeated"].."   0/1", 
+                "|r"..L["Hello Kitty defeated"].."   0/1",
                 },
     bossesTwo   = {
-                "|cff777777"..L["Johnny Awesome defeated"].."   1/1   |cff4cff0003:28|r", 
-                "|cff777777"..L["Innocent Cat defeated"].."   1/1   |cff4cff0016:31|r", 
-                "|cff777777"..L["Pink fluffy Unicorn defeated"].."   1/1   |cff4cff0024:44|r", 
-                L["Hello Kitty defeated"].."   0/1",
+                "|cff777777"..L["Johnny Awesome defeated"].."   1/1   |cff4cff0007:03|r", 
+                "|cff777777"..L["Innocent Cat defeated"].."   1/1   |cff4cff0023:16|r", 
+                "|r|r"..L["Pink fluffy Unicorn defeated"].."   0/1", 
+                "|r"..L["Hello Kitty defeated"].."   0/1",
+                },
+    bossesAbs   = {
+                "|cff777777"..L["Johnny Awesome defeated"].."   1/1   |cff4cff0007:03   |cff4fc3f7[06:41]|r", 
+                "|cff777777"..L["Innocent Cat defeated"].."   1/1   |cff4cff0023:16   |cff4fc3f7[24:26]|r", 
+                "|r|r"..L["Pink fluffy Unicorn defeated"].."   0/1", 
+                "|r"..L["Hello Kitty defeated"].."   0/1",
+                },
+    bossesRel   = {
+                "|cff777777"..L["Johnny Awesome defeated"].."   1/1   |cff4cff0007:03   |cff4fc3f7[+00:22]|r", 
+                "|cff777777"..L["Innocent Cat defeated"].."   1/1   |cff4cff0023:16   |cff4fc3f7[-01:10]|r", 
+                "|r|r"..L["Pink fluffy Unicorn defeated"].."   0/1", 
+                "|r"..L["Hello Kitty defeated"].."   0/1",
                 },
     dungeonName = {
                 --BfA
@@ -46,14 +58,14 @@ local previewSettings = {
                 [369] = {shortName = "Yard"},
                 [370] = {shortName = "Work"},
                 --Shadowlands
-                [375] = {shortName = "Mists"},
-                [376] = {shortName = "NW"},
-                [377] = {shortName = "DOS"},
-                [378] = {shortName = "HoA"},
-                [379] = {shortName = "PF"},
-                [380] = {shortName = "SD"},
-                [381] = {shortName = "SoA"},
-                [382] = {shortName = "ToP"},
+                [375] = {shortName = L["Mists"]},
+                [376] = {shortName = L["NW"]},
+                [377] = {shortName = L["DOS"]},
+                [378] = {shortName = L["HoA"]},
+                [379] = {shortName = L["PF"]},
+                [380] = {shortName = L["SD"]},
+                [381] = {shortName = L["SoA"]},
+                [382] = {shortName = L["ToP"]}, 
                 },
     affixIcon   = {
                 [1]   = {icon = 463570},  --Overflowing
@@ -79,6 +91,24 @@ local previewSettings = {
                 [122] = {icon = 135946},  --Inspiring
                 [123] = {icon = 135945},  --Spiteful
                 [124] = {icon = 136018},  --Storming
+                },
+    AffixNil    = {
+                [1]={
+                    id=9,
+                    seasonID=0
+                    },
+                [2]={
+                    id=7,
+                    seasonID=0
+                    },
+                [3]={
+                    id=4,
+                    seasonID=0
+                    },
+                [4]={
+                    id=121,
+                    seasonID=0
+                    }
                 },
 }
 
@@ -134,12 +164,14 @@ local sparkleEffect = {
     [4]  = {animation = 1522788},
     [5]  = {animation = 1384104},
     [6]  = {animation = 654238},
-    [7]  = {animation = 240950},
+    [7]  = {animation = 841273}, --240950
     [8]  = {animation = 1322288},
     [9]  = {animation = 978543},
-    [10]  = {animation = 310425},
+    [10] = {animation = 310425},
     [11] = {animation = 1135053},
 }
+
+local timeThrottle = nil
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --  Function Section
@@ -370,16 +402,39 @@ end
 local function UpdateMobs()
     local current, total = GetMobCount()
     local before = current / total * 100
-    local new = ""
-    local colorBefore = "FFffffff"
-    local colorInd = "ff4cff00"
+    local red, time, new, cur, cur2 = false, GetTime(), "", "", ""
+    local _,affix = C_ChallengeMode.GetActiveKeystoneInfo()
+    local colorBefore, colorInd, colorRed = "FFffffff", "ff4cff00", "ffe22b2a"
     local strBefore = string.format("|c%s%.2f%%|r", colorBefore, before)
-    local cur = string.format("\n|c%s+%.2f%%|r", colorInd, db.profile.currentPullCount)
-    local cur2 = string.format("\n|c%s%.2f%%|r", colorInd, db.profile.currentPullCount+before)
+
+    if (before < 20 and db.profile.PullCheck+before >= 20) or
+    (before < 40 and db.profile.PullCheck+before >= 40) or
+    (before < 60 and db.profile.PullCheck+before >= 60) or
+    (before < 80 and db.profile.PullCheck+before >= 80) or
+    (before < 100 and db.profile.PullCheck+before >= 100) then
+        cur = string.format("\n|c%s+%.2f%%|r", colorRed, db.profile.currentPullCount)
+        cur2 = string.format("\n|c%s%.2f%%|r", colorRed, db.profile.currentPullCount+before)
+
+        if not db.profile.sound and db.profile.pridefulAlertT and IsAddOnLoaded("MythicDungeonTools") and affix[4] == 121 then
+            if not timeThrottle or time-timeThrottle > 90 then
+                timeThrottle = time
+                db.profile.sound = true
+                PlaySoundFile(AceGUIWidgetLSMlists.sound[db.profile.pridefulAlertSound], "Master")
+            end
+        end
+
+        red = true
+    else
+        db.profile.sound = false
+        cur = string.format("\n|c%s+%.2f%%|r", colorInd, db.profile.currentPullCount)
+        cur2 = string.format("\n|c%s%.2f%%|r", colorInd, db.profile.currentPullCount+before)
+    end
+    
     local f = LucidKeystoneFrame
     db.profile.GetPull = string.format("%.2f",before)
 
     if db.profile.MobPercStep then
+
         if db.profile.MobPullConf == 2 and db.profile.currentPullCount > 0 then
             strBefore = strBefore..cur
         elseif db.profile.MobPullConf == 3 and db.profile.currentPullCount > 0 then
@@ -389,9 +444,17 @@ local function UpdateMobs()
         f.textMobs:SetText(strBefore)
     else
         if db.profile.MobPullConf == 2 and db.profile.currentPullCount > 0 then
-            new = string.format("\n|c%s+%d|r", colorInd, db.profile.currentPullCount)
+            if red then
+                new = string.format("\n|c%s+%d|r", colorRed, db.profile.currentPullCount)
+            else
+                new = string.format("\n|c%s+%d|r", colorInd, db.profile.currentPullCount)
+            end
         elseif db.profile.MobPullConf == 3 and db.profile.currentPullCount > 0 then
-            new = string.format("\n|c%s%d|r", colorInd, db.profile.currentPullCount+current)
+            if red then
+                new = string.format("\n|c%s%d|r", colorRed, db.profile.currentPullCount+current)
+            else
+                new = string.format("\n|c%s%d|r", colorInd, db.profile.currentPullCount+current)
+            end
         end
         f.textMobs:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 13, "OUTLINE")
         f.textMobs:SetText(current.." / "..total..new)
@@ -406,16 +469,14 @@ end
 
 -- Mobupdate on Preview
 function Module.Config:MobUpdateConfig()
-    local current = 256
-    local total = 285
-    local mobPerc = previewSettings.mobPerc
-    local mobCurPerc = previewSettings.mobCurPerc
+    local current, total = 256, 285
+    local mobPerc, mobCurPerc = previewSettings.mobPerc, previewSettings.mobCurPerc
     local f = LucidKeystoneFrame
     if db.profile.MobPercStep then
         f.textMobs:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 15, "OUTLINE")
-        if db.profile.MobPullConf == 2 then
+        if db.profile.MobPullConf == 2 and IsAddOnLoaded("MythicDungeonTools") then
             f.textMobs:SetText(mobPerc.."%\n|cff4cff00+"..mobCurPerc.."%|r")
-        elseif db.profile.MobPullConf == 3 then
+        elseif db.profile.MobPullConf == 3 and IsAddOnLoaded("MythicDungeonTools") then
             f.textMobs:SetText(mobPerc.."%\n|cff4cff00"..mobCurPerc+mobPerc.."%|r")
         else
             f.textMobs:SetText(mobPerc.."%")
@@ -442,8 +503,7 @@ local function UpdateDungeonName()
 end
 
 local function GetBestBefore()
-    local level = C_ChallengeMode.GetActiveKeystoneInfo()
-    local mapID = db.profile.GetActiveChallengeMapID
+    local level, mapID = C_ChallengeMode.GetActiveKeystoneInfo(), db.profile.GetActiveChallengeMapID
     local newLevel = 1
     db.profile.bestBeforeStart = {}
     for i = 1, 10 do
@@ -468,19 +528,25 @@ local function GetBestBefore()
 end
 
 
+
+
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --  Event Handler 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 local function eventHandler(self, e, ...)
     if e == "CHALLENGE_MODE_START" then
+        local p = db.profile
         Module.Config.ToggleFrames()
         ObjectiveTrackerFrame:Hide()
         LucidKeystoneFrame:Show()
-        db.profile.start = true
-        db.profile.currentPull = 0.0
-        db.profile.currentPullCount = 0.0
-        db.profile.GetActiveChallengeMapID = C_ChallengeMode.GetActiveChallengeMapID()
+        p.start = true
+        p.currentPull = 0.0
+        p.currentPullCount = 0.0
+        p.PullCheck = 0.0
+        p.KillTimes = {}
+        p.sound = false
+        p.GetActiveChallengeMapID = C_ChallengeMode.GetActiveChallengeMapID()
         UpdateDungeonName()
         bootlegRepeatingTimer()
         UpdateBosses()
@@ -506,6 +572,7 @@ local function eventHandler(self, e, ...)
             UpdateDungeonName()
             UpdateBosses()
         end
+
         if db.profile.start == false then
             if ObjectiveTrackerFrame:IsShown() == false then
                 ObjectiveTrackerFrame:Show()
@@ -514,7 +581,6 @@ local function eventHandler(self, e, ...)
         end
     end
     if e == "CHALLENGE_MODE_COMPLETED" then
-        --local _, level, time, onTime = C_ChallengeMode.GetCompletionInfo()
         local _, level, time = C_ChallengeMode.GetCompletionInfo()
         local f = LucidKeystoneFrame
         local bar = LucidKeystoneFrameBar
@@ -523,7 +589,7 @@ local function eventHandler(self, e, ...)
         bar:SetMinMaxValues(0,maxTime)
         bar:SetValue(maxTime-time)
         f.textMobs:SetText("100.00%")
-        f.textLevel:SetText(GetScoreColor(GetBaseScore(level))..level)
+        f.textLevel:SetText(GetScoreColor(GetBaseScore(level))..level) 
         f.textTimer:SetText(TimeFormat(time))
         f.textTimerSmall:SetText(TimeFormat(maxTime-time))
         f.textTimerOne:SetText("+1\n"..TimeFormat(maxTime))
@@ -533,6 +599,7 @@ local function eventHandler(self, e, ...)
     end
     if e == "COMBAT_LOG_EVENT_UNFILTERED" and db.profile.start and db.profile.MobPullConf ~= 1 and IsAddOnLoaded("MythicDungeonTools") then
         db.profile.currentPull = 0.0
+        db.profile.PullCheck = 0.0
     
         for i = 1, 40 do
             local unit = "nameplate"..i
@@ -552,6 +619,9 @@ local function eventHandler(self, e, ...)
                         weight = count/max
                     end
                     weight = weight*100
+                    if (weight and weight > 0) then
+                        db.profile.PullCheck = db.profile.currentPull+weight
+                    end
                     if db.profile.MobPercStep then
                         if (weight and weight > 0) then
                                 db.profile.currentPull = db.profile.currentPull+weight
@@ -567,15 +637,16 @@ local function eventHandler(self, e, ...)
     end
     if e == "PLAYER_REGEN_ENABLED" and db.profile.start and db.profile.MobPullConf then
             db.profile.currentPull = 0.0
+            db.profile.PullCheck = 0.0
     end
 
     --Test Event
     --[[if e == "PLAYER_STOPPED_MOVING" then
         -- do test stuff kappa
-        GetBestBefore()
     end
     if e == "PLAYER_STARTED_MOVING" then
         -- do test stuff kappa
+        print(AddonName)
     end]]
 end
 
@@ -623,6 +694,7 @@ local function ToggleLucidKeystoneFrame()
     bg:EnableMouse(false)
     bg:SetWidth(512)
     bg:SetHeight(256)
+    bg:SetScale(db.profile.ScaleStyle)
     t = bg:CreateTexture(nil,"BACKGROUND")
     t:SetAllPoints(bg) 
     t:SetTexture(Addon[imgfile[Module.Config:GetOption("background")]..Module.Config:GetOption("mobCount")])
@@ -702,7 +774,6 @@ local function ToggleLucidKeystoneFrame()
     bar:SetValue(maxTime-previewSettings.time)
     bar:SetClipsChildren(true)
     bar:SetOrientation("HORIZONTAL")
-    --bar:SetStatusBarTexture(Addon.BAR_PARTICLES)
     bar:SetStatusBarTexture(AceGUIWidgetLSMlists.statusbar[db.profile.TimerBarStyle])
     bar:SetStatusBarColor(db.profile.timerBarColor.r, db.profile.timerBarColor.g, db.profile.timerBarColor.b, 1)
 
@@ -720,7 +791,6 @@ local function ToggleLucidKeystoneFrame()
     barP:SetHeight(12)
     barP:SetMinMaxValues(0,100)
     barP:SetOrientation("HORIZONTAL")
-    --barP:SetStatusBarTexture(Addon.BAR_PARTICLES)
     barP:SetStatusBarTexture(AceGUIWidgetLSMlists.statusbar[db.profile.MobBarStyle])
     barP:SetStatusBarColor(db.profile.mobBarColor.r, db.profile.mobBarColor.g, db.profile.mobBarColor.b, 1)
 
@@ -736,10 +806,9 @@ local function ToggleLucidKeystoneFrame()
     spark:SetPoint("RIGHT", bar:GetStatusBarTexture(), "RIGHT", 6, 0)-- Castbar:GetStatusBarTexture(), 'RIGHT', 0, 0
     spark:SetWidth(12)
     spark:SetHeight(20)
-    tex = spark:CreateTexture(nil,"ARTWORK")
+    tex = spark:CreateTexture("LKFStex","ARTWORK")
     tex:SetAllPoints(spark)
     tex:SetBlendMode("ADD")
-    tex:SetVertexColor(0, 0.7, 1, 1)
     tex:SetTexture("Interface\\CastingBar\\UI-CastingBar-Spark")
     spark.texture = tex
 
@@ -749,10 +818,9 @@ local function ToggleLucidKeystoneFrame()
     sparkp:SetPoint("RIGHT", barP:GetStatusBarTexture(), "RIGHT", 6, 0)-- Castbar:GetStatusBarTexture(), 'RIGHT', 0, 0
     sparkp:SetWidth(12)
     sparkp:SetHeight(20)
-    texp = sparkp:CreateTexture(nil,"ARTWORK")
+    texp = sparkp:CreateTexture("LKFSPtex","ARTWORK")
     texp:SetAllPoints(sparkp)
     texp:SetBlendMode("ADD")
-    texp:SetVertexColor(0.7, 1, 0, 1)
     texp:SetTexture("Interface\\CastingBar\\UI-CastingBar-Spark")
     sparkp.texture = tex
 
@@ -779,12 +847,18 @@ function Module.Config:KeyLevel()
     end
 end
 
+function Module.Config:Scale()
+    LucidKeystoneFrame:SetScale(db.profile.ScaleStyle)
+end
+
 -- Set Timer Bar Color
 function Module.Config:SetTimerBarColor()
     LucidKeystoneFrameBar:SetStatusBarColor(db.profile.timerBarColor.r,db.profile.timerBarColor.g,db.profile.timerBarColor.b,1)
+    LKFStex:SetVertexColor(db.profile.timerBarColor.r,db.profile.timerBarColor.g,db.profile.timerBarColor.b,1)
 end
 function Module.Config:SetMobBarColor()
     LucidKeystoneFrameBarPerc:SetStatusBarColor(db.profile.mobBarColor.r,db.profile.mobBarColor.g,db.profile.mobBarColor.b,1)
+    LKFSPtex:SetVertexColor(db.profile.mobBarColor.r,db.profile.mobBarColor.g,db.profile.mobBarColor.b,1)
 end
 
 -- Set Text for Timers
@@ -806,7 +880,6 @@ function Module.Config:TimerText()
     local timeSmall = time
     local mobPercPlus = ""
     local f = LucidKeystoneFrame
-    --b:SetStatusBarColor(0,0.7,1,1)
     if db.profile.mainTimer == 2 then
         time = maxTime-time
     end
@@ -820,9 +893,9 @@ function Module.Config:TimerText()
         f.textDeaths:SetText(test.." "..deaths.."\n-"..TimeFormat(deaths*5))
         if db.profile.MobPercStep then
             f.textMobs:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 15, "OUTLINE")
-            if db.profile.MobPullConf == 2 then
+            if db.profile.MobPullConf == 2 and IsAddOnLoaded("MythicDungeonTools") then
                 f.textMobs:SetText(mobPerc.."%\n|cff4cff00+"..mobCurPerc.."%|r")
-            elseif db.profile.MobPullConf == 3 then
+            elseif db.profile.MobPullConf == 3 and IsAddOnLoaded("MythicDungeonTools") then
                 f.textMobs:SetText(mobPerc.."%\n|cff4cff00"..mobCurPerc+mobPerc.."%|r")
             else
                 f.textMobs:SetText(mobPerc.."%")
@@ -852,7 +925,7 @@ function Module.Config:PlusTimer()
             if plus3 >= 0 then smartTime = "+3\n"..TimeFormat(plus3) elseif
             plus2 >= 0 then smartTime = "+2\n"..TimeFormat(plus2) elseif
             plus1 >= 0 then smartTime = "+1\n"..TimeFormat(plus1) elseif
-            plus1 <= 0 then smartTime = "Over by |cffC43333"..plusSmartOne
+            plus1 <= 0 then smartTime = L["Over by"].." |cffC43333"..plusSmartOne
             end
             f.textTimerTwo:SetText(smartTime)
         end
@@ -886,21 +959,27 @@ function Module.Config:BossesText()
     if db.profile.bosses == 2 then
         f.textBosses:SetPoint("CENTER",60,39)
         if db.profile.start == false then
-            f.textBosses:SetText("3/4")
+            f.textBosses:SetText("2/4")
         else
             UpdateBosses()
         end
     elseif db.profile.bosses == 3 and db.profile.timeStamp then
-        xof = 1
+        xof = -4
         yof = yof+offset
         f.textBosses:SetPoint("CENTER",xof,yof)
         if db.profile.start == false then
-            f.textBosses:SetText(table.concat(previewSettings.bossesTwo, "|r\n"))
+            if db.profile.bestBefore == 2 or db.profile.bestBefore == 4 then
+                f.textBosses:SetText(table.concat(previewSettings.bossesAbs, "|r\n"))
+            elseif db.profile.bestBefore == 3 or db.profile.bestBefore == 5 then
+                f.textBosses:SetText(table.concat(previewSettings.bossesRel, "|r\n"))
+            else
+                f.textBosses:SetText(table.concat(previewSettings.bossesTwo, "|r\n"))
+            end
         else
             UpdateBosses()
         end
     elseif db.profile.bosses == 3 and not db.profile.timeStamp then
-        xof = 1
+        xof = -4
         yof = yof+offset
         f.textBosses:SetPoint("CENTER",xof,yof)
         if db.profile.start == false then
@@ -917,8 +996,14 @@ end
 function Module.Config:AffixText()
     local f = LucidKeystoneFrame
     local offset = 0
-    local wAffix = C_MythicPlus.GetCurrentAffixes()
+    local wAffix = {}
     local affixTable = {}
+
+    if C_ChallengeMode.IsChallengeModeActive() then
+		wAffix = C_MythicPlus.GetCurrentAffixes()
+	elseif not C_ChallengeMode.IsChallengeModeActive() then
+		wAffix = previewSettings.AffixNil
+	end
 
     if db.profile.mobCount == 1 then
         offset = 15
@@ -1091,6 +1176,7 @@ function Module.Config.ToggleFrames()
     Module.Config:MobUpdateConfig()
     Module.Config:SparkleUpdate()
     Module.Config:KeyLevel()
+    Module.Config:Scale()
     Module.Config:BossesText()
     Module.Config:DungeonText()
     Module.Config:MobBar()
