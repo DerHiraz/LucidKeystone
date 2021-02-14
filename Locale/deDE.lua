@@ -1,6 +1,12 @@
 local L = LibStub("AceLocale-3.0"):NewLocale("LucidKeystone", "deDE")
 if not L then return end
 
+-- Translated by Hiraz
+
+--#Expansion
+--Only if the translation is official by Blizzard
+L["Shadowlands"]                                                                            = "Shadowlands"
+
 --# Options Frame
 --## Buttons
 L["Preview"]                                                                                = "Vorschau"
@@ -21,6 +27,17 @@ L["version"]                                                                    
 L["help"]                                                                                   = "hilfe"
 L["Lucid Keystone Commands:"]                                                               = "Lucid Keystone Befehle:"
 L["Invalid Command. Type \"/lk help\" to see all Lucid Keystone Commands."]                 = "Ungültiger Befehl. Gebt \"/lk hilfe\" ein, um alle Befehle für Lucid Keystone aufzurufen."
+
+--## Dungeon Shortnames
+--### Shadowlands
+L["Mists"]                                                                                  = "Nebel"
+L["NW"]                                                                                     = "NS"
+L["DOS"]                                                                                    = "DAS"
+L["HoA"]                                                                                    = "HdS"
+L["PF"]                                                                                     = "SeSt"
+L["SD"]                                                                                     = "BT"
+L["SoA"]                                                                                    = "SdA"
+L["ToP"]                                                                                    = "TdS"
 
 --## Style Settings
 L["Style"]                                                                                  = "Stil"
@@ -98,6 +115,7 @@ L["Shows the Mob Count in Percent instead of the exact Number."]                
 L["Current Pull"]                                                                           = "Momentaner Pull"
 L["Get the current Pull Percentage / Count gain."]                                          = "Zeigt die Prozente / Anzahl vom momentanen Pull"
 L["After Pull"]                                                                             = "Nach dem Pull"
+L["Over by"]                                                                                = "Über um"
 
 --## General Settings
 L["General"]                                                                                = "Allgemein"
@@ -105,6 +123,7 @@ L["History Mode"]                                                               
 L["Font"]                                                                                   = "Schriftart"
 L["Keystone Autoplace"]                                                                     = "Automatisch Schlüsselstein setzen"
 L["Play Prideful Sound"]                                                                    = "Spiele einen Ton bei Affix \"Stolz\""
+L["Sound"]                                                                                  = "Ton"
 L["Activate |cff87ceeb!keys|r Command"]                                                     = "Aktiviere |cff87ceeb!keys|r Befehl"
 L["Link your Key in chat by typing |cff87ceeb!keys|r in party/raid chat."]                  = "Verlinke deinen Schlüsselstein in Gruppen/Raid Chat mit dem |cff87ceeb!keys|r befehl."
 L["Autopost your Key"]                                                                      = "Schlüsselstein automatisch verlinken"
@@ -112,6 +131,7 @@ L["Autopost your Key after finishing a run."]                                   
 L["Auto Rolecheck"]                                                                         = "Automatischer Rollencheck"
 L["Automatically accept your role at each role check."]                                     = "Akzeptiert automatisch die Rolle bei einem Rollencheck."
 L["Send Automatic whisper while doing Mythic Plus"]                                         = "Sende eine automatische Flüsternachricht während Mytisch Plus"
+L["Scale Timer"]                                                                            = "Skaliere den Timer"
 L["Enable"]                                                                                 = "Aktivieren"
 L["Send Keystone Level"]                                                                    = "Schlüsselstein Level senden"
 L["Send Dungeon Name"]                                                                      = "Dungeon Name senden"
@@ -156,7 +176,6 @@ L["minutes"]                                                                    
 L["seconds"]                                                                                = "Sekunden"
 L["Time played this Season in M+: "]                                                        = "Zeit in dieser Saison gespielt in M+: "
 
-
 --## About
 L["About"]                                                                                  = "Über"
 L["Title: "]                                                                                = "Titel: "
@@ -165,10 +184,34 @@ L["Notes: "]                                                                    
 L["Author: "]                                                                               = "Autor: "
 L["Website: "]                                                                              = "Internetseite: "
 L["Donate: "]                                                                               = "Spenden: "
+L["Special Thanks"]                                                                         = "Besonderer Dank"
+L["Guild on EU-Thrall"]                                                                     = "Gilde auf EU-Thrall"
+L["esES Translation"]                                                                       = "esES Übersetzung"
+L["esMX Translation"]                                                                       = "esMX Übersetzung"
+L["frFR Translation"]                                                                       = "frFR Übersetzung"
+L["itIT Translation"]                                                                       = "itIT Übersetzung"
+L["koKR Translation"]                                                                       = "koKR Übersetzung"
+L["ptBR Translation"]                                                                       = "ptBR Übersetzung"
+L["ruRU Translation"]                                                                       = "ruRU Übersetzung"
+L["zhCN Translation"]                                                                       = "zhCN Übersetzung"
+L["zhTW Translation"]                                                                       = "zhTW Übersetzung"
 
 --## Profiles
 L["Profiles"]                                                                               = "Profile"
+L["Copy Profile"]                                                                           = "Profil Kopieren"
+L["Copy from"]                                                                              = "Kopieren von..."
+L["Copy the settings from one existing profile into the currently active profile"]          = "Kopiere die Einstellungen von einem vorhandenen Profil in das aktive Profil."
+L["Choose Profile"]                                                                         = "Profil wählen"
+L["Hardreset"]                                                                              = "Harter Reset"
+L["Are you sure to Reset everything in Lucid Keystone, even your Dungeon statistics?"]      = "Bist du dir sicher, dass du alles in Lucid Keystone zurücksetzen willst, selbst die Dungeon Statistiken?"
+L["This cannot be undone!"]                                                                 = "Das kann nicht rückgängig gemacht werden!"
+L["Everything in Lucid Keystone was wiped painfully!"]                                      = "Alles in Lucid Keystone wurde schmerzhaft vernichtet!"
 
+
+--# Devtools
+L["Devtools enabled"]                                                                       = "Devtools aktiviert"
+L["Lucid Keystone Devtools DISABLED"]                                                       = "Lucid Keystone Devtools DEAKTIVIERT"
+L["Lucid Keystone Devtools ENABLED"]                                                        = "Lucid Keystone Devtools AKTIVIERT"
 
 --# Version Check Frame
 --##General

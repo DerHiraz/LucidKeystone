@@ -1,6 +1,8 @@
 <Ui xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.blizzard.com/wow/ui/">
 	<Script file = "deDE.lua" />
 	<Script file = "enUS.lua" />
+	<Script file = "zhCN.lua" />
+	<Script file = "zhTW.lua" />
 	<!--
 	<Script file = "esES.lua" />
 	<Script file = "esMX.lua" />
@@ -9,7 +11,5 @@
 	<Script file = "koKR.lua" />
 	<Script file = "ptBR.lua" />
 	<Script file = "ruRU.lua" />
-	<Script file = "zhCN.lua" />
-	<Script file = "zhTW.lua" />
 	-->
 </Ui>

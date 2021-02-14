@@ -3,6 +3,10 @@ if not L then return end
 
 -- WORK IN PROGRESS
 
+--#Expansion
+--Only if the translation is official by Blizzard
+L["Shadowlands"]                                                                            = "Shadowlands"
+
 --# Options Frame
 --## Buttons
 L["Preview"]                                                                                = "Preview"
@@ -23,6 +27,17 @@ L["version"]                                                                    
 L["help"]                                                                                   = "help"
 L["Lucid Keystone Commands:"]                                                               = "Lucid Keystone Commands:"
 L["Invalid Command. Type \"/lk help\" to see all Lucid Keystone Commands."]                 = "Invalid Command. Type \"/lk help\" to see all Lucid Keystone Commands."
+
+--## Dungeon Shortnames
+--### Shadowlands
+L["Mists"]                                                                                  = "Mists"
+L["NW"]                                                                                     = "NW"
+L["DOS"]                                                                                    = "DOS"
+L["HoA"]                                                                                    = "HoA"
+L["PF"]                                                                                     = "PF"
+L["SD"]                                                                                     = "SD"
+L["SoA"]                                                                                    = "SoA"
+L["ToP"]                                                                                    = "ToP"
 
 --## Style Settings
 L["Style"]                                                                                  = "Style"
@@ -100,6 +115,7 @@ L["Shows the Mob Count in Percent instead of the exact Number."]                
 L["Current Pull"]                                                                           = "Current Pull "
 L["Get the current Pull Percentage / Count gain."]                                          = "Get the current Pull Percentage / Count gain."
 L["After Pull"]                                                                             = "After Pull"
+L["Over by"]                                                                                = "Over by"
 
 --## General Settings
 L["General"]                                                                                = "General"
@@ -107,6 +123,7 @@ L["History Mode"]                                                               
 L["Font"]                                                                                   = "Font"
 L["Keystone Autoplace"]                                                                     = "Keystone Autoplace"
 L["Play Prideful Sound"]                                                                    = "Play Prideful Sound"
+L["Sound"]                                                                                  = "Sound"
 L["Activate |cff87ceeb!keys|r Command"]                                                     = "Activate |cff87ceeb!keys|r Command"
 L["Link your Key in chat by typing |cff87ceeb!keys|r in party/raid chat."]                  = "Link your Key in chat by typing |cff87ceeb!keys|r in party/raid chat."
 L["Autopost your Key"]                                                                      = "Autopost your Key"
@@ -114,6 +131,7 @@ L["Autopost your Key after finishing a run."]                                   
 L["Auto Rolecheck"]                                                                         = "Auto Rolecheck"
 L["Automatically accept your role at each role check."]                                     = "Automatically accept your role at each role check."
 L["Send Automatic whisper while doing Mythic Plus"]                                         = "Send Automatic whisper while doing Mythic Plus"
+L["Scale Timer"]                                                                            = "Scale Timer"
 L["Enable"]                                                                                 = "Enable"
 L["Send Keystone Level"]                                                                    = "Send Keystone Level"
 L["Send Dungeon Name"]                                                                      = "Send Dungeon Name"
@@ -166,10 +184,34 @@ L["Notes: "]                                                                    
 L["Author: "]                                                                               = "Author: "
 L["Website: "]                                                                              = "Website: "
 L["Donate: "]                                                                               = "Donate: "
+L["Special Thanks"]                                                                         = "Special Thanks"
+L["Guild on EU-Thrall"]                                                                     = "Guild on EU-Thrall"
+L["esES Translation"]                                                                       = "esES Translation"
+L["esMX Translation"]                                                                       = "esMX Translation"
+L["frFR Translation"]                                                                       = "frFR Translation"
+L["itIT Translation"]                                                                       = "itIT Translation"
+L["koKR Translation"]                                                                       = "koKR Translation"
+L["ptBR Translation"]                                                                       = "ptBR Translation"
+L["ruRU Translation"]                                                                       = "ruRU Translation"
+L["zhCN Translation"]                                                                       = "zhCN Translation"
+L["zhTW Translation"]                                                                       = "zhTW Translation"
 
 --## Profiles
 L["Profiles"]                                                                               = "Profiles"
+L["Copy Profile"]                                                                           = "Copy Profile"
+L["Copy from"]                                                                              = "Copy from"
+L["Copy the settings from one existing profile into the currently active profile"]          = "Copy the settings from one existing profile into the currently active profile"
+L["Choose Profile"]                                                                         = "Choose Profile"
+L["Hardreset"]                                                                              = "Hardreset"
+L["Are you sure to Reset everything in Lucid Keystone, even your Dungeon statistics?"]      = "Are you sure to Reset everything in Lucid Keystone, even your Dungeon statistics?"
+L["This cannot be undone!"]                                                                 = "This cannot be undone!"
+L["Everything in Lucid Keystone was wiped painfully!"]                                      = "Everything in Lucid Keystone was wiped painfully!"
 --L[] = true
+
+--# Devtools
+L["Devtools enabled"]                                                                       = "Devtools enabled"
+L["Lucid Keystone Devtools DISABLED"]                                                       = "Lucid Keystone Devtools DISABLED"
+L["Lucid Keystone Devtools ENABLED"]                                                        = "Lucid Keystone Devtools ENABLED"
 
 
 --# Version Check Frame

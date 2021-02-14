@@ -1,6 +1,12 @@
 local L = LibStub("AceLocale-3.0"):NewLocale("LucidKeystone", "enUS", true)
 if not L then return end
 
+
+
+--#Expansion
+--Only if the translation is official by Blizzard
+L["Shadowlands"] = true
+
 --# Options Frame
 --## Buttons
 L["Preview"] = true
@@ -21,6 +27,17 @@ L["version"] = true
 L["help"] = true
 L["Lucid Keystone Commands:"] = true
 L["Invalid Command. Type \"/lk help\" to see all Lucid Keystone Commands."] = true
+
+--## Dungeon Shortnames
+--### Shadowlands
+L["Mists"] = true
+L["NW"] = true
+L["DOS"] = true
+L["HoA"] = true
+L["PF"] = true
+L["SD"] = true
+L["SoA"] = true
+L["ToP"] = true
 
 --## Style Settings
 L["Style"] = true
@@ -98,6 +115,7 @@ L["Shows the Mob Count in Percent instead of the exact Number."] = true
 L["Current Pull"] = true
 L["Get the current Pull Percentage / Count gain."] = true
 L["After Pull"] = true
+L["Over by"] = true
 
 --## General Settings
 L["General"] = true
@@ -105,6 +123,7 @@ L["History Mode"] = true
 L["Font"] = true
 L["Keystone Autoplace"] = true
 L["Play Prideful Sound"] = true
+L["Sound"] = true
 L["Activate |cff87ceeb!keys|r Command"] = true
 L["Link your Key in chat by typing |cff87ceeb!keys|r in party/raid chat."] = true
 L["Autopost your Key"] = true
@@ -112,6 +131,7 @@ L["Autopost your Key after finishing a run."] = true
 L["Auto Rolecheck"] = true
 L["Automatically accept your role at each role check."] = true
 L["Send Automatic whisper while doing Mythic Plus"] = true
+L["Scale Timer"] = true
 L["Enable"] = true
 L["Send Keystone Level"] = true
 L["Send Dungeon Name"] = true
@@ -164,11 +184,34 @@ L["Notes: "] = true
 L["Author: "] = true
 L["Website: "] = true
 L["Donate: "] = true
+L["Special Thanks"] = true
+L["Guild on EU-Thrall"] = true
+L["esES Translation"] = true
+L["esMX Translation"] = true
+L["frFR Translation"] = true
+L["itIT Translation"] = true
+L["koKR Translation"] = true
+L["ptBR Translation"] = true
+L["ruRU Translation"] = true
+L["zhCN Translation"] = true
+L["zhTW Translation"] = true
 
 --## Profiles
 L["Profiles"] = true
+L["Copy Profile"] = true
+L["Copy from"] = true
+L["Copy the settings from one existing profile into the currently active profile"] = true
+L["Choose Profile"] = true
+L["Hardreset"] = true
+L["Are you sure to Reset everything in Lucid Keystone, even your Dungeon statistics?"] = true
+L["This cannot be undone!"] = true
+L["Everything in Lucid Keystone was wiped painfully!"] = true
 --L[] = true
 
+--# Devtools
+L["Devtools enabled"] = true
+L["Lucid Keystone Devtools DISABLED"] = true
+L["Lucid Keystone Devtools ENABLED"] = true
 
 --# Version Check Frame
 --##General
