@@ -60,4 +60,5 @@ Lucid Keystone currently works with
 - ``deDE``
 - ``zhCN``
 - ``zhTW``
+
 I always looking for people that want to translate more. If you want to help with localization, just contact me.
