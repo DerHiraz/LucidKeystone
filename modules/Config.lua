@@ -3,18 +3,20 @@ local AddonLib = LibStub("AceAddon-3.0"):GetAddon("LucidKeystone")
 local Module = AddonLib:NewModule("Config", "AceConsole-3.0")
 local ACD = LibStub("AceConfigDialog-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("LucidKeystone")
+local ldb = LibStub:GetLibrary("LibDataBroker-1.1", true)
 
 local db, version, author, notes, title
+local icon = LibStub("LibDBIcon-1.0")--, true)
+--if not icon then return end
+--[[if not LKIconDB then LKIconDB = {
+        profile = {
+            minimap = {
+                hide = false,
+            },
+        },
+    }
+end]]
 
-
-local fontColor = {
-    yellow  = "|cffffd100%s|r",
-    green   = "|cff4cff00%s|r",
-    blue    = "|cff009dd5%s|r",
-    red     = "|cffe22b2a%s|r",
-    lucid   = "|cff71478E%s|r",
-    grey    = "|cff787878%s|r",
-}
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --  Profile Default Settings
@@ -22,177 +24,6 @@ local fontColor = {
 ------  Blank Tables
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-local dungeonListInt = {
-    [244] = 0,
-    [245] = 0,
-    [246] = 0,
-    [247] = 0,
-    [248] = 0,
-    [249] = 0,
-    [250] = 0,
-    [251] = 0,
-    [252] = 0,
-    [353] = 0,
-    [369] = 0,
-    [370] = 0,
-    [375] = 0,
-    [376] = 0,
-    [377] = 0,
-    [378] = 0,
-    [379] = 0,
-    [380] = 0,
-    [381] = 0,
-    [382] = 0,
-}
-local dungeonListTable = {
-    [244] = {},
-    [245] = {},
-    [246] = {},
-    [247] = {},
-    [248] = {},
-    [249] = {},
-    [250] = {},
-    [251] = {},
-    [252] = {},
-    [353] = {},
-    [369] = {},
-    [370] = {},
-    [375] = {},
-    [376] = {},
-    [377] = {},
-    [378] = {},
-    [379] = {},
-    [380] = {},
-    [381] = {},
-    [382] = {},
-}
-local bestList = {
-    level       = 0,
-    duration    = 100000,
-    date        = 0,
-}
-local levelBossTiming = {
-    [1] = {duration = 100000},
-    [2] = {duration = 100000},
-    [3] = {duration = 100000},
-    [4] = {duration = 100000},
-    [5] = {duration = 100000},
-}
-
-local levelBossTimingBest = {
-    [1]  = levelBossTiming,
-    [2]  = levelBossTiming,
-    [3]  = levelBossTiming,
-    [4]  = levelBossTiming,
-    [5]  = levelBossTiming,
-    [6]  = levelBossTiming,
-    [7]  = levelBossTiming,
-    [8]  = levelBossTiming,
-    [9]  = levelBossTiming,
-    [10] = levelBossTiming,
-    [11] = levelBossTiming,
-    [12] = levelBossTiming,
-    [13] = levelBossTiming,
-    [14] = levelBossTiming,
-    [15] = levelBossTiming,
-    [16] = levelBossTiming,
-    [17] = levelBossTiming,
-    [18] = levelBossTiming,
-    [19] = levelBossTiming,
-    [20] = levelBossTiming,
-    [21] = levelBossTiming,
-    [22] = levelBossTiming,
-    [23] = levelBossTiming,
-    [24] = levelBossTiming,
-    [25] = levelBossTiming,
-    [26] = levelBossTiming,
-    [27] = levelBossTiming,
-    [28] = levelBossTiming,
-    [29] = levelBossTiming,
-    [30] = levelBossTiming,
-    [31] = levelBossTiming,
-    [32] = levelBossTiming,
-    [33] = levelBossTiming,
-    [34] = levelBossTiming,
-    [35] = levelBossTiming,
-}
-local dungeonBestBossT = {
-    [244] = levelBossTimingBest,
-    [245] = levelBossTimingBest,
-    [246] = levelBossTimingBest,
-    [247] = levelBossTimingBest,
-    [248] = levelBossTimingBest,
-    [249] = levelBossTimingBest,
-    [250] = levelBossTimingBest,
-    [251] = levelBossTimingBest,
-    [252] = levelBossTimingBest,
-    [353] = levelBossTimingBest,
-    [369] = levelBossTimingBest,
-    [370] = levelBossTimingBest,
-    [375] = levelBossTimingBest,
-    [376] = levelBossTimingBest,
-    [377] = levelBossTimingBest,
-    [378] = levelBossTimingBest,
-    [379] = levelBossTimingBest,
-    [380] = levelBossTimingBest,
-    [381] = levelBossTimingBest,
-    [382] = levelBossTimingBest,
-}
-local dungeonListTableBest = {
-    [244] = bestList,
-    [245] = bestList,
-    [246] = bestList,
-    [247] = bestList,
-    [248] = bestList,
-    [249] = bestList,
-    [250] = bestList,
-    [251] = bestList,
-    [252] = bestList,
-    [353] = bestList,
-    [369] = bestList,
-    [370] = bestList,
-    [375] = bestList,
-    [376] = bestList,
-    [377] = bestList,
-    [378] = bestList,
-    [379] = bestList,
-    [380] = bestList,
-    [381] = bestList,
-    [382] = bestList,
-}
-local bestListTable = {
-    level           = {},
-    duration        = {},
-    durationTrans   = {},
-    date            = {},
-}
-local historyListTableBest = {
-    [244] = bestListTable,
-    [245] = bestListTable,
-    [246] = bestListTable,
-    [247] = bestListTable,
-    [248] = bestListTable,
-    [249] = bestListTable,
-    [250] = bestListTable,
-    [251] = bestListTable,
-    [252] = bestListTable,
-    [353] = bestListTable,
-    [369] = bestListTable,
-    [370] = bestListTable,
-    [375] = bestListTable,
-    [376] = bestListTable,
-    [377] = bestListTable,
-    [378] = bestListTable,
-    [379] = bestListTable,
-    [380] = bestListTable,
-    [381] = bestListTable,
-    [382] = bestListTable,
-}
-local statDB = {
-    deaths = 0,
-    volcanic = 0,
-    pride = 0,
-}
 local LucidProfileList = {""}
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -200,194 +31,8 @@ local LucidProfileList = {""}
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 local defaults = {
-    global = {
-        --global defaults
-        statistic = statDB,
-    },
-    profile = {
-        --character defaults
-        statistic       = statDB,
-        colorit         = {
-                            r = 0,
-                            g = 0.7,
-                            b = 0.5,
-                            a = 0.8,
-                        },
-        customKeyColor  = {
-                            r = 1,
-                            g = 1,
-                            b = 1,
-                            a = 1,
-                        },
-        timerBarColor   = {
-                            r = 0,
-                            g = 0.7,
-                            b = 1,
-                            a = 1,
-                        },
-        mobBarColor     = {
-                            r = 0.5,
-                            g = 1,
-                            b = 0,
-                            a = 1,
-                        },
-        timeStamp       = true,
-        keyColor        = true,
-        plusOne         = true,
-        plusTwo         = true,
-        plusThree       = true,
-        smartTimer      = false,
-        history         = true,
-        autoPlace       = true,
-        unlock          = false,
-        pridefulAlertT  = true,
-        postCom         = false,
-        autoPost        = false,
-        autoRole        = false,
-        start           = false,
-        invertPerc      = false,
-        MobPercStep     = true,
-        SendMSGEnable   = false,
-        SendMSGLevel    = true,
-        SendMSGName     = true,
-        SendMSGTime     = true,
-        SendMSGForces   = true,
-        SendMSGBosses   = true,
-        SendMSGDeaths   = true,
-        devtools        = false,
-        Changed         = true,
-        background      = 2,
-        sparkle         = 3,
-        bosses          = 3,
-        affix           = 1,
-        dungeonName     = 1,
-        mainTimer       = 1,
-        mobCount        = 1,
-        MobPullConf     = 3,
-        bestBefore      = 4,
-        ScaleStyle      = 1,
-        fpoint          = "TOPRIGHT",
-        TimerBarStyle   = "Lucid Keystone Particles",
-        MobBarStyle     = "Lucid Keystone Particles",
-        FontStyle       = "Kozuka Gothic Light",
-        pridefulAlertSound = "Stop Death",
-        importFrom      = "",
-        fxof            = -140,
-        fyof            = 0,
-        expansion       = GetExpansionLevel(),
-        season          = 1,
-        dungeonBestBoss = dungeonBestBossT,
-        runs            = {
-                            [7] = { --expansion
-                                [1] = { -- season
-                                    [1] = dungeonListInt,
-                                    [2] = dungeonListInt,
-                                },
-                                [2] = {
-                                    [1] = dungeonListInt,
-                                    [2] = dungeonListInt,
-                                },
-                                [3] = {
-                                    [1] = dungeonListInt,
-                                    [2] = dungeonListInt,
-                                },
-                                [4] = {
-                                    [1] = dungeonListInt,
-                                    [2] = dungeonListInt,
-                                },
-                            },
-                            [8] = { --expansion
-                                [1] = { -- season
-                                    [1] = dungeonListInt,
-                                    [2] = dungeonListInt,
-                                },
-                                [2] = {
-                                    [1] = dungeonListInt,
-                                    [2] = dungeonListInt,
-                                },
-                                [3] = {
-                                    [1] = dungeonListInt,
-                                    [2] = dungeonListInt,
-                                },
-                                [4] = {
-                                    [1] = dungeonListInt,
-                                    [2] = dungeonListInt,
-                                },
-                            },
-                        },
-        avglvl          = {
-                            [7] = { --expansion
-                                [1] = { -- season
-                                    [1] = dungeonListTable,
-                                },
-                                [2] = {
-                                    [1] = dungeonListTable,
-                                },
-                                [3] = {
-                                    [1] = dungeonListTable,
-                                },
-                                [4] = {
-                                    [1] = dungeonListTable,
-                                },
-                            },
-                            [8] = { --expansion
-                                [1] = { -- season
-                                    [1] = dungeonListTable,
-                                },
-                                [2] = {
-                                    [1] = dungeonListTable,
-                                },
-                                [3] = {
-                                    [1] = dungeonListTable,
-                                },
-                                [4] = {
-                                    [1] = dungeonListTable,
-                                },
-                            },
-                        },
-        bestIntime      = {
-                            [7] = {
-                                [1] = dungeonListTableBest,
-                                [2] = dungeonListTableBest,
-                                [3] = dungeonListTableBest,
-                                [4] = dungeonListTableBest,
-                            },
-                            [8] = {
-                                [1] = dungeonListTableBest,
-                                [2] = dungeonListTableBest,
-                                [3] = dungeonListTableBest,
-                                [4] = dungeonListTableBest,
-                            },
-                        },
-        bestOvertime    = {
-                            [7] = {
-                                [1] = dungeonListTableBest,
-                                [2] = dungeonListTableBest,
-                                [3] = dungeonListTableBest,
-                                [4] = dungeonListTableBest,
-                            },
-                            [8] = {
-                                [1] = dungeonListTableBest,
-                                [2] = dungeonListTableBest,
-                                [3] = dungeonListTableBest,
-                                [4] = dungeonListTableBest,
-                            },
-                        },
-        dungeonHistory  = {
-                            [7] = {
-                                [1] = historyListTableBest,
-                                [2] = historyListTableBest,
-                                [3] = historyListTableBest,
-                                [4] = historyListTableBest,
-                            },
-                            [8] = {
-                                [1] = historyListTableBest,
-                                [2] = historyListTableBest,
-                                [3] = historyListTableBest,
-                                [4] = historyListTableBest,
-                            },
-                        },
-    },
+    global = Addon.GlobalDefaults,
+    profile = Addon.ProfileDefaults,
 }
 
 --Backdrop
@@ -396,17 +41,32 @@ local backdroplist = {
     [2] = L["Blizzard Default"],
     [3] = L["Horde"],
     [4] = L["Alliance"],
-    [5] = L["Simple"],
+    [5] = L["Marble"],
     [6] = L["Color It"],
     [7] = L["Dark Glass"],
-    [8] = L["Awakened"],
-    [9] = L["Prideful"],
     [10] = L["Paradox"],
+    [20] = Addon.fontColor.green:format("-- "..L["Season"].." --"),
+    [21] = L["Awakened"],
+    [22] = L["Prideful"],
+    [30] = Addon.fontColor.blue:format("-- "..L["Covenants"].." --"),
+    [31] = CreateAtlasMarkup("sanctumupgrades-kyrian-32x32").." "..L["Kyrian"],
+    [32] = CreateAtlasMarkup("sanctumupgrades-necrolord-32x32").." "..L["Necrolord"],
+    [33] = CreateAtlasMarkup("sanctumupgrades-nightfae-32x32").." "..L["Night Fae"],
+    [34] = CreateAtlasMarkup("sanctumupgrades-venthyr-32x32").." "..L["Venthyr"],
 }
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --  Reset Function
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+function Module:UpdateConfig(keys)
+    if keys then
+        LibStub("AceConfigRegistry-3.0"):NotifyChange("LucidKeystonekeys")
+    else
+        LibStub("AceConfigRegistry-3.0"):NotifyChange("LucidKeystone")
+    end
+    StaticPopup_Show("LucidKeystone_ReloadPopup")
+end
 
 local function ResetConfig(hardReset)
     if hardReset then
@@ -446,8 +106,7 @@ local function ResetConfig(hardReset)
         db.profile.ProfileID = exclude.ProfileID
         SendSystemMessage("Reset completed")
     end
-    LibStub("AceConfigRegistry-3.0"):NotifyChange("LucidKeystone")
-    StaticPopup_Show("LucidKeystone_ReloadPopup")
+    Module:UpdateConfig()
     Module:ToggleFrames()
 end
 
@@ -492,8 +151,7 @@ local function CopyProfile()
     db.profile.KillTimes = exclude.KillTimes
     db.profile.sound = exclude.sound
     db.profile.GetActiveChallengeMapID = exclude.GetActiveChallengeMapID
-    LibStub("AceConfigRegistry-3.0"):NotifyChange("LucidKeystone")
-    StaticPopup_Show("LucidKeystone_ReloadPopup")
+    Module:UpdateConfig()
 end
 
 function Module:GetOption(option)
@@ -543,8 +201,7 @@ local function CheckCharChanges()
             if id == LucidKeystoneDB.profiles[ProfileNames[i]].ProfileID then
                 db:CopyProfile(ProfileNames[i])
                 db:DeleteProfile(ProfileNames[i])
-                LibStub("AceConfigRegistry-3.0"):NotifyChange("LucidKeystone")
-                StaticPopup_Show("LucidKeystone_ReloadPopup")
+                Module:UpdateConfig()
             end
         end
         db.profile.Changed = true
@@ -564,12 +221,37 @@ local function eventHandler(self, e, ...)
         end
         if (isLogin or isReload) and not db.profile.FontStyle then
             db.profile.FontStyle = "Kozuka Gothic Light"
+            MinimapUpdate()
         end
     end
 end
 
+-- Get Base Score by Raider.IO
+--[[local function GetBaseScore(level)
+    local score
+    if level <= 10 then
+        score = level * 10
+    else
+        score = 1.1^(level-10)*100
+    end
+    return score
+end
+
+-- Get Score Color by Raider.IO
+local function GetScoreColor(score)
+    local ScoreColor
+    if (IsAddOnLoaded("RaiderIO")) and db.profile.keyColor then
+        local zone = C_ChallengeMode.GetMapTable()
+        local rR, rG, rB = RaiderIO.GetScoreColor(score*#zone)
+        ScoreColor = string.format("|cff%.2X%.2X%.2X", rR*255, rG*255, rB*255)
+    else
+        ScoreColor = string.format("|cff%.2X%.2X%.2X", db.profile.customKeyColor.r*255, db.profile.customKeyColor.g*255, db.profile.customKeyColor.b*255)
+    end
+    return ScoreColor
+end]]
+
 -- Timeformats
-local function TimeFormat(time,dayInd)
+--[[local function TimeFormat(time,dayInd)
     local format_minutes = "%.2d:%.2d"
     local format_hours = "%d:%.2d:%.2d"
     local format_days = "%d:%.2d:%.2d:%.2d"
@@ -592,7 +274,7 @@ local function TimeFormat(time,dayInd)
     else
         return prefix .. string.format(format_days, days, hours, minutes, seconds)
     end
-end
+end]]
 
 --Stars
 local function GetStarsSymbol(time, zoneID)
@@ -636,6 +318,11 @@ local function OnInitProfiles()
     config:SetScript("OnEvent", eventHandler)
     config:RegisterEvent("PLAYER_ENTERING_WORLD")
     config:RegisterEvent("ADDON_LOADED")
+    if db.profile.background == 8 then
+        db.profile.background = 21
+    elseif db.profile.background == 9 then
+        db.profile.background = 22
+    end
 end
 
 local function CheckForTimings()
@@ -694,9 +381,12 @@ local function dungeonInfo(zoneID)
         inTimeDate = ""
     else
         inTimeLevel = intime.level
-        inTimeDur = TimeFormat(intime.duration)
+        inTimeDur = Addon.TimeFormat(intime.duration)
         inTimeStars = " "..GetStarsSymbol(intime.duration, zoneID)
         inTimeDate = intime.date
+        inTimeDate = string.gsub(inTimeDate, "%.", Addon.Delimiter[db.profile.DateFormatSep])
+        inTimeDate = string.gsub(inTimeDate, "%/", Addon.Delimiter[db.profile.DateFormatSep])
+        inTimeDate = string.gsub(inTimeDate, "%-", Addon.Delimiter[db.profile.DateFormatSep])
     end
 
     local runPerc
@@ -705,12 +395,12 @@ local function dungeonInfo(zoneID)
     else
         runPerc = 100*db.profile.runs[expansion][season][1][zoneID]/(db.profile.runs[expansion][season][1][zoneID]+db.profile.runs[expansion][season][2][zoneID])
     end
-    return "\n"..fontColor.blue:format(L[" < Intime Info >"])
-    .."\n\n"..fontColor.yellow:format(L["Season Best: "])..inTimeLevel
-    .."\n"..fontColor.yellow:format(L["Status: "])..inTimeStars
-    .."\n"..fontColor.yellow:format(L["Completion Time: "])..inTimeDur
-    .."\n"..fontColor.yellow:format(L["Date: "])..inTimeDate
-    .."\n"..fontColor.yellow:format(L["Runs: "])..db.profile.runs[expansion][season][1][zoneID].."  ("..string.format("%.1f", runPerc).."%)"
+    return "\n"..Addon.fontColor.blue:format(L[" < Intime Info >"])
+    .."\n\n"..Addon.fontColor.yellow:format(L["Season Best: "])..inTimeLevel
+    .."\n"..Addon.fontColor.yellow:format(L["Status: "])..inTimeStars
+    .."\n"..Addon.fontColor.yellow:format(L["Completion Time: "])..inTimeDur
+    .."\n"..Addon.fontColor.yellow:format(L["Date: "])..inTimeDate
+    .."\n"..Addon.fontColor.yellow:format(L["Runs: "])..db.profile.runs[expansion][season][1][zoneID].."  ("..string.format("%.1f", runPerc).."%)"
 end
 
 -- Best for Dungeon Overtime
@@ -726,15 +416,18 @@ local function dungeonInfo2(zoneID)
         overTimeDate = ""
     else
         overTimeLevel = overtime.level
-        overTimeDur = TimeFormat(overtime.duration)
+        overTimeDur = Addon.TimeFormat(overtime.duration)
         overTimeDate = overtime.date
+        overTimeDate = string.gsub(overTimeDate, "%.", Addon.Delimiter[db.profile.DateFormatSep])
+        overTimeDate = string.gsub(overTimeDate, "%/", Addon.Delimiter[db.profile.DateFormatSep])
+        overTimeDate = string.gsub(overTimeDate, "%-", Addon.Delimiter[db.profile.DateFormatSep])
     end
 
-    return "\n"..fontColor.blue:format(L[" < Overtime Info >"])
-    .."\n\n"..fontColor.yellow:format(L["Season Best: "])..overTimeLevel
-    .."\n"..fontColor.yellow:format(L["Completion Time: "])..overTimeDur
-    .."\n"..fontColor.yellow:format(L["Date: "])..overTimeDate
-    .."\n"..fontColor.yellow:format(L["Runs: "])..db.profile.runs[expansion][season][2][zoneID]
+    return "\n"..Addon.fontColor.blue:format(L[" < Overtime Info >"])
+    .."\n\n"..Addon.fontColor.yellow:format(L["Season Best: "])..overTimeLevel
+    .."\n"..Addon.fontColor.yellow:format(L["Completion Time: "])..overTimeDur
+    .."\n"..Addon.fontColor.yellow:format(L["Date: "])..overTimeDate
+    .."\n"..Addon.fontColor.yellow:format(L["Runs: "])..db.profile.runs[expansion][season][2][zoneID]
     .."\n "
 end
 
@@ -744,7 +437,7 @@ local function dungeonInfo3(zoneID)
     local season = db.profile.season
 
     local runs = db.profile.runs[expansion][season][1][zoneID] + db.profile.runs[expansion][season][2][zoneID]
-    return "\n\n"..fontColor.yellow:format(L["Total Runs: "])..runs.."\n\n"
+    return "\n\n"..Addon.fontColor.yellow:format(L["Total Runs: "])..runs.."\n\n"
 end
 
 local function SendMSG()
@@ -829,7 +522,7 @@ local function TotalRuns()
     if loss == 0 then loss = 1 end
     win = string.format("%.2f", win/loss)
 
-    return fontColor.yellow:format(L["Total Runs: "])..runs, zoneNames, zoneRuns, fontColor.yellow:format(L["Avg. Level: "])..string.format("%.1f", levels), zoneLevels, fontColor.yellow:format(L["Intime/Overtime Ratio: "])..win
+    return Addon.fontColor.yellow:format(L["Total Runs: "])..runs, zoneNames, zoneRuns, Addon.fontColor.yellow:format(L["Avg. Level: "])..string.format("%.1f", levels), zoneLevels, Addon.fontColor.yellow:format(L["Intime/Overtime Ratio: "])..win
 end
 
 -- Simple String split function
@@ -845,13 +538,20 @@ function split(s, delimiter)
 end
 
 -- Time Spent in MPlus
-local function TimeSpend()
+local function TimeSpend(cmd)
     local zones = {375,376,377,378,379,380,381,382}
     local expansion = db.profile.expansion
     local season = db.profile.season
     local result = 0
     local runs = 0
     local resultPer = 0
+    if cmd then
+        if C_MythicPlus.GetCurrentSeason() >= 5 then
+            season = C_MythicPlus.GetCurrentSeason()-4
+        else
+            season = C_MythicPlus.GetCurrentSeason()
+        end
+    end
 
     for i = 1, #zones do
         local duration = db.profile.dungeonHistory[expansion][season][zones[i]].durationTrans
@@ -865,9 +565,9 @@ local function TimeSpend()
     end
 
     if runs >= 1 then
-        runs = TimeFormat(result/runs)
+        runs = Addon.TimeFormat(result/runs)
     end
-    result = split(TimeFormat(result,true),":")
+    result = split(Addon.TimeFormat(result,false,true),":")
 
     return result, runs
 end
@@ -885,7 +585,7 @@ local function GetTitle(zoneID)
     if #db.profile.avglvl[expansion][season][1][zoneID] ~= 0 then
         avgLvl = avgLvl/#db.profile.avglvl[expansion][season][1][zoneID]
     end
-    return fontColor.yellow:format(" "..name.."\n\n "..L["Avg. Level: "])..string.format("%.1f", avgLvl).."\n", name
+    return Addon.fontColor.yellow:format(" "..name.."\n\n "..L["Avg. Level: "])..string.format("%.1f", avgLvl).."\n", name
 end
 
 local mapID = {
@@ -918,6 +618,8 @@ local function GetHistoryTable(zoneID)
     local expansion = db.profile.expansion
     local season = db.profile.season
     local level, duration, date
+    local dateDelimited = {}
+
     if db.profile.dungeonHistory[expansion][season][zoneID].level[1] == nil then
         level = {L["Nothing to see here"]}
         duration = {""}
@@ -928,12 +630,154 @@ local function GetHistoryTable(zoneID)
         date = db.profile.dungeonHistory[expansion][season][zoneID].date
     end
 
+    for k,v in pairs(date) do
+        v = string.gsub(v, "%.", Addon.Delimiter[db.profile.DateFormatSep])
+        v = string.gsub(v, "%/", Addon.Delimiter[db.profile.DateFormatSep])
+        v = string.gsub(v, "%-", Addon.Delimiter[db.profile.DateFormatSep])
+        date[k] = v
+    end
+
     local historyTable = {
         [1] = level,
         [2] = duration,
         [3] = date,
     }
     return historyTable
+end
+
+function MinimapUpdate()
+    if not db.profile.Minimap then
+        icon:Hide(AddonName)
+    else
+        icon:Show(AddonName)
+    end
+end
+
+local collapse = {}
+local partyKeys = {}
+for i = 1, 5 do
+    local ord = i*10
+    local tableforParty = {
+        type = "group",
+        name = "",
+        inline = true,
+        order = ord,
+        hidden = function()
+            if i <= GetNumGroupMembers() and not IsInRaid() and select(1,Addon.KeyCommInfo(i))then
+                return false
+            else
+                return true
+            end
+        end,
+        args = {
+            PartyFrameCollapse = {
+                order = 10,
+                name = "",
+                width = 0.2,
+                desc = "",
+                type = "execute",
+                image = Addon.TEX_UTILS,
+                imageCoords = function() if collapse[i] == true then return Addon.GetUtilInfo(2,1) else return Addon.GetUtilInfo(1,1) end end,
+                imageWidth = 16,
+                imageHeight = 16,
+                func = function()
+                    PlaySound(799)
+                    if collapse[i] == true then
+                        collapse[i] = false
+                    else
+                        collapse[i] = true
+                    end
+                end,
+            },
+            KeyLevelFrame = {
+                order = 20,
+                fontSize = "large",
+                type = "description",
+                desc = "test",
+                name = function()
+                    if select(1,Addon.KeyCommInfo(i)) == 0 then
+                        return ""
+                    else
+                        return Addon.GetScoreColor(Addon.GetBaseScore(select(1,Addon.KeyCommInfo(i))))..select(1,Addon.KeyCommInfo(i))
+                    end
+                end,
+                width = 0.3,
+            },
+            KeyNameFrame = {
+                order = 30,
+                fontSize = "large",
+                type = "description",
+                name = function() return Addon.fontColor.yellow:format(select(2,Addon.KeyCommInfo(i))) end,
+                width = 1.5,
+            },
+            KeyOwnerFrame = {
+                order = 40,
+                fontSize = "large",
+                type = "description",
+                name = function() return select(3,Addon.KeyCommInfo(i)) end,
+                width = 0.9,
+            },
+            IsAddonUser = {
+                order = 50,
+                fontSize = "large",
+                type = "description",
+                name = "",
+                image = Addon.TEX_UTILS,
+                imageCoords = Addon.GetUtilInfo(3,1),
+                imageWidth = 16,
+                imageHeight = 16,
+                width = 0.2,
+            },
+            KeyFrameSeperator = {
+                order = 60,
+                type = "header",
+                name = "-",
+                width = "half",
+                hidden = function() return not collapse[i] end,
+            },
+            KeyPartyInfoSep = {
+                order = 70,
+                fontSize = "medium",
+                type = "description",
+                name = " ",
+                hidden = function() return not collapse[i] end,
+                width = 0.2,
+            },
+            KeyPartyUpgrade = {
+                order = 80,
+                fontSize = "medium",
+                type = "description",
+                name = function() return table.concat(select(4,Addon.KeyCommInfoParty(i)),"\n\n").."\n " end,
+                hidden = function() return not collapse[i] end,
+                width = 0.1,
+            },
+            KeyPartyOne = {
+                order = 90,
+                fontSize = "medium",
+                type = "description",
+                name = function() return table.concat(select(1,Addon.KeyCommInfoParty(i)),"\n\n").."\n " end,
+                hidden = function() return not collapse[i] end,
+                width = 1,
+            },
+            KeyPartyBest = {
+                order = 100,
+                fontSize = "medium",
+                type = "description",
+                name = function() return table.concat(select(2,Addon.KeyCommInfoParty(i)),"\n\n").."\n " end,
+                hidden = function() return not collapse[i] end,
+                width = 0.8,
+            },
+            KeyPartyTotal = {
+                order = 110,
+                fontSize = "medium",
+                type = "description",
+                name = function() return table.concat(select(3,Addon.KeyCommInfoParty(i)),"\n\n").."\n " end,
+                hidden = function() return not collapse[i] end,
+                width = 0.6,
+            },
+        },
+    }
+    table.insert(partyKeys, tableforParty)
 end
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -954,7 +798,7 @@ for i = 1, #zoneTable do
     local ord = i*10
     local tablefor = {
         type = "group",
-        name = mapID[zoneTable[i]].ShortName,
+        name = Addon.MapID[zoneTable[i]].ShortName,
         desc = function() return select(2,GetTitle(zoneTable[i])) end, 
         order = ord,
         args = {
@@ -1023,7 +867,7 @@ for i = 1, #zoneTable do
                     historylevelT = {
                         order = 1,
                         fontSize = "medium",
-                        name = fontColor.yellow:format(L["Level"]),
+                        name = Addon.fontColor.yellow:format(L["Level"]),
                         type = "description",
                         width = 1,
                     },
@@ -1031,7 +875,7 @@ for i = 1, #zoneTable do
                     historytimeT = {
                         order = 2,
                         fontSize = "medium",
-                        name = fontColor.yellow:format(L["Time"]),
+                        name = Addon.fontColor.yellow:format(L["Time"]),
                         type = "description",
                         width = 1,
                     },
@@ -1040,7 +884,7 @@ for i = 1, #zoneTable do
                         order = 3,
                         fontSize = "medium",
                         type = "description",
-                        name = fontColor.yellow:format(L["Date"]),
+                        name = Addon.fontColor.yellow:format(L["Date"]),
                         width = 1,
                     },
                     -- Seperator
@@ -1130,7 +974,7 @@ local function AddConfig()
             devText = {
                 order = 20,
                 type = "description",
-                name = fontColor.lucid:format("\n\n"..L["Devtools enabled"]),
+                name = Addon.fontColor.lucid:format("\n\n"..L["Devtools enabled"]),
                 hidden = function() return not db.profile.devtools end,
                 fontSize = "large",
                 width = 0.8,
@@ -1152,15 +996,15 @@ local function AddConfig()
                         end,
                         width = 0.8,
                     },
-                    versionButton = {
+                    keystoneButton = {
                         order = 20,
-                        name = L["Version Check"],
-                        desc = L["Check for updates."],
+                        name = L["Keystones"],
+                        desc = L["Open Keystone Window"],
                         type = "execute",
-                        confirm = true,
-                        confirmText = fontColor.yellow:format(L["Version Check"]).."\n\n\n"..version.."\n ",
                         func = function()
-                            return
+                            ACD:Close(AddonName)
+                            ACD:SetDefaultSize(AddonName.."keys", 648, 570)
+                            ACD:Open(AddonName.."keys")
                         end,
                         width = 0.8,
                     },
@@ -1168,7 +1012,7 @@ local function AddConfig()
                         order = 30,
                         name = L["Reset to Defaults"],
                         confirm = true,
-                        confirmText = L["You really want reset to defaults?"].."\n\n"..fontColor.red:format(L["This does not affect your Dungeon stats."]),
+                        confirmText = L["You really want reset to defaults?"].."\n\n"..Addon.fontColor.red:format(L["This does not affect your Dungeon stats."]),
                         desc = L["Reset all options to their default values."],
                         type = "execute",
                         func = function() ResetConfig() end,
@@ -1205,7 +1049,7 @@ local function AddConfig()
                         args = {
                             styleHeader = {
                                 order = 10,
-                                name = fontColor.lucid:format(L["Choose your own Style"]),
+                                name = Addon.fontColor.lucid:format(L["Choose your own Style"]),
                                 type = "description",
                                 fontSize = "large",
                                 width = "full",
@@ -1291,7 +1135,7 @@ local function AddConfig()
                         args = {
                             displayTimerHeader = {
                                 order = 10,
-                                name = fontColor.lucid:format(L["Timer"]),
+                                name = Addon.fontColor.lucid:format(L["Timer"]),
                                 type = "description",
                                 fontSize = "large",
                                 width = "full",
@@ -1414,7 +1258,7 @@ local function AddConfig()
                         args = {
                             displayHeader = {
                                 order = 10,
-                                name = fontColor.lucid:format(L["Bosses"]),
+                                name = Addon.fontColor.lucid:format(L["Bosses"]),
                                 type = "description",
                                 fontSize = "large",
                                 width = "full",
@@ -1480,7 +1324,7 @@ local function AddConfig()
                         args = {
                             displayHeaderM = {
                                 order = 10,
-                                name = fontColor.lucid:format(L["Mob Counter"]),
+                                name = Addon.fontColor.lucid:format(L["Mob Counter"]),
                                 type = "description",
                                 fontSize = "large",
                                 width = "full",
@@ -1648,7 +1492,7 @@ local function AddConfig()
                         args = {
                             displayHeaderK = {
                                 order = 10,
-                                name = fontColor.lucid:format(L["Keylevel"]),
+                                name = Addon.fontColor.lucid:format(L["Keylevel"]),
                                 type = "description",
                                 fontSize = "large",
                                 width = "full",
@@ -1694,7 +1538,7 @@ local function AddConfig()
                         args = {
                             displayHeaderK = {
                                 order = 10,
-                                name = fontColor.lucid:format(L["Others"]),
+                                name = Addon.fontColor.lucid:format(L["Others"]),
                                 type = "description",
                                 fontSize = "large",
                                 width = "full",
@@ -1817,6 +1661,18 @@ local function AddConfig()
                                 width = 1.2,
                                 order = 70,
                             },
+                            Minimap = {
+                                type = "toggle",
+                                name = L["Minimap Icon"],
+                                desc = "",
+                                set = function(_, val)
+                                    Module:SetOption("Minimap", val)
+                                    MinimapUpdate()
+                                end,
+                                get = function() return Module:GetOption("Minimap") end,
+                                width = 1.2,
+                                order = 90,
+                            },
                         },
                     },
                     generalSettings = {
@@ -1830,8 +1686,8 @@ local function AddConfig()
                                 name = L["Font"],
                                 type = "select",
                                 width = 1.2,
-                                dialogControl = "LSM30_Font",
-                                values = _G.AceGUIWidgetLSMlists.font,
+                                dialogControl = "LSM30_Font",--LSM30_Font
+                                values = _G.AceGUIWidgetLSMlists.font,--font
                                 set = function(_, val)
                                     Module:SetOption("FontStyle", val)
                                     Module:UpdateFonts()
@@ -1854,12 +1710,66 @@ local function AddConfig()
                                 max = 1.5,
                                 step = 0.01,
                             },
+                            GeneralSeperator1 = {
+                                order = 30,
+                                name = "",
+                                type = "description",
+                                width = "full",
+                            },
+                            DateFormat = {
+                                order = 40,
+                                name = L["Date Format Type"],
+                                type = "select",
+                                width = 0.7,
+                                values = {
+                                    [1] = "dd-mm-yyyy",
+                                    [2] = "yyyy-mm-dd",
+                                },
+                                set = function(_, val)
+                                    Module:SetOption("DateFormat", val)
+                                end,
+                                get = function() return Module:GetOption("DateFormat") end,
+                                hidden = function() return not db.profile.devtools end,
+                            },
+                            DateFormatSep = {
+                                order = 50,
+                                name = L["Date Delimiter"],
+                                type = "select",
+                                width = 0.7,
+                                values = {
+                                    [1] = ".",
+                                    [2] = "/",
+                                    [3] = "-",
+                                },
+                                set = function(_, val)
+                                    Module:SetOption("DateFormatSep", val)
+                                end,
+                                get = function() return Module:GetOption("DateFormatSep") end,
+                            },
+                        },
+                    },
+                    Manager = {
+                        type = "group",
+                        name = L["Keystone Manager"],
+                        order = 30,
+                        inline = true,
+                        args = {
+                            ShareTotal = {
+                                order = 10,
+                                name = L["Share Total Runs"],
+                                type = "toggle",
+                                width = 1.2,
+                                set = function(_, val)
+                                    Module:SetOption("ShareTotal", val)
+                                end,
+                                get = function() return Module:GetOption("ShareTotal") end,
+                            },
                         },
                     },
                     sendMSG = {
                         type = "group",
                         name = L["Send Automatic whisper while doing Mythic Plus"],
-                        order = 30,
+                        order = 40,
                         inline = true,
                         args = {
                             SendMSGEnable = {
@@ -1872,11 +1782,25 @@ local function AddConfig()
                                 end,
                                 get = function() return Module:GetOption("SendMSGEnable") end,
                             },
+                            SendMSGDelay = {
+                                order = 11,
+                                name = L["Delay in Minutes"],
+                                type = "range",
+                                width = 1,
+                                set = function(_, val)
+                                    Module:SetOption("SendMSGDelay", val)
+                                end,
+                                get = function() return Module:GetOption("SendMSGDelay") end,
+                                disabled = function() return db.profile.SendMSGEnable == false end,
+                                min = 1,
+                                max = 30,
+                                step = 1,
+                            },
                             SendMSGsperator1 = {
                                 order = 20,
                                 name = "",
                                 type = "description",
-                                width = 2,
+                                width = 1.6,
                             },
                             SendMSGLevel = {
                                 order = 30,
@@ -1946,7 +1870,7 @@ local function AddConfig()
                             },
                             SendMSGPreview = {
                                 order = 90,
-                                name = fontColor.yellow:format(L["Preview Message"]),
+                                name = Addon.fontColor.yellow:format(L["Preview Message"]),
                                 type = "input",
                                 get = function()
                                     return SendMSG()
@@ -1960,13 +1884,390 @@ local function AddConfig()
                 },
             },
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-----------  Dungeon Tab
+----------  About Tab
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+            aboutTab = {
+                type = "group",
+                name = L["About"],
+                childGroups = "tab",
+                order = 70,
+                args = {
+                    about = {
+                        type = "group",
+                        name = " ",
+                        order = 10,
+                        inline = true,
+                        args = {
+                            aboutTitle = {
+                                order = 10,
+                                name = Addon.fontColor.yellow:format(L["Title: "])..title,
+                                type = "description",
+                                width = "full",
+                            },
+                            aboutVersion = {
+                                order = 20,
+                                name = Addon.fontColor.yellow:format(L["Version: "])..version,
+                                type = "description",
+                                width = "full",
+                            },
+                            aboutNotes = {
+                                order = 30,
+                                name = Addon.fontColor.yellow:format(L["Notes: "])..notes,
+                                type = "description",
+                                width = "full",
+                            },
+                            aboutAuthor = {
+                                order = 40,
+                                --name = Addon.fontColor.yellow:format(L["Author: "]).."|T"..Addon.TEX_UTILS..":12:12:0:0:256:256:"..Addon.GetUtilInfo(4,4,true).."|t "..author,
+                                name = Addon.fontColor.yellow:format(L["Author: "])..Addon.GetUtilInfo(4,4,true,12)..author,
+                                type = "description",
+                                width = 1.6
+                            },
+                            aboutWeb = {
+                                order = 50,
+                                name = Addon.fontColor.yellow:format(L["Website: "]),
+                                type = "input",
+                                get = function()
+                                    return GetAddOnMetadata(AddonName, "X-Website")
+                                end,
+                                width = "full",
+                            },
+                            aboutDonate = {
+                                order = 60,
+                                name = Addon.fontColor.yellow:format(L["Donate: "]),
+                                type = "input",
+                                get = function()
+                                    return GetAddOnMetadata(AddonName, "X-Donate")
+                                end,
+                                width = "full",
+                            },
+                            aboutTwitch = {
+                                order = 70,
+                                name = Addon.fontColor.yellow:format("Twitch: "),
+                                type = "input",
+                                get = function()
+                                    return GetAddOnMetadata(AddonName, "X-Twitch")
+                                end,
+                                width = "full",
+                            },
+                        },
+                    },
+                    historyA = {
+                        order = 20,
+                        type = "header",
+                        name = "",
+                        width = "half",
+                    },
+                    SpecialThanks = {
+                        order = 30,
+                        name = Addon.fontColor.yellow:format(L["Special Thanks"]),
+                        type = "description",
+                        width = "full",
+                    },
+                    SpecialThanksN1 = {
+                        order = 40,
+                        name = function() return " - Pull bei Eins"..Addon.fontColor.grey:format(" ("..L["Guild on EU-Thrall"]..")") end,
+                        type = "description",
+                        width = "full",
+                    },
+                    SpecialThanksN2 = {
+                        order = 50,
+                        name = function() return " - SoulAwaken"..Addon.fontColor.grey:format(" ("..L["zhCN Translation"]..")") end,
+                        type = "description",
+                        width = "full",
+                    },
+                    SpecialThanksN3 = {
+                        order = 60,
+                        name = function() return " - SoulAwaken"..Addon.fontColor.grey:format(" ("..L["zhTW Translation"]..")") end,
+                        type = "description",
+                        width = "full",
+                    },
+                },
+            },
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+----------  Profile Tab
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+            ProfileTab = {
+                type = "group",
+                name = Addon.fontColor.blue:format(L["Profiles"]),
+                childGroups = "tab",
+                order = 80,
+                args = {
+                    ProfileTitle = {
+                        order = 10,
+                        name = Addon.fontColor.lucid:format(L["Copy Profile"]),
+                        type = "description",
+                        width = "full",
+                        fontSize = "large",
+                    },
+                    ProfileDesc = {
+                        order = 20,
+                        name = L["Copy the settings from one existing profile into the currently active profile"],
+                        type = "description",
+                        width = "full",
+                    },
+                    ProfileSet = {
+                        order = 30,
+                        name = L["Copy from"],
+                        type = "select",
+                        width = 1.2,
+                        set = function(_, val)
+                            Module:SetOption("ProfileSet", val)
+                        end,
+                        get = function() return Module:GetOption("ProfileSet") end,
+                        values = LucidProfileList,
+                    },
+                    ProfileButton = {
+                        order = 40,
+                        name = function()
+                            local name = GetUnitName("PLAYER").." - "..GetRealmName()
+                            if db.profile.ProfileSet == 1 or LucidProfileList[db.profile.ProfileSet] == name then
+                                return Addon.fontColor.grey:format(L["Copy Profile"])
+                            else
+                                return L["Copy Profile"]
+                            end
+                        end,
+                        desc = "",
+                        type = "execute",
+                        func = function()
+                            CopyProfile()
+                            Module:ToggleFrames()
+                        end,
+                        disabled = function()
+                            local name = GetUnitName("PLAYER").." - "..GetRealmName()
+                            if db.profile.ProfileSet == 1 or LucidProfileList[db.profile.ProfileSet] == name then
+                                return true
+                            else
+                                return false
+                            end
+                        end,
+                        width = 0.8,
+                    },
+                    historyP = {
+                        order = 50,
+                        type = "header",
+                        name = "",
+                        width = "half",
+                        hidden = function() return not db.profile.devtools end,
+                    },
+                    ProfileIDdisplay = {
+                        order = 60,
+                        name = function()
+                            if db.profile.ProfileID then
+                                return Addon.fontColor.yellow:format("Lucid Keystone CharacterID: ")..db.profile.ProfileID.."\n "
+                            else
+                                return Addon.fontColor.yellow:format("Lucid Keystone CharacterID: \n ")
+                            end
+                        end,
+                        type = "description",
+                        width = "full",
+                        hidden = function() return not db.profile.devtools end,
+                    },
+                    ProfileHardReset = {
+                        order = 70,
+                        name = Addon.fontColor.red:format(L["Hardreset"]),
+                        desc = "",
+                        type = "execute",
+                        confirm = true,
+                        confirmText = Addon.fontColor.red:format(L["Are you sure to Reset everything in Lucid Keystone, even your Dungeon statistics?"].."\n\n"..L["This cannot be undone!"]),
+                        func = function()
+                            ResetConfig(true)
+                        end,
+                        hidden = function() return not db.profile.devtools end,
+                        width = 1,
+                    },
+                },
+            },
+        },
+    }
+    local partykeys =
+    {
+        name = function()
+            --Title Info by Addon
+            if InterfaceOptionsFrame:IsShown() then
+                return ""
+            else
+                if (IsAddOnLoaded("ElvUI")) then
+                    local space = " "
+                    local new = ""
+                    for i = 1, 140 do
+                        new = new..space
+                    end
+                    return new
+                else
+                    return "Lucid Keystone"
+                end
+            end
+        end,
+        type = "group",
+        childGroups = "tab",
+        get = get_set,
+        set = get_set,
+        args = {
+            --Header in Options
+            logo = {
+                order = 10,
+                type = "description",
+                name = "",
+                image = Addon.LOGO_LOCATION,
+                imageWidth = 256,
+                imageHeight = 64,
+                width = 1.6,
+            },
+            KeyFrameSep = {
+                order = 20,
+                name = "",
+                type = "description",
+                width = "full",
+            },
+            OptionsButton = {
+                order = 30,
+                name = "",
+                width = 0.2,
+                desc = "",
+                type = "execute",
+                image = Addon.TEX_UTILS,
+                imageCoords = function() return Addon.GetUtilInfo(2,3) end,
+                imageWidth = 20,
+                imageHeight = 20,
+                func = function()
+                    PlaySound(799)
+                    ACD:SetDefaultSize(AddonName, 648, 570)
+                    ACD:Close(AddonName.."keys")
+                    ACD:Open(AddonName)
+                end,
+            },
+            ConfigDesc = {
+                order = 31,
+                name = Addon.fontColor.yellow:format(L["Config Menu"]),
+                type = "description",
+                width = 1,
+            },
+            keysTab = {
+                type = "group",
+                name = L["Keystones"],
+                childGroups = "tab",
+                order = 40,
+                args = {
+                    PartyTab = {
+                        type = "group",
+                        name = "Party",
+                        order = 10,
+                        args = {
+                            partySep = {
+                                order = 1,
+                                fontSize = "medium",
+                                name = "",
+                                type = "description",
+                                width = 0.2,
+                            },
+                            partyLevel = {
+                                order = 2,
+                                fontSize = "medium",
+                                name = Addon.fontColor.yellow:format(L["Level"]),
+                                type = "description",
+                                width = 0.3,
+                            },
+                            ----Time
+                            partyDungeons = {
+                                order = 3,
+                                fontSize = "medium",
+                                name = Addon.fontColor.yellow:format(L["Dungeons"]),
+                                type = "description",
+                                width = 1.5,
+                            },
+                            ----Date
+                            partyCharacter = {
+                                order = 4,
+                                fontSize = "medium",
+                                type = "description",
+                                name = Addon.fontColor.yellow:format(L["Characters"]),
+                                width = 0.8,
+                            },
+                            -- Seperator
+                            partyS = {
+                                order = 5,
+                                type = "header",
+                                name = "",
+                                width = "half",
+                            },
+                            NoPartyPart = {
+                                order = 6,
+                                type = "description",
+                                fontSize = "large",
+                                name = L["Join a Party to see Keystones."],
+                                width = "full",
+                                hidden = function()
+                                    if GetNumGroupMembers() == 0 or IsInRaid() then
+                                        return false
+                                    else
+                                        return true
+                                    end
+                                end,
+                            },
+                            Testus1 = partyKeys[1],
+                            Testus2 = partyKeys[2],
+                            Testus3 = partyKeys[3],
+                            Testus4 = partyKeys[4],
+                            Testus5 = partyKeys[5],
+                            ColorDesc = {
+                                order = 60,
+                                type = "description",
+                                name = function()
+                                    return Addon.GetUtilInfo(2,2,true,10)..Addon.fontColor.grey:format("Key isn't an Upgrade").."\n"
+                                    ..Addon.GetUtilInfo(3,2,true,10)..Addon.fontColor.grey:format("Key on same Level").."\n"
+                                    ..Addon.GetUtilInfo(1,2,true,10)..Addon.fontColor.grey:format("Key is an Upgrade")
+                                end,
+                                width = "full",
+                                hidden = function()
+                                    if GetNumGroupMembers() == 0 or IsInRaid() then
+                                        return true
+                                    else
+                                        return false
+                                    end
+                                end,
+                            },
+                            RefreshKeys = {
+                                order = 70,
+                                name = "",
+                                width = 0.2,
+                                desc = "",
+                                type = "execute",
+                                image = Addon.TEX_UTILS,
+                                imageCoords = function() return Addon.GetUtilInfo(1,3) end,
+                                imageWidth = 20,
+                                imageHeight = 20,
+                                func = function()
+                                    PlaySound(799)
+                                    Module:UpdateConfig(true)
+                                end,
+                                hidden = function() return not db.profile.devtools end,
+                            }
+                        },
+                    },
+                    GuildTab = {
+                        type = "group",
+                        name = L["Guild"],
+                        order = 20,
+                        hidden = function() return not db.profile.devtools end,
+                        args = {
+                        },
+                    },
+                    CharactersTab = {
+                        type = "group",
+                        name = L["Characters"],
+                        order = 30,
+                        hidden = function() return not db.profile.devtools end,
+                        args = {
+                        },
+                    },
+                },
+            },
             dungeonTab = {
                 type = "group",
                 name = L["Dungeons"],
                 childGroups = "tab",
-                order = 60,
+                order = 50,
                 args = {
                     expansion = {
                         type = "select",
@@ -2098,7 +2399,7 @@ local function AddConfig()
                             TS = {
                                 order = 90,
                                 fontSize = "large",
-                                name = fontColor.yellow:format(L["Time Spent in Mythic+"]),
+                                name = Addon.fontColor.yellow:format(L["Time Spent in Mythic+"]),
                                 type = "description",
                                 width = "full",
                             },
@@ -2144,206 +2445,13 @@ local function AddConfig()
                     },
                 },
             },
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-----------  About Tab
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-            aboutTab = {
-                type = "group",
-                name = L["About"],
-                childGroups = "tab",
-                order = 70,
-                args = {
-                    about = {
-                        type = "group",
-                        name = " ",
-                        order = 10,
-                        inline = true,
-                        args = {
-                            aboutTitle = {
-                                order = 10,
-                                name = fontColor.yellow:format(L["Title: "])..title,
-                                type = "description",
-                                width = "full",
-                            },
-                            aboutVersion = {
-                                order = 20,
-                                name = fontColor.yellow:format(L["Version: "])..version,
-                                type = "description",
-                                width = "full",
-                            },
-                            aboutNotes = {
-                                order = 30,
-                                name = fontColor.yellow:format(L["Notes: "])..notes,
-                                type = "description",
-                                width = "full",
-                            },
-                            aboutAuthor = {
-                                order = 40,
-                                name = fontColor.yellow:format(L["Author: "])..author,
-                                type = "description",
-                                width = 1.6
-                            },
-                            aboutWeb = {
-                                order = 50,
-                                name = fontColor.yellow:format(L["Website: "]),
-                                type = "input",
-                                get = function()
-                                    return GetAddOnMetadata(AddonName, "X-Website")
-                                end,
-                                width = "full",
-                            },
-                            aboutDonate = {
-                                order = 60,
-                                name = fontColor.yellow:format(L["Donate: "]),
-                                type = "input",
-                                get = function()
-                                    return GetAddOnMetadata(AddonName, "X-Donate")
-                                end,
-                                width = "full",
-                            },
-                            aboutTwitch = {
-                                order = 70,
-                                name = fontColor.yellow:format("Twitch: "),
-                                type = "input",
-                                get = function()
-                                    return GetAddOnMetadata(AddonName, "X-Twitch")
-                                end,
-                                width = "full",
-                            },
-                        },
-                    },
-                    historyA = {
-                        order = 20,
-                        type = "header",
-                        name = "",
-                        width = "half",
-                    },
-                    SpecialThanks = {
-                        order = 30,
-                        name = fontColor.yellow:format(L["Special Thanks"]),
-                        type = "description",
-                        width = "full",
-                    },
-                    SpecialThanksN1 = {
-                        order = 40,
-                        name = function() return " - Pull bei Eins"..fontColor.grey:format(" ("..L["Guild on EU-Thrall"]..")") end,
-                        type = "description",
-                        width = "full",
-                    },
-                    SpecialThanksN2 = {
-                        order = 50,
-                        name = function() return " - SoulAwaken"..fontColor.grey:format(" ("..L["zhCN Translation"]..")") end,
-                        type = "description",
-                        width = "full",
-                    },
-                    SpecialThanksN3 = {
-                        order = 60,
-                        name = function() return " - SoulAwaken"..fontColor.grey:format(" ("..L["zhTW Translation"]..")") end,
-                        type = "description",
-                        width = "full",
-                    },
-                },
-            },
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-----------  Profile Tab
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-            ProfileTab = {
-                type = "group",
-                name = fontColor.blue:format(L["Profiles"]),
-                childGroups = "tab",
-                order = 80,
-                args = {
-                    ProfileTitle = {
-                        order = 10,
-                        name = fontColor.lucid:format(L["Copy Profile"]),
-                        type = "description",
-                        width = "full",
-                        fontSize = "large",
-                    },
-                    ProfileDesc = {
-                        order = 20,
-                        name = L["Copy the settings from one existing profile into the currently active profile"],
-                        type = "description",
-                        width = "full",
-                    },
-                    ProfileSet = {
-                        order = 30,
-                        name = L["Copy from"],
-                        type = "select",
-                        width = 1.2,
-                        set = function(_, val)
-                            Module:SetOption("ProfileSet", val)
-                        end,
-                        get = function() return Module:GetOption("ProfileSet") end,
-                        values = LucidProfileList,
-                    },
-                    ProfileButton = {
-                        order = 40,
-                        name = function()
-                            local name = GetUnitName("PLAYER").." - "..GetRealmName()
-                            if db.profile.ProfileSet == 1 or LucidProfileList[db.profile.ProfileSet] == name then
-                                return fontColor.grey:format(L["Copy Profile"])
-                            else
-                                return L["Copy Profile"]
-                            end
-                        end,
-                        desc = "",
-                        type = "execute",
-                        func = function()
-                            CopyProfile()
-                            Module:ToggleFrames()
-                        end,
-                        disabled = function()
-                            local name = GetUnitName("PLAYER").." - "..GetRealmName()
-                            if db.profile.ProfileSet == 1 or LucidProfileList[db.profile.ProfileSet] == name then
-                                return true
-                            else
-                                return false
-                            end
-                        end,
-                        width = 0.8,
-                    },
-                    historyP = {
-                        order = 50,
-                        type = "header",
-                        name = "",
-                        width = "half",
-                        hidden = function() return not db.profile.devtools end,
-                    },
-                    ProfileIDdisplay = {
-                        order = 60,
-                        name = function()
-                            if db.profile.ProfileID then
-                                return fontColor.yellow:format("Lucid Keystone CharacterID: ")..db.profile.ProfileID.."\n "
-                            else
-                                return fontColor.yellow:format("Lucid Keystone CharacterID: \n ")
-                            end
-                        end,
-                        type = "description",
-                        width = "full",
-                        hidden = function() return not db.profile.devtools end,
-                    },
-                    ProfileHardReset = {
-                        order = 70,
-                        name = fontColor.red:format(L["Hardreset"]),
-                        desc = "",
-                        type = "execute",
-                        confirm = true,
-                        confirmText = fontColor.red:format(L["Are you sure to Reset everything in Lucid Keystone, even your Dungeon statistics?"].."\n\n"..L["This cannot be undone!"]),
-                        func = function()
-                            ResetConfig(true)
-                        end,
-                        hidden = function() return not db.profile.devtools end,
-                        width = 1,
-                    },
-                },
-            },
-        },
+        }, 
     }
     --Add to Blizzard Interface Options
     local AceConfig = LibStub("AceConfig-3.0")
     local AceConfigDialog = LibStub("AceConfigDialog-3.0")
     AceConfig:RegisterOptionsTable(AddonName, options)
+    AceConfig:RegisterOptionsTable(AddonName.."keys", partykeys)
     local frame = AceConfigDialog:AddToBlizOptions(AddonName, "Lucid Keystone", nil)
 end
 
@@ -2360,14 +2468,19 @@ function SlashCmdList.LK(msg,editbox)
     local _, _, cmd, args = string.find(msg, "%s?(%w+)%s?(.*)")
     if msg == "" then
         -- Open Config
+        ACD:SetDefaultSize(AddonName.."keys", 648, 570)
+        ACD:Close(AddonName)
+        ACD:Open(AddonName.."keys")
+    elseif msg == L["config"] or msg == "config" then
         ACD:SetDefaultSize(AddonName, 648, 570)
+        ACD:Close(AddonName.."keys")
         ACD:Open(AddonName)
     elseif msg == L["played"] or msg == "played" then
         -- Get M+ Time played in Chat
-        local days = select(1,TimeSpend()[1]).." "..L["days"]
-        local hours = select(1,TimeSpend()[2]).." "..L["hours"]
-        local minutes = select(1,TimeSpend()[3]).." "..L["minutes"]
-        local seconds = select(1,TimeSpend()[4]).." "..L["seconds"]
+        local days = select(1,TimeSpend(true)[1]).." "..L["days"]
+        local hours = select(1,TimeSpend(true)[2]).." "..L["hours"]
+        local minutes = select(1,TimeSpend(true)[3]).." "..L["minutes"]
+        local seconds = select(1,TimeSpend(true)[4]).." "..L["seconds"]
 
         SendSystemMessage(L["Time played this Season in M+: "]..days..", "..hours..", "..minutes..", "..seconds)
     elseif msg == L["preview"] or msg == "preview" then
@@ -2378,7 +2491,7 @@ function SlashCmdList.LK(msg,editbox)
         SendSystemMessage(L["Version: "]..version)
     elseif msg == L["help"] or msg == "help" then
         -- Get all Commands in Chat
-        SendSystemMessage(L["Lucid Keystone Commands:"].."\n/lk\n/lk "..L["played"].."\n/lk "..L["version"].."\n/lk "..L["preview"])
+        SendSystemMessage(L["Lucid Keystone Commands:"].."\n/lk\n/lk "..L["config"].."\n/lk "..L["played"].."\n/lk "..L["version"].."\n/lk "..L["preview"])
     elseif msg == "test" and db.profile.devtools then
         -- Do things
         print(L["Nothing to see here"])
@@ -2396,25 +2509,12 @@ function SlashCmdList.LK(msg,editbox)
             db.profile.devtools = true
             SendSystemMessage(L["Lucid Keystone Devtools ENABLED"])
         end
-        LibStub("AceConfigRegistry-3.0"):NotifyChange("LucidKeystone")
-        StaticPopup_Show("LucidKeystone_ReloadPopup")
-    elseif msg == "Cat" and db.profile.devtools then
-        -- Get April fool
-        if not backdroplist[11] then
-            backdroplist[11] = "April Fool"
-        else
-            backdroplist[11] = nil
-        end
-    elseif msg == "send" and db.profile.devtools then
-        -- Test function - who uses the addon in party
-        if db.profile.SendTest then
-            db.profile.SendTest = false
-            print("Addon msg disabled")
-        else
-            db.profile.SendTest = true
-            print("Addon msg enabled")
-        end
-    elseif msg == "sendraid" and db.profile.devtools then
+        Module:UpdateConfig()
+    elseif msg == "getstats" and db.profile.devtools then
+        print("Deaths: "..db.profile.statistic.deaths)
+        print("Height fallen due to Volcanic: ".. db.profile.statistic.volcanic*2 .." yard")
+        print("-------------")
+    --[[elseif msg == "sendraid" and db.profile.devtools then
         -- Test function - who uses the addon in raid
         if db.profile.SendRaidTest then
             db.profile.SendRaidTest = false
@@ -2422,23 +2522,55 @@ function SlashCmdList.LK(msg,editbox)
         else
             db.profile.SendRaidTest = true
             print("Addon msg Raid enabled")
-        end
+        end]]
     else
         -- Get Error Msg
         SendSystemMessage(L["Invalid Command. Type \"/lk help\" to see all Lucid Keystone Commands."])
     end
 end
 
+local LKIcon = ldb:NewDataObject(AddonName, {
+	type = "data source",
+	text = "LucidKeystone",
+    icon = Addon.LOGO,
+    OnClick = function(self, button)
+		if button == "LeftButton" then 
+			ACD:SetDefaultSize(AddonName.."keys", 648, 570)
+			ACD:Close(AddonName)
+            ACD:Open(AddonName.."keys")
+		elseif button == "RightButton" then
+            ACD:SetDefaultSize(AddonName, 648, 570)
+			ACD:Close(AddonName.."keys")
+			ACD:Open(AddonName)
+		end  
+    end,
+    OnTooltipShow = function(tooltip)
+		tooltip:AddLine(Addon.fontColor.lucid:format("Lucid Keystone"))
+		tooltip:AddLine(Addon.fontColor.blue:format(L["Left Click"])..L[" to toggle \"Keystone\" Window"])
+		tooltip:AddLine(Addon.fontColor.blue:format(L["Right Click"])..L[" to toggle Config Menu"])
+	end,
+})
 
 --Initialize function
 function Module:OnInitialize()
     db = LibStub("AceDB-3.0"):New("LucidKeystoneDB", defaults)
-    LSM = LibStub:GetLibrary("LibSharedMedia-3.0");
+    LKIconDB = LibStub("AceDB-3.0"):New("LucidMinimap", {
+		profile = {
+			minimap = {
+				hide = not db.profile.Minimap,
+                lock = true,
+                radius = 90, -- how many pixels from 0 / top of minimap
+                minimapPos = 155 -- how far away from minimap center in pixels
+			},
+		},
+	})
+    icon:Register(AddonName, LKIcon, LKIconDB.profile.minimap)
+    MinimapUpdate()
+    LSM = LibStub:GetLibrary("LibSharedMedia-3.0")
     version = GetAddOnMetadata(AddonName, "Version")
     author = GetAddOnMetadata(AddonName, "Author")
     notes = GetAddOnMetadata(AddonName, "Notes")
     title = GetAddOnMetadata(AddonName, "Title")
-    db.profile.pridefulAlert = nil
     AddConfig()
     ToggleAutoRole()
     OnInitProfiles()

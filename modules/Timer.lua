@@ -43,30 +43,7 @@ local previewSettings = {
                 "|r|r"..L["Pink fluffy Unicorn defeated"].."   0/1", 
                 "|r"..L["Hello Kitty defeated"].."   0/1",
                 },
-    dungeonName = {
-                --BfA
-                [244] = {shortName = "AD"},
-                [245] = {shortName = "FH"},
-                [246] = {shortName = "TD"},
-                [247] = {shortName = "ML"},
-                [248] = {shortName = "WM"},
-                [249] = {shortName = "KR"},
-                [250] = {shortName = "ToS"},
-                [251] = {shortName = "UR"},
-                [252] = {shortName = "SotS"},
-                [353] = {shortName = "SoB"},
-                [369] = {shortName = "Yard"},
-                [370] = {shortName = "Work"},
-                --Shadowlands
-                [375] = {shortName = L["Mists"]},
-                [376] = {shortName = L["NW"]},
-                [377] = {shortName = L["DOS"]},
-                [378] = {shortName = L["HoA"]},
-                [379] = {shortName = L["PF"]},
-                [380] = {shortName = L["SD"]},
-                [381] = {shortName = L["SoA"]},
-                [382] = {shortName = L["ToP"]}, 
-                },
+    dungeonName = Addon.MapID,
     affixIcon   = {
                 [1]   = {icon = 463570},  --Overflowing
                 [2]   = {icon = 135994},  --Skittish
@@ -116,59 +93,21 @@ local previewSettings = {
 --  General Tables and Arrays
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-Addon.MDTdungeon = {
-        [1663] = 30, -- Halls of Atonement
-        [1664] = 30, -- Halls of Atonement
-        [1665] = 30, -- Halls of Atonement
-        [1666] = 35, -- The Necrotic Wake
-        [1667] = 35, -- The Necrotic Wake
-        [1668] = 35, -- The Necrotic Wake
-        [1669] = 31, -- Mists Of Tirna Scithe
-        [1674] = 32, -- Plaguefall
-        [1697] = 32, -- Plaguefall
-        [1675] = 33, -- Sanguine Depths
-        [1676] = 33, -- Sanguine Depths
-        [1677] = 29, -- De Other Side
-        [1678] = 29, -- De Other Side
-        [1679] = 29, -- De Other Side
-        [1680] = 29, -- De Other Side
-        [1683] = 36, -- Theater Of Pain
-        [1684] = 36, -- Theater Of Pain
-        [1685] = 36, -- Theater Of Pain
-        [1686] = 36, -- Theater Of Pain
-        [1687] = 36, -- Theater Of Pain
-        [1692] = 34, -- Spires Of Ascension
-        [1693] = 34, -- Spires Of Ascension
-        [1694] = 34, -- Spires Of Ascension
-        [1695] = 34, -- Spires Of Ascension
-}
-
 local imgfile = {
     [1] = "lk_bg_None",
     [2] = "lk_bg_Blizzard",
     [3] = "lk_bg_Horde",
     [4] = "lk_bg_Alliance",
-    [5] = "lk_bg_Simple",
+    [5] = "lk_bg_Marble",
     [6] = "lk_bg_Color",
     [7] = "lk_bg_DarkGlass",
-    [8] = "lk_bg_Awakened",
-    [9] = "lk_bg_Prideful",
+    [21] = "lk_bg_Awakened",
+    [22] = "lk_bg_Prideful",
     [10] = "lk_bg_Paradox",
-    [11] = "lk_bg_Cat",
-}
-
-local sparkleEffect = {
-    [1]  = {animation = 165433},
-    [2]  = {animation = 1097298},
-    [3]  = {animation = 1004197},
-    [4]  = {animation = 1522788},
-    [5]  = {animation = 1384104},
-    [6]  = {animation = 654238},
-    [7]  = {animation = 841273}, --240950
-    [8]  = {animation = 1322288},
-    [9]  = {animation = 978543},
-    [10] = {animation = 310425},
-    [11] = {animation = 1135053},
+    [31] = "lk_bg_Kyrian",
+    [32] = "lk_bg_Necrolord",
+    [33] = "lk_bg_NightFae",
+    [34] = "lk_bg_Venthyr",
 }
 
 local timeThrottle = nil
@@ -177,55 +116,8 @@ local timeThrottle = nil
 --  Function Section
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
--- Time formating for every Timer in Frame
-local function TimeFormat(time,plus) 
-    local format_minutes = "%.2d:%.2d"
-    local format_hours = "%d:%.2d:%.2d"
-    local prefix = " "
-    if plus then
-        prefix = "+"
-    end
-    if time < 0 then
-        time = time * -1
-        prefix = "-"
-    end
-
-    local seconds = time % 60 -- seconds/min
-    local minutes = math.floor((time / 60) % 60) -- min/hr
-    local hours = math.floor(time / 3600)
-    if hours == 0 then
-        return prefix .. string.format(format_minutes, minutes, seconds)
-    else
-        return prefix .. string.format(format_hours, hours, minutes, seconds)
-    end
-end
-
 local function MovableCheck()
     LucidKeystoneFrame:SetMovable(db.profile.unlock)
-end
-
--- Get Base Score by Raider.IO
-local function GetBaseScore(level)
-    local score
-    if level <= 10 then
-        score = level * 10
-    else
-        score = 1.1^(level-10)*100
-    end
-    return score
-end
-
--- Get Score Color by Raider.IO
-local function GetScoreColor(score)
-    local ScoreColor
-    if (IsAddOnLoaded("RaiderIO")) and db.profile.keyColor then
-        local zone = C_ChallengeMode.GetMapTable()
-        local rR, rG, rB = RaiderIO.GetScoreColor(score*#zone)
-        ScoreColor = string.format("|cff%.2X%.2X%.2X", rR*255, rG*255, rB*255)
-    else
-        ScoreColor = string.format("|cff%.2X%.2X%.2X", db.profile.customKeyColor.r*255, db.profile.customKeyColor.g*255, db.profile.customKeyColor.b*255)
-    end
-    return ScoreColor
 end
 
 -- Get Time for active Run
@@ -249,86 +141,11 @@ end
 local function GetMobCount()
     local _,_,steps = C_Scenario.GetStepInfo()
     -- last scenario step is the mob count
-    --local percent, total,_,_,current = select(4, C_Scenario.GetCriteriaInfo(steps))
     local _, _, _, percent, total, _, _, current = C_Scenario.GetCriteriaInfo(steps)
     if current then
         current = tonumber(string.sub(current, 1, string.len(current) - 1))
     end
     return current or 0, total or 1, percent or 0
-end
-
--- Timer Function for active Run
-local function bootlegRepeatingTimer()
-    if db.profile.start then
-        local time = GetElapsedTime()
-        local _,_,maxTime = C_ChallengeMode.GetMapUIInfo(db.profile.GetActiveChallengeMapID)
-        
-        db.profile.GetCurrentTime = TimeFormat(time).."/"..TimeFormat(maxTime)
-
-        if not maxTime then
-            return
-        else
-            local level = C_ChallengeMode.GetActiveKeystoneInfo()
-            local f = LucidKeystoneFrame
-            local bar = LucidKeystoneFrameBar
-            local timeSmall = time
-
-            -- Main Timer
-            if db.profile.mainTimer == 2 then
-                time = maxTime-time
-            end
-            if db.profile.mainTimer == 1 then
-                timeSmall = maxTime-timeSmall
-            end
-
-            -- Smart Timer Only
-            if db.profile.smartTimer then
-                local timer = time
-                if db.profile.mainTimer == 2 then
-                    timer = timeSmall
-                end
-                if f.textTimerOne:IsShown() then
-                    f.textTimerOne:Hide()
-                    f.textTimerThree:Hide()
-                end
-
-                local smartTime
-                local plus3 = maxTime*0.6-timer
-                local plus2 = maxTime*0.8-timer
-                local plus1 = maxTime-timer
-                local plusSmartOne = TimeFormat(maxTime-timer)
-                
-                if plus3 >= 0 then smartTime = "+3\n"..TimeFormat(plus3) elseif
-                plus2 >= 0 then smartTime = "+2\n"..TimeFormat(plus2) elseif
-                plus1 >= 0 then smartTime = "+1\n"..TimeFormat(plus1) elseif
-                plus1 <= 0 then smartTime = "Over by |cffC43333"..plusSmartOne
-                end
-                f.textTimerTwo:SetText(smartTime)
-            else
-                local timer = time
-                if db.profile.mainTimer == 2 then
-                    timer = timeSmall
-                end
-                f.textTimerOne:SetText("+1\n"..TimeFormat(maxTime))
-                f.textTimerTwo:SetText("+2\n"..TimeFormat(maxTime*0.8-timer))
-                f.textTimerThree:SetText("+3\n"..TimeFormat(maxTime*0.6-timer))
-            end
-            
-            -- Set Timer to Frame
-            local grave = CreateAtlasMarkup("poi-graveyard-neutral")
-            bar:SetMinMaxValues(0,maxTime)
-            if db.profile.mainTimer == 1 then
-                bar:SetValue(maxTime-time)
-            elseif db.profile.mainTimer == 2 then
-                bar:SetValue(maxTime-timeSmall)
-            end
-            f.textLevel:SetText(GetScoreColor(GetBaseScore(level))..level)
-            f.textTimer:SetText(TimeFormat(time))
-            f.textTimerSmall:SetText(TimeFormat(timeSmall))
-            f.textDeaths:SetText(grave.." "..GetDeaths().."\n-"..TimeFormat(GetDeaths()*5))
-            C_Timer.After(1, bootlegRepeatingTimer)
-        end
-    end
 end
 
 -- Bosses Killed in active Run
@@ -381,7 +198,7 @@ local function UpdateBosses()
                         end
 
                         if before < 100000 then
-                            before = "  ["..TimeFormat(before,plus).."]|r"
+                            before = "  ["..Addon.TimeFormat(before,plus).."]|r"
                         else
                             before = "|r"
                         end
@@ -414,12 +231,14 @@ local function UpdateMobs()
     (before < 100 and db.profile.PullCheck+before >= 100) then
         cur = string.format("\n|c%s+%.2f%%|r", colorRed, db.profile.currentPullCount)
         cur2 = string.format("\n|c%s%.2f%%|r", colorRed, db.profile.currentPullCount+before)
-
-        if not db.profile.sound and db.profile.pridefulAlertT and IsAddOnLoaded("MythicDungeonTools") and affix[4] == 121 then
+        db.profile.DoubleCheck = true
+        if not db.profile.sound and db.profile.pridefulAlertT and IsAddOnLoaded("MythicDungeonTools") and affix[4] == 121 and db.profile.DoubleCheck and db.profile.DoubleCheckCount >= 2 then
             if not timeThrottle or time-timeThrottle > 90 then
                 timeThrottle = time
                 db.profile.sound = true
                 PlaySoundFile(AceGUIWidgetLSMlists.sound[db.profile.pridefulAlertSound], "Master")
+                db.profile.DoubleCheck = false
+                db.profile.DoubleCheckCount = 0
             end
         end
 
@@ -467,6 +286,86 @@ local function UpdateMobs()
     end
 end
 
+-- Timer Function for active Run
+local function bootlegRepeatingTimer()
+    if db.profile.start then
+        local time = GetElapsedTime()
+        local _,_,maxTime = C_ChallengeMode.GetMapUIInfo(db.profile.GetActiveChallengeMapID)
+        if db.profile.DoubleCheck == true then
+            db.profile.DoubleCheckCount = db.profile.DoubleCheckCount + 1
+            UpdateMobs()
+            if db.profile.DoubleCheckCount >= 3 then
+                db.profile.DoubleCheck = false
+            end
+        end
+        db.profile.GetCurrentTime = Addon.TimeFormat(time).."/"..Addon.TimeFormat(maxTime)
+
+        if not maxTime then
+            return
+        else
+            local level = C_ChallengeMode.GetActiveKeystoneInfo()
+            local f = LucidKeystoneFrame
+            local bar = LucidKeystoneFrameBar
+            local timeSmall = time
+
+            -- Main Timer
+            if db.profile.mainTimer == 2 then
+                time = maxTime-time
+            end
+            if db.profile.mainTimer == 1 then
+                timeSmall = maxTime-timeSmall
+            end
+
+            -- Smart Timer Only
+            if db.profile.smartTimer then
+                local timer = time
+                if db.profile.mainTimer == 2 then
+                    timer = timeSmall
+                end
+                if f.textTimerOne:IsShown() then
+                    f.textTimerOne:Hide()
+                    f.textTimerThree:Hide()
+                end
+
+                local smartTime
+                local plus3 = maxTime*0.6-timer
+                local plus2 = maxTime*0.8-timer
+                local plus1 = maxTime-timer
+                local plusSmartOne = Addon.TimeFormat(maxTime-timer)
+                
+                if plus3 >= 0 then smartTime = "+3\n"..Addon.TimeFormat(plus3) elseif
+                plus2 >= 0 then smartTime = "+2\n"..Addon.TimeFormat(plus2) elseif
+                plus1 >= 0 then smartTime = "+1\n"..Addon.TimeFormat(plus1) elseif
+                plus1 <= 0 then smartTime = L["Over by"].." |cffC43333"..plusSmartOne
+                end
+                f.textTimerTwo:SetText(smartTime)
+            else
+                local timer = time
+                if db.profile.mainTimer == 2 then
+                    timer = timeSmall
+                end
+                f.textTimerOne:SetText("+1\n"..Addon.TimeFormat(maxTime))
+                f.textTimerTwo:SetText("+2\n"..Addon.TimeFormat(maxTime*0.8-timer))
+                f.textTimerThree:SetText("+3\n"..Addon.TimeFormat(maxTime*0.6-timer))
+            end
+            
+            -- Set Timer to Frame
+            local grave = CreateAtlasMarkup("poi-graveyard-neutral")
+            bar:SetMinMaxValues(0,maxTime)
+            if db.profile.mainTimer == 1 then
+                bar:SetValue(maxTime-time)
+            elseif db.profile.mainTimer == 2 then
+                bar:SetValue(maxTime-timeSmall)
+            end
+            f.textLevel:SetText(Addon.GetScoreColor(Addon.GetBaseScore(level))..level)
+            f.textTimer:SetText(Addon.TimeFormat(time))
+            f.textTimerSmall:SetText(Addon.TimeFormat(timeSmall))
+            f.textDeaths:SetText(grave.." "..GetDeaths().."\n-"..Addon.TimeFormat(GetDeaths()*5))
+            C_Timer.After(1, bootlegRepeatingTimer)
+        end
+    end
+end
+
 -- Mobupdate on Preview
 function Module.Config:MobUpdateConfig()
     local current, total = 256, 285
@@ -498,7 +397,7 @@ local function UpdateDungeonName()
     if db.profile.dungeonName == 2 then
         LucidKeystoneFrame.textDungeon:SetText(C_ChallengeMode.GetMapUIInfo(db.profile.GetActiveChallengeMapID))
     elseif db.profile.dungeonName == 3 then
-        LucidKeystoneFrame.textDungeon:SetText(previewSettings.dungeonName[db.profile.GetActiveChallengeMapID].shortName)
+        LucidKeystoneFrame.textDungeon:SetText(previewSettings.dungeonName[db.profile.GetActiveChallengeMapID].ShortName)
     end
 end
 
@@ -526,9 +425,6 @@ local function GetBestBefore()
         end
     end
 end
-
-
-
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --  Event Handler 
@@ -589,12 +485,12 @@ local function eventHandler(self, e, ...)
         bar:SetMinMaxValues(0,maxTime)
         bar:SetValue(maxTime-time)
         f.textMobs:SetText("100.00%")
-        f.textLevel:SetText(GetScoreColor(GetBaseScore(level))..level) 
-        f.textTimer:SetText(TimeFormat(time))
-        f.textTimerSmall:SetText(TimeFormat(maxTime-time))
-        f.textTimerOne:SetText("+1\n"..TimeFormat(maxTime))
-        f.textTimerTwo:SetText("+2\n"..TimeFormat(maxTime*0.8-time))
-        f.textTimerThree:SetText("+3\n"..TimeFormat(maxTime*0.6-time))
+        f.textLevel:SetText(Addon.GetScoreColor(Addon.GetBaseScore(level))..level) 
+        f.textTimer:SetText(Addon.TimeFormat(time))
+        f.textTimerSmall:SetText(Addon.TimeFormat(maxTime-time))
+        f.textTimerOne:SetText("+1\n"..Addon.TimeFormat(maxTime))
+        f.textTimerTwo:SetText("+2\n"..Addon.TimeFormat(maxTime*0.8-time))
+        f.textTimerThree:SetText("+3\n"..Addon.TimeFormat(maxTime*0.6-time))
         db.profile.currentPull = 0.0
     end
     if e == "COMBAT_LOG_EVENT_UNFILTERED" and db.profile.start and db.profile.MobPullConf ~= 1 and IsAddOnLoaded("MythicDungeonTools") then
@@ -646,7 +542,6 @@ local function eventHandler(self, e, ...)
     end
     if e == "PLAYER_STARTED_MOVING" then
         -- do test stuff kappa
-        print(AddonName)
     end]]
 end
 
@@ -697,7 +592,6 @@ local function ToggleLucidKeystoneFrame()
     bg:SetScale(db.profile.ScaleStyle)
     t = bg:CreateTexture(nil,"BACKGROUND")
     t:SetAllPoints(bg) 
-    t:SetTexture(Addon[imgfile[Module.Config:GetOption("background")]..Module.Config:GetOption("mobCount")])
     bg.texture = t
     bg:SetPoint(db.profile.fpoint, db.profile.fxof, db.profile.fyof)
     bg:SetScript("OnEvent", eventHandler)
@@ -843,7 +737,7 @@ function Module.Config:KeyLevel()
     local level = previewSettings.level
     local f = LucidKeystoneFrame
     if db.profile.start == false then
-        f.textLevel:SetText(GetScoreColor(GetBaseScore(level))..level)
+        f.textLevel:SetText(Addon.GetScoreColor(Addon.GetBaseScore(level))..level)
     end
 end
 
@@ -876,6 +770,7 @@ function Module.Config:TimerText()
         mobPerc = previewSettings.mobPerc
         mobCurPerc = previewSettings.mobCurPerc
     end
+    -- I wish she will return my love
     local test = CreateAtlasMarkup("poi-graveyard-neutral")
     local timeSmall = time
     local mobPercPlus = ""
@@ -888,9 +783,10 @@ function Module.Config:TimerText()
     end
     if db.profile.start == false then
         f.textTimer:SetTextColor(0, 0.72, 1, 1)
-        f.textTimer:SetText(TimeFormat(time))
-        f.textTimerSmall:SetText(TimeFormat(timeSmall))
-        f.textDeaths:SetText(test.." "..deaths.."\n-"..TimeFormat(deaths*5))
+        f.textTimer:SetText(Addon.TimeFormat(time))
+        f.textTimerSmall:SetText(Addon.TimeFormat(timeSmall))
+        f.textDeaths:SetText(test.." "..deaths.."\n-"..Addon.TimeFormat(deaths*5))
+        -- sadly, she dont love me back. but i will dont stop
         if db.profile.MobPercStep then
             f.textMobs:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 15, "OUTLINE")
             if db.profile.MobPullConf == 2 and IsAddOnLoaded("MythicDungeonTools") then
@@ -914,26 +810,27 @@ function Module.Config:PlusTimer()
     local time = previewSettings.time
     if db.profile.smartTimer then
         f.textTimerOne:Hide()
+        f.textTimerTwo:Show()
         f.textTimerThree:Hide()
         if db.profile.start == false then
             local smartTime
             local plus3 = maxTime*0.6-time
             local plus2 = maxTime*0.8-time
             local plus1 = maxTime-time
-            local plusSmartOne = TimeFormat(maxTime-time)
+            local plusSmartOne = Addon.TimeFormat(maxTime-time)
             
-            if plus3 >= 0 then smartTime = "+3\n"..TimeFormat(plus3) elseif
-            plus2 >= 0 then smartTime = "+2\n"..TimeFormat(plus2) elseif
-            plus1 >= 0 then smartTime = "+1\n"..TimeFormat(plus1) elseif
+            if plus3 >= 0 then smartTime = "+3\n"..Addon.TimeFormat(plus3) elseif
+            plus2 >= 0 then smartTime = "+2\n"..Addon.TimeFormat(plus2) elseif
+            plus1 >= 0 then smartTime = "+1\n"..Addon.TimeFormat(plus1) elseif
             plus1 <= 0 then smartTime = L["Over by"].." |cffC43333"..plusSmartOne
             end
             f.textTimerTwo:SetText(smartTime)
         end
     else
         if db.profile.start == false then
-            f.textTimerOne:SetText("+1\n"..TimeFormat(maxTime))
-            f.textTimerTwo:SetText("+2\n"..TimeFormat(maxTime*0.8-time))
-            f.textTimerThree:SetText("+3\n"..TimeFormat(maxTime*0.6-time))
+            f.textTimerOne:SetText("+1\n"..Addon.TimeFormat(maxTime))
+            f.textTimerTwo:SetText("+2\n"..Addon.TimeFormat(maxTime*0.8-time))
+            f.textTimerThree:SetText("+3\n"..Addon.TimeFormat(maxTime*0.6-time))
         end
 
         if db.profile.plusOne then f.textTimerOne:Show() else f.textTimerOne:Hide() end
@@ -1051,7 +948,7 @@ function Module.Config:DungeonText()
     if db.profile.dungeonName == 3 then
         f.textDungeon:SetPoint("CENTER",-116,38)
         if db.profile.start == false then
-            f.textDungeon:SetText(previewSettings.dungeonName[previewSettings.ZoneID].shortName)
+            f.textDungeon:SetText(previewSettings.dungeonName[previewSettings.ZoneID].ShortName)
         else
             UpdateDungeonName()
         end
@@ -1128,7 +1025,7 @@ end
 
 -- Update Sparkle Effect
 function Module.Config:SparkleUpdate()
-    LucidKeystoneFrameSparkle:SetModel(sparkleEffect[db.profile.sparkle].animation)
+    LucidKeystoneFrameSparkle:SetModel(Addon.sparkleEffect[db.profile.sparkle].animation)
 end
 
 -- Update Bar Styles
@@ -1156,10 +1053,28 @@ end
 
 -- Set Backdrop
 function Module.Config:BackgroundUpdate()
-    local todaydate = C_DateAndTime.GetCurrentCalendarTime()
+    --[[local todaydate = C_DateAndTime.GetCurrentCalendarTime()
     local today = todaydate.monthDay .. ".".. todaydate.month
-    if today == "1.4" then
+    if today == "5.4" then
         LucidKeystoneFrame.texture:SetTexture(Addon[imgfile[11]..db.profile.mobCount])
+    else]]
+        -- 1 = Kyrian
+        -- 2 = Venthyr
+        -- 3 = Night Fae
+        -- 4 = Necrolord
+    if db.profile.background == 20 then
+        LucidKeystoneFrame.texture:SetTexture(Addon[imgfile[22]..db.profile.mobCount]) --Prideful
+    elseif db.profile.background == 30 then
+        local covenant = C_Covenants.GetActiveCovenantID()
+        local num = 31
+        if covenant == 2 then
+            num = 34
+        elseif covenant == 3 then
+            num = 33
+        elseif covenant == 4 then
+            num = 32
+        end
+        LucidKeystoneFrame.texture:SetTexture(Addon[imgfile[num]..db.profile.mobCount])
     else
         LucidKeystoneFrame.texture:SetTexture(Addon[imgfile[db.profile.background]..db.profile.mobCount])
         if Module.Config:GetOption("background") == 6 then

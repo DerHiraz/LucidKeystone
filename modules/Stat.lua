@@ -7,49 +7,11 @@ local Module = {
 }
 local db
 
-local fontColor = {
-    yellow  = "|cffffd100%s|r",
-    blue    = "|cff009dd5%s|r",
-}
-
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --  Function Section
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
--- Time formating for every Timer in Frame
-local function TimeFormat(time) 
-    local format_minutes = "%.2d:%.2d"
-    local format_hours = "%d:%.2d:%.2d"
-    local prefix = " "
-    if time < 0 then
-        time = time * -1
-        prefix = "-"
-    end
-    local seconds = time % 60 -- seconds/min
-    local minutes = math.floor((time / 60) % 60) -- min/hr
-    local hours = math.floor(time / 3600)
-    if hours == 0 then
-        return prefix .. string.format(format_minutes, minutes, seconds)
-    else
-        return prefix .. string.format(format_hours, hours, minutes, seconds)
-    end
-end
 
--- Get Stars for Runs
-local function GetStars(time, zoneID)
-    local _,_,maxTime = C_ChallengeMode.GetMapUIInfo(zoneID)
-    if time == 0 then
-        return ""
-    elseif time < maxTime*0.6 then
-        return fontColor.yellow:format("***")
-    elseif time < maxTime*0.8 then
-        return fontColor.yellow:format("**")
-    elseif time < maxTime then
-        return fontColor.yellow:format("*")
-    else
-        return ""
-    end
-end
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --  Event Handler 
@@ -68,6 +30,13 @@ local function eventHandler(self, e, ...)
         --Set MapID of active Run
         db.profile.GetActiveChallengeMapID = C_ChallengeMode.GetActiveChallengeMapID()
         db.profile.StartDeaths = 0
+        db.profile.StartVolcanic = 0
+        db.profile.DoubleCheckCount = 0
+        db.profile.DoubleCheck = false
+        local _, affix = C_ChallengeMode.GetActiveKeystoneInfo()
+        if affix[3] == 3 then
+            db.profile.VolcanicCheck = true
+        end
     end
     if e == "CHALLENGE_MODE_COMPLETED" then
         local _, level, time, onTime = C_ChallengeMode.GetCompletionInfo()
@@ -89,7 +58,7 @@ local function eventHandler(self, e, ...)
             if (bestIntime.level == level and bestIntime.duration > time) or bestIntime.level < level then
                 bestIntime.level = level
                 bestIntime.duration = time
-                bestIntime.date = today.monthDay.."."..today.month.."."..today.year
+                bestIntime.date = today.monthDay..Addon.Delimiter[db.profile.DateFormatSep]..today.month..Addon.Delimiter[db.profile.DateFormatSep]..today.year
             end
         else
             local bestOvertime = db.profile.bestOvertime[expansion][season][db.profile.GetActiveChallengeMapID]
@@ -98,22 +67,35 @@ local function eventHandler(self, e, ...)
             if (bestOvertime.level == level and bestOvertime.duration > time) or bestOvertime.level < level then
                 bestOvertime.level = level
                 bestOvertime.duration = time
-                bestOvertime.date = today.monthDay.."."..today.month.."."..today.year
+                bestOvertime.date = today.monthDay..Addon.Delimiter[db.profile.DateFormatSep]..today.month..Addon.Delimiter[db.profile.DateFormatSep]..today.year
             end
         end
-        local translit = TimeFormat(time)
-        local stars = GetStars(time,db.profile.GetActiveChallengeMapID)
+        local translit = Addon.TimeFormat(time)
+        local stars = Addon.GetStars(time,db.profile.GetActiveChallengeMapID)
         table.insert(db.profile.dungeonHistory[expansion][season][db.profile.GetActiveChallengeMapID].level, 1, "+"..level..stars)
         table.insert(db.profile.dungeonHistory[expansion][season][db.profile.GetActiveChallengeMapID].durationTrans, 1, translit)
-        table.insert(db.profile.dungeonHistory[expansion][season][db.profile.GetActiveChallengeMapID].date, 1, today.monthDay.."."..today.month.."."..today.year)
+        table.insert(db.profile.dungeonHistory[expansion][season][db.profile.GetActiveChallengeMapID].date, 1, today.monthDay..Addon.Delimiter[db.profile.DateFormatSep]..today.month..Addon.Delimiter[db.profile.DateFormatSep]..today.year)
         table.insert(db.profile.avglvl[expansion][season][1][db.profile.GetActiveChallengeMapID],level)
 
         local deathsProfile = db.profile.statistic.deaths
         db.profile.statistic.deaths = db.profile.StartDeaths + deathsProfile
+        db.profile.statistic.volcanic = db.profile.statistic.volcanic + db.profile.StartVolcanic
         db.profile.start = false
         db.profile.StartDeaths = nil
+        db.profile.StartVolcanic = nil
+        db.profile.VolcanicCheck = nil
     end
-
+    if e == "COMBAT_LOG_EVENT_UNFILTERED" and db.profile.start and db.profile.VolcanicCheck then
+        local _, message, _, _, _, _, _, _, destName, _, _, spellid = CombatLogGetCurrentEventInfo()
+        local name = ""
+        local char = UnitName("player")
+        if destName then
+            name = Ambiguate(destName, "short")
+            if message == "SPELL_DAMAGE" and spellid == 209862 and name == char then
+                db.profile.StartVolcanic = db.profile.StartVolcanic + 1
+            end
+        end
+    end
 end
 
 -- Set Events
@@ -124,6 +106,7 @@ local function ToggleStatFrame()
     stat:RegisterEvent("PLAYER_DEAD")
     stat:RegisterEvent("CHALLENGE_MODE_START")
     stat:RegisterEvent("CHALLENGE_MODE_COMPLETED")
+    stat:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 end
 
 --Initialize function
