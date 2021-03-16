@@ -1,5 +1,5 @@
 LucidKeystone = LibStub("AceAddon-3.0"):NewAddon("LucidKeystone", "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0")
-LucidKeystone.AceGUI = LibStub("AceGUI-3.0", true);
+LucidKeystone.AceGUI = LibStub("AceGUI-3.0", true)
 
 --    _           _    _ 
 --   | |  _  _ __(_)__| |

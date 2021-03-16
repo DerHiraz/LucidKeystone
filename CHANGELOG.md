@@ -1,5 +1,22 @@
 # CHANGELOG
 
+## 1.0.7
+
+- removed ``Version Check`` from Config Menu
+- added new Window ``Keystones``
+- moved ``Dungeons`` Tab to ``Keystones``
+- added Minimap Icon
+- added customizable delay timer for ``Busy Msg`` and increased default delay to 5 minutes (up from 3 minutes)
+- fixed display bug if ``Show +2`` is disabled and ``Smart Timer`` is enabled
+- removed April Fool
+- added Keystone Manager for party Keystones
+- ``/lk`` is now for ``Party Keystones`` and ``Dungeons``
+- added ``/lk config`` to get the config menu
+- renamed Background ``Simple`` to ``Marble``
+- fixed bug for ``/lk played`` command
+- added Covenant Backgrounds
+- added option for automatic season and covenant background
+
 ## 1.0.6
 
 - added automatic dungeon statistic import after name change or realm transfer

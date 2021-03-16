@@ -15,13 +15,13 @@ The statistics show you exactly which keys you can improve or how well you have 
 
 ## Features
 ### Different options to personalize the timer
-- 9 different Backdrops
+- 13 different Backdrops
 - Sparkle effects on Timerbar
 - Timer for all Upgrades
 - different displays for Bosses
 - Change fonts
 - Scale the Timer
-- Get more information then the default Timer
+- Get more information than the default Timer
 - Raider.IO support with colors
 - Mythic Dungeon Tools support with Current Pull Trash Count
 ### Get your Statistics
@@ -32,12 +32,14 @@ The statistics show you exactly which keys you can improve or how well you have 
 - Keystone Autoplacer
 - Auto Rolecheck
 - DND Message while doing Mythic Plus
+- Party Keystone Manager
  
 ## Slash Commands
 ### Main Commands
 - /lucidkeystone
 - /lk
 ### Bonus Commands
+- /lk config
 - /lk played
 - /lk preview
 - /lk version
@@ -50,3 +52,12 @@ Activate devtools with ``/lk devtools`` command
 Go to Lucid Keystone Config Tab ``Profiles``
 ### Step 3
 Click on ``Hardreset`` and confirm the Reset
+
+## Notes
+### Localization
+Lucid Keystone currently works with
+- ``enUS``
+- ``deDE``
+- ``zhCN``
+- ``zhTW``
+I always looking for people that want to translate more. If you want to help with localization, just contact me.
