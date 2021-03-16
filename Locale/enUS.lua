@@ -11,22 +11,32 @@ L["Shadowlands"] = true
 --## Buttons
 L["Preview"] = true
 L["Click to emulate the timer."] = true
-L["Version Check"] = true
-L["Check for updates."] = true
+--L["Version Check"] = true
+--L["Check for updates."] = true
 L["Reset to Defaults"] = true
 L["Reset all options to their default values."] = true
 L["This does not affect your Dungeon stats."] = true
 L["You really want reset to defaults?"] = true
 L["Unlock"] = true
 L["Lock or unlock the window"] = true
+L["Keystones"] = true
+L["Characters"] = true
+L["Open Keystone Window"] = true
 
 --## Slash Commands
 L["played"] = true
 L["preview"] = true
 L["version"] = true
+L["config"] = true
 L["help"] = true
 L["Lucid Keystone Commands:"] = true
 L["Invalid Command. Type \"/lk help\" to see all Lucid Keystone Commands."] = true
+
+--## Minimap
+L["Left Click"] = true
+L[" to toggle Config Menu"] = true
+L["Right Click"] = true
+L[" to toggle \"Keystone\" Window"] = true
 
 --## Dungeon Shortnames
 --### Shadowlands
@@ -48,12 +58,19 @@ L["None"] = true
 L["Blizzard Default"] = true
 L["Horde"] = true
 L["Alliance"] = true
+L["Marble"] = true
 L["Simple"] = true
 L["Color It"] = true
 L["Dark Glass"] = true
 L["Awakened"] = true
 L["Prideful"] = true
+L["Domination"] = true
 L["Paradox"] = true
+L["Covenants"] = true
+L["Kyrian"] = true
+L["Necrolord"] = true
+L["Night Fae"] = true
+L["Venthyr"] = true
 L["Sparkle Effect"] = true
 L["Gives you a sparkle effect on the bar."] = true
 L["Low Sparkle"] = true
@@ -133,6 +150,7 @@ L["Automatically accept your role at each role check."] = true
 L["Send Automatic whisper while doing Mythic Plus"] = true
 L["Scale Timer"] = true
 L["Enable"] = true
+L["Delay in Minutes"] = true
 L["Send Keystone Level"] = true
 L["Send Dungeon Name"] = true
 L["Send current Time"] = true
@@ -144,6 +162,16 @@ L["I'm busy in Mythic Plus"] = true
 L["% of Trash"] = true
 L["bosses defeated"] = true
 L["deaths"] = true
+L["Minimap Icon"] = true
+L["Date Format Type"] = true
+L["Date Delimiter"] = true
+L["Share Total Runs"] = true
+
+--## Keystone Manager
+L["Keystone Manager"] = true
+L["Guild"] = true
+L["Join a Party to see Keystones."] = true
+L["Config Menu"] = true
 
 --## Dungeons
 L["Dungeons"] = true
@@ -237,7 +265,7 @@ L["Btw, the key is not a lie."] = true
 L["Leeeeeeeeeeeeeeeroy!"] = true
 L["Millions of years of evolution vs. your fist... lets go!"] = true
 L["Keep calm and blame it on the lag."] = true
-L["If the Key don't scare your, then it's too low."] = true
+L["If the key doesn't scare you, then it's too low."] = true
 L["Don't stop until you're Proud."] = true
 L["Keep in mind, you only fail when you wipe."] = true
 L["Don't forget to stay hydrated."] = true

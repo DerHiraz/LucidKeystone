@@ -11,22 +11,32 @@ L["Shadowlands"]                                                                
 --## Buttons
 L["Preview"]                                                                                = "预览"
 L["Click to emulate the timer."]                                                            = "点击来预览大秘境计时器"
-L["Version Check"]                                                                          = "检查版本"
-L["Check for updates."]                                                                     = "检查是否有更新"
+--L["Version Check"]                                                                          = "检查版本"
+--L["Check for updates."]                                                                     = "检查是否有更新"
 L["Reset to Defaults"]                                                                      = "重置为默认"
 L["Reset all options to their default values."]                                             = "还原所有选项为默认设置"
 L["This does not affect your Dungeon stats."]                                               = "这将不会影响你的大秘境记录"
 L["You really want reset to defaults?"]                                                     = "你确认要把所有设置还原为默认吗？"
 L["Unlock"]                                                                                 = "解锁"
 L["Lock or unlock the window"]                                                              = "锁定或解锁计时器框架"
+L["Keystones"]                                                                              = "钥石"
+L["Characters"]                                                                             = "角色"
+L["Open Keystone Window"]                                                                   = "打开钥石窗口"
 
 --## Slash Commands
 L["played"]                                                                                 = "时间"
 L["preview"]                                                                                = "预览"
 L["version"]                                                                                = "版本"
+L["config"]                                                                                 = "config"
 L["help"]                                                                                   = "帮助"
 L["Lucid Keystone Commands:"]                                                               = "Lucid Keystone 指令:"
 L["Invalid Command. Type \"/lk help\" to see all Lucid Keystone Commands."]                 = "错误指令， 输入 \"/lk 帮助\" 查看所有Lucid Keystone指令。"
+
+--## Minimap
+L["Left Click"]                                                                             = "左键点击"
+L[" to toggle Config Menu"]                                                                 = "打开配置菜单"
+L["Right Click"]                                                                            = "右键点击"
+L[" to toggle \"Keystone\" Window"]                                                         = "打开 \"钥石\" 窗口"
 
 --## Dungeon Shortnames
 --### Shadowlands
@@ -48,12 +58,19 @@ L["None"]                                                                       
 L["Blizzard Default"]                                                                       = "暴雪默认"
 L["Horde"]                                                                                  = "部落"
 L["Alliance"]                                                                               = "联盟"
+L["Marble"]                                                                                 = "大理石"
 L["Simple"]                                                                                 = "简约"
 L["Color It"]                                                                               = "自定义颜色"
 L["Dark Glass"]                                                                             = "暗璃"
 L["Awakened"]                                                                               = "觉醒者"
 L["Prideful"]                                                                               = "傲慢"
+L["Domination"]                                                                             = "统御" -- Upcoming Affix Design
 L["Paradox"]                                                                                = "Paradox"
+L["Covenants"]                                                                              = "盟约"
+L["Kyrian"]                                                                                 = "格里恩"
+L["Necrolord"]                                                                              = "通灵领主"
+L["Night Fae"]                                                                              = "法夜"
+L["Venthyr"]                                                                                = "温西尔"
 L["Sparkle Effect"]                                                                         = "火花效果"
 L["Gives you a sparkle effect on the bar."]                                                 = "给进度条添加火花效果"
 L["Low Sparkle"]                                                                            = "小火花特效"
@@ -133,6 +150,7 @@ L["Automatically accept your role at each role check."]                         
 L["Send Automatic whisper while doing Mythic Plus"]                                         = "在进行大秘境时自动回复密语"
 L["Scale Timer"]                                                                            = "缩放计时器"
 L["Enable"]                                                                                 = "开启"
+L["Delay in Minutes"]                                                                       = "延迟密语时间（分钟"
 L["Send Keystone Level"]                                                                    = "发送钥石等级"
 L["Send Dungeon Name"]                                                                      = "发送地下城名称"
 L["Send current Time"]                                                                      = "发送当前时间"
@@ -144,6 +162,16 @@ L["I'm busy in Mythic Plus"]                                                    
 L["% of Trash"]                                                                             = "% 的小怪"
 L["bosses defeated"]                                                                        = "Boss进度"
 L["deaths"]                                                                                 = "次死亡"
+L["Minimap Icon"]                                                                           = "小地图图标"
+L["Date Format Type"]                                                                       = "日期格式"
+L["Date Delimiter"]                                                                         = "日期分隔符"
+L["Share Total Runs"]                                                                       = "分享总计记录"
+
+--## Keystone Manager
+L["Keystone Manager"]                                                                       = "钥石记录管理"
+L["Guild"]                                                                                  = "公会"
+L["Join a Party to see Keystones."]                                                         = "加入一个队伍来查看钥石."
+L["Config Menu"]                                                                            = "配置主菜单"
 
 --## Dungeons
 L["Dungeons"]                                                                               = "地下城"
@@ -196,7 +224,6 @@ L["ruRU Translation"]                                                           
 L["zhCN Translation"]                                                                       = "简体中文翻译"
 L["zhTW Translation"]                                                                       = "繁体中文翻译"
 
-
 --## Profiles
 L["Profiles"]                                                                               = "配置文件"
 L["Copy Profile"]                                                                           = "复制配置文件"
@@ -209,12 +236,10 @@ L["This cannot be undone!"]                                                     
 L["Everything in Lucid Keystone was wiped painfully!"]                                      = "Lucid Keystone已被成功重置。"
 --L[] = true
 
-
 --# Devtools
 L["Devtools enabled"]                                                                       = "开发者工具已启用"
 L["Lucid Keystone Devtools DISABLED"]                                                       = "Lucid Keystone 开发者工具已关闭"
 L["Lucid Keystone Devtools ENABLED"]                                                        = "Lucid Keystone 开发者工具已启用"
-
 
 --# Version Check Frame
 --##General
@@ -240,7 +265,7 @@ L["Btw, the key is not a lie."]                                                 
 L["Leeeeeeeeeeeeeeeroy!"]                                                                   = "冲冲冲"
 L["Millions of years of evolution vs. your fist... lets go!"]                               = "都别整活嗷"
 L["Keep calm and blame it on the lag."]                                                     = "放松，稳住，限时妥妥的"
-L["If the Key don't scare your, then it's too low."]                                        = "全力以赴"
+L["If the key doesn't scare you, then it's too low."]                                       = "全力以赴"
 L["Don't stop until you're Proud."]                                                         = "注意坦克节奏，大家跟上"
 L["Keep in mind, you only fail when you wipe."]                                             = "好心态，易限时"
 L["Don't forget to stay hydrated."]                                                         = "祝各位好运！"

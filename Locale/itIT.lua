@@ -11,22 +11,32 @@ L["Shadowlands"]                                                                
 --## Buttons
 L["Preview"]                                                                                = "Preview"
 L["Click to emulate the timer."]                                                            = "Click to emulate the timer."
-L["Version Check"]                                                                          = "Version Check"
-L["Check for updates."]                                                                     = "Check for updates."
+--L["Version Check"]                                                                          = "Version Check"
+--L["Check for updates."]                                                                     = "Check for updates."
 L["Reset to Defaults"]                                                                      = "Reset to Defaults"
 L["Reset all options to their default values."]                                             = "Reset all options to their default values."
 L["This does not affect your Dungeon stats."]                                               = "This does not affect your Dungeon stats."
 L["You really want reset to defaults?"]                                                     = "You really want reset to defaults?"
 L["Unlock"]                                                                                 = "Unlock"
 L["Lock or unlock the window"]                                                              = "Lock or unlock the window"
+L["Keystones"]                                                                              = "Keystones"
+L["Characters"]                                                                             = "Characters"
+L["Open Keystone Window"]                                                                   = "Open Keystone Window"
 
 --## Slash Commands
 L["played"]                                                                                 = "played"
 L["preview"]                                                                                = "preview"
 L["version"]                                                                                = "version"
+L["config"]                                                                                 = "config"
 L["help"]                                                                                   = "help"
 L["Lucid Keystone Commands:"]                                                               = "Lucid Keystone Commands:"
 L["Invalid Command. Type \"/lk help\" to see all Lucid Keystone Commands."]                 = "Invalid Command. Type \"/lk help\" to see all Lucid Keystone Commands."
+
+--## Minimap
+L["Left Click"]                                                                             = "Left Click"
+L[" to toggle Config Menu"]                                                                 = " to toggle Config Menu"
+L["Right Click"]                                                                            = "Right Click"
+L[" to toggle \"Keystone\" Window"]                                                         = " to toggle \"Keystone\" Window"
 
 --## Dungeon Shortnames
 --### Shadowlands
@@ -48,12 +58,19 @@ L["None"]                                                                       
 L["Blizzard Default"]                                                                       = "Blizzard Default"
 L["Horde"]                                                                                  = "Horde"
 L["Alliance"]                                                                               = "Alliance"
+L["Marble"]                                                                                 = "Marble"
 L["Simple"]                                                                                 = "Simple"
 L["Color It"]                                                                               = "Color It"
 L["Dark Glass"]                                                                             = "Dark Glass"
 L["Awakened"]                                                                               = "Awakened"
 L["Prideful"]                                                                               = "Prideful"
+L["Domination"]                                                                             = "Domination" -- Upcoming Affix Design
 L["Paradox"]                                                                                = "Paradox"
+L["Covenants"]                                                                              = "Covenants"
+L["Kyrian"]                                                                                 = "Kyrian"
+L["Necrolord"]                                                                              = "Necrolord"
+L["Night Fae"]                                                                              = "Nacht Fae"
+L["Venthyr"]                                                                                = "Venthyr"
 L["Sparkle Effect"]                                                                         = "Sparkle Effect"
 L["Gives you a sparkle effect on the bar."]                                                 = "Gives you a sparkle effect on the bar."
 L["Low Sparkle"]                                                                            = "Low Sparkle"
@@ -133,6 +150,7 @@ L["Automatically accept your role at each role check."]                         
 L["Send Automatic whisper while doing Mythic Plus"]                                         = "Send Automatic whisper while doing Mythic Plus"
 L["Scale Timer"]                                                                            = "Scale Timer"
 L["Enable"]                                                                                 = "Enable"
+L["Delay in Minutes"]                                                                       = "Delay in Minutes"
 L["Send Keystone Level"]                                                                    = "Send Keystone Level"
 L["Send Dungeon Name"]                                                                      = "Send Dungeon Name"
 L["Send current Time"]                                                                      = "Send current Time"
@@ -144,6 +162,16 @@ L["I'm busy in Mythic Plus"]                                                    
 L["% of Trash"]                                                                             = "% of Trash"
 L["bosses defeated"]                                                                        = "bosses defeated"
 L["deaths"]                                                                                 = "deaths"
+L["Minimap Icon"]                                                                           = "Minimap Icon"
+L["Date Format Type"]                                                                       = "Date Format Type"
+L["Date Delimiter"]                                                                         = "Date Delimiter"
+L["Share Total Runs"]                                                                       = "Share Total Runs"
+
+--## Keystone Manager
+L["Keystone Manager"]                                                                       = "Keystone Manager"
+L["Guild"]                                                                                  = "Guild"
+L["Join a Party to see Keystones."]                                                         = "Join a Party to see Keystones."
+L["Config Menu"]                                                                            = "Config Menu"
 
 --## Dungeons
 L["Dungeons"]                                                                               = "Dungeons"
@@ -213,7 +241,6 @@ L["Devtools enabled"]                                                           
 L["Lucid Keystone Devtools DISABLED"]                                                       = "Lucid Keystone Devtools DISABLED"
 L["Lucid Keystone Devtools ENABLED"]                                                        = "Lucid Keystone Devtools ENABLED"
 
-
 --# Version Check Frame
 --##General
 L["Work In Progress"]                                                                       = "Work In Progress"
@@ -238,7 +265,7 @@ L["Btw, the key is not a lie."]                                                 
 L["Leeeeeeeeeeeeeeeroy!"]                                                                   = "Leeeeeeeeeeeeeeeroy!"
 L["Millions of years of evolution vs. your fist... lets go!"]                               = "Millions of years of evolution vs. your fist... lets go!"
 L["Keep calm and blame it on the lag."]                                                     = "Keep calm and blame it on the lag."
-L["If the Key don't scare your, then it's too low."]                                        = "If the Key don't scare your, then it's too low."
+L["If the key doesn't scare you, then it's too low."]                                       = "If the Key don't scare your, then it's too low."
 L["Don't stop until you're Proud."]                                                         = "Don't stop until you're Proud."
 L["Keep in mind, you only fail when you wipe."]                                             = "Keep in mind, you only fail when you wipe."
 L["Don't forget to stay hydrated."]                                                         = "Don't forget to stay hydrated."
