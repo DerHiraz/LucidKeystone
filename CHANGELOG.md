@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## 1.0.8
+
+- fixed position Bug for Bossnames
+- fixed auto msg delay for bnet whispers
+- fixed ``Blizzard Default`` Background display
+- fixed Keycolor for ``Party Keystones``
+- fixed an issue for statistic import after realm-/namechange
+- added more motivation quotes
+- added option to send current covenant with keypost
+- added special badges
+- added Tooltip for Detailed Deaths
+- added Tormented Mob Indicator
+- changed Raider.IO colors to dynamic Blizzard score colors
+
 ## 1.0.7
 
 - removed ``Version Check`` from Config Menu

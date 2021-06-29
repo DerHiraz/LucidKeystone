@@ -15,14 +15,14 @@ The statistics show you exactly which keys you can improve or how well you have 
 
 ## Features
 ### Different options to personalize the timer
-- 13 different Backdrops
+- 14 different Backdrops
 - Sparkle effects on Timerbar
 - Timer for all Upgrades
 - different displays for Bosses
 - Change fonts
 - Scale the Timer
+- Dynamic Blizzard Score Colors
 - Get more information than the default Timer
-- Raider.IO support with colors
 - Mythic Dungeon Tools support with Current Pull Trash Count
 ### Get your Statistics
 - Saves every completed run
@@ -33,6 +33,7 @@ The statistics show you exactly which keys you can improve or how well you have 
 - Auto Rolecheck
 - DND Message while doing Mythic Plus
 - Party Keystone Manager
+- Advanced Deathlog with Mouseover
  
 ## Slash Commands
 ### Main Commands
