@@ -1,5 +1,9 @@
 local _, Addon = ...
 
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--  Default Preperation
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 local dungeonListInt = {
     [244] = 0,
     [245] = 0,
@@ -172,6 +176,10 @@ local statDB = {
     pride = 0,
 }
 
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--  Actual Defaults
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 Addon.GlobalDefaults = {
     --global defaults
     statistic = statDB,
@@ -185,24 +193,35 @@ Addon.ProfileDefaults = {
                         g = 0.7,
                         b = 0.5,
                         a = 0.8,
+                        hex = "00b380",
                     },
     customKeyColor  = {
                         r = 1,
                         g = 1,
                         b = 1,
                         a = 1,
+                        hex = "ffffff",
                     },
     timerBarColor   = {
                         r = 0,
                         g = 0.7,
                         b = 1,
                         a = 1,
+                        hex = "00b3ff",
                     },
     mobBarColor     = {
                         r = 0.5,
                         g = 1,
                         b = 0,
                         a = 1,
+                        hex = "80ff00",
+                    },
+    tormentedColor  = {
+                        r = 0.3,
+                        g = 1,
+                        b = 0.5,
+                        a = 1,
+                        hex = "57ff79",
                     },
     timeStamp       = true,
     keyColor        = true,
@@ -215,6 +234,7 @@ Addon.ProfileDefaults = {
     unlock          = false,
     pridefulAlertT  = true,
     postCom         = false,
+    postComCov      = true,
     autoPost        = false,
     autoRole        = false,
     start           = false,
@@ -228,9 +248,10 @@ Addon.ProfileDefaults = {
     SendMSGBosses   = true,
     SendMSGDeaths   = true,
     devtools        = false,
-    Changed         = true,
+    Changed         = false,
     Minimap         = true,
     ShareTotal      = true,
+    tormentedInd    = true,
     background      = 2,
     sparkle         = 3,
     bosses          = 3,
@@ -244,6 +265,7 @@ Addon.ProfileDefaults = {
     SendMSGDelay    = 5,
     DateFormat      = 1,
     DateFormatSep   = 1,
+    tormentedStyle  = 1,
     fpoint          = "TOPRIGHT",
     TimerBarStyle   = "Lucid Keystone Particles",
     MobBarStyle     = "Lucid Keystone Particles",

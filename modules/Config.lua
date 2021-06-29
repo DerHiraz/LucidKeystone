@@ -44,10 +44,15 @@ local backdroplist = {
     [5] = L["Marble"],
     [6] = L["Color It"],
     [7] = L["Dark Glass"],
+    --[8] = L[""],
+    --[9] = L[""],
     [10] = L["Paradox"],
+    -- Season Backgrounds
     [20] = Addon.fontColor.green:format("-- "..L["Season"].." --"),
     [21] = L["Awakened"],
     [22] = L["Prideful"],
+    [23] = L["Tormented"],
+    -- Covenant Backgrounds
     [30] = Addon.fontColor.blue:format("-- "..L["Covenants"].." --"),
     [31] = CreateAtlasMarkup("sanctumupgrades-kyrian-32x32").." "..L["Kyrian"],
     [32] = CreateAtlasMarkup("sanctumupgrades-necrolord-32x32").." "..L["Necrolord"],
@@ -184,7 +189,7 @@ end
 -- Check Char Changes
 local function CheckCharChanges()
     local name = GetUnitName("PLAYER").." - "..GetRealmName()
-    if not db.profile.Changed then
+    if not db.profile.Changed and GetMaxLevelForExpansionLevel(GetExpansionLevel()) == UnitLevel("player") then
         local ProfileNames = {}
         local one, two, three = GetStatistic(1197), GetStatistic(60), GetStatistic(98)
         local _, class = UnitClass("player")
@@ -193,6 +198,7 @@ local function CheckCharChanges()
         local id = loc..one.."-"..class1..two.."-"..class2..three
         for k,_ in pairs(LucidKeystoneDB.profiles) do
             if k ~= name then
+                
                 table.insert(ProfileNames, k)
             end
         end
@@ -225,30 +231,6 @@ local function eventHandler(self, e, ...)
         end
     end
 end
-
--- Get Base Score by Raider.IO
---[[local function GetBaseScore(level)
-    local score
-    if level <= 10 then
-        score = level * 10
-    else
-        score = 1.1^(level-10)*100
-    end
-    return score
-end
-
--- Get Score Color by Raider.IO
-local function GetScoreColor(score)
-    local ScoreColor
-    if (IsAddOnLoaded("RaiderIO")) and db.profile.keyColor then
-        local zone = C_ChallengeMode.GetMapTable()
-        local rR, rG, rB = RaiderIO.GetScoreColor(score*#zone)
-        ScoreColor = string.format("|cff%.2X%.2X%.2X", rR*255, rG*255, rB*255)
-    else
-        ScoreColor = string.format("|cff%.2X%.2X%.2X", db.profile.customKeyColor.r*255, db.profile.customKeyColor.g*255, db.profile.customKeyColor.b*255)
-    end
-    return ScoreColor
-end]]
 
 -- Timeformats
 --[[local function TimeFormat(time,dayInd)
@@ -306,6 +288,8 @@ local function ToggleAutoRole()
     end
 end
 
+
+------== Do OnInit changes!
 local function OnInitProfiles()
     LucidKeystoneConfigFrame = CreateFrame("Frame", "LucidKeystoneConfigFrame", UIParent)
     db.profile.ProfileSet = 1
@@ -318,11 +302,9 @@ local function OnInitProfiles()
     config:SetScript("OnEvent", eventHandler)
     config:RegisterEvent("PLAYER_ENTERING_WORLD")
     config:RegisterEvent("ADDON_LOADED")
-    if db.profile.background == 8 then
-        db.profile.background = 21
-    elseif db.profile.background == 9 then
-        db.profile.background = 22
-    end
+    
+    db.profile.DoubleCheck = nil
+    db.profile.DoubleCheckCount = nil
 end
 
 local function CheckForTimings()
@@ -693,12 +675,12 @@ for i = 1, 5 do
                 order = 20,
                 fontSize = "large",
                 type = "description",
-                desc = "test",
+                desc = "",
                 name = function()
                     if select(1,Addon.KeyCommInfo(i)) == 0 then
                         return ""
                     else
-                        return Addon.GetScoreColor(Addon.GetBaseScore(select(1,Addon.KeyCommInfo(i))))..select(1,Addon.KeyCommInfo(i))
+                        return Addon.GetScoreColor(select(1,Addon.KeyCommInfo(i))*100,true)..select(1,Addon.KeyCommInfo(i))
                     end
                 end,
                 width = 0.3,
@@ -1112,6 +1094,7 @@ local function AddConfig()
                                     [8] = L["Digital"],
                                     [9] = L["Awakened"],
                                     [10] = L["Prideful"],
+                                    [11] = L["Tormented"]
                                 },
                             },
                         },
@@ -1304,6 +1287,9 @@ local function AddConfig()
                                     Module:BossesText()
                                 end,
                                 get = function() return Module:GetOption("bestBefore") end,
+                                disabled = function()
+                                    return Module:GetOption("bosses") ~= 3
+                                end,
                                 width = 1.2,
                                 order = 40,
                                 values = {
@@ -1454,8 +1440,12 @@ local function AddConfig()
                                     Module:SetOption("pridefulAlertT", val)
                                 end,
                                 get = function() return Module:GetOption("pridefulAlertT") end,
-                                disabled = function()
-                                    return not  IsAddOnLoaded("MythicDungeonTools")
+                                hidden = function()
+                                    local disableSound = false
+                                    if not IsAddOnLoaded("MythicDungeonTools") then disableSound = true end
+                                    if C_MythicPlus.GetCurrentAffixes()[4].id ~= 121 then disableSound = true end
+
+                                    return disableSound
                                 end,
                                 width = 1,
                                 order = 110,
@@ -1465,6 +1455,13 @@ local function AddConfig()
                                 name = " ",
                                 type = "description",
                                 width = 2,
+                                hidden = function()
+                                    local disableSound = false
+                                    if not IsAddOnLoaded("MythicDungeonTools") then disableSound = true end
+                                    if C_MythicPlus.GetCurrentAffixes()[4].id ~= 121 then disableSound = true end
+
+                                    return disableSound
+                                end,
                             },
                             pridefulAlertSound = {
                                 order = 130,
@@ -1478,8 +1475,86 @@ local function AddConfig()
                                     PlaySoundFile(AceGUIWidgetLSMlists.sound[db.profile.pridefulAlertSound], "Master")
                                 end,
                                 get = function() return Module:GetOption("pridefulAlertSound") end,
-                                disabled = function()
-                                    return not Module:GetOption("pridefulAlertT")
+                                hidden = function()
+                                    local disableSound = false
+                                    if not Module:GetOption("pridefulAlertT") then disableSound = true end
+                                    if C_MythicPlus.GetCurrentAffixes()[4].id ~= 121 then disableSound = true end
+                                    return disableSound
+                                end,
+                            },
+                            MobSpac5 = {
+                                order = 140,
+                                name = " ",
+                                type = "description",
+                                width = 2,
+                                hidden = function()
+                                    local disableSound = false
+                                    if not IsAddOnLoaded("MythicDungeonTools") then disableSound = true end
+                                    if C_MythicPlus.GetCurrentAffixes()[4].id ~= 121 then disableSound = true end
+
+                                    return disableSound
+                                end,
+                            },
+                            tormentedInd = {
+                                type = "toggle",
+                                name = L["Tormented Indicator"],
+                                desc = L["Get an indicator for killed tormented adds."],
+                                set = function(_, val)
+                                    Module:SetOption("tormentedInd", val)
+                                    Module:SeasonMobs()
+                                end,
+                                get = function() return Module:GetOption("tormentedInd") end,
+                                hidden = function()
+                                    local disableInd = false
+                                    if C_MythicPlus.GetCurrentAffixes()[4].id ~= 128 then disableInd = true end
+
+                                    return disableInd
+                                end,
+                                width = 1,
+                                order = 150,
+                            },
+                            tormentedColor = {
+                                type = "color",
+                                name = L["Tormented Color"],
+                                desc = "",
+                                hasAlpha = false,
+                                set = function(_, r, g, b, a)
+                                    Module:SetOption("tormentedColor", { ["r"] = r, ["g"] = g, ["b"] = b, ["a"] = a })
+                                    Module:SeasonMobs()
+                                end,
+                                get = function()
+                                    local color = Module:GetOption("tormentedColor")
+                                    return color["r"], color["g"], color["b"], color["a"]
+                                end,
+                                hidden = function()
+                                    local disableInd = false
+                                    if C_MythicPlus.GetCurrentAffixes()[4].id ~= 128 then disableInd = true end
+
+                                    return disableInd
+                                end,
+                                width = 0.8,
+                                order = 160,
+                            },
+                            tormentedStyle = {
+                                type = "select",
+                                name = L["Tormented Style"],
+                                desc = "",
+                                set = function(_, val)
+                                    Module:SetOption("tormentedStyle", val)
+                                    Module:SeasonMobs()
+                                end,
+                                get = function() return Module:GetOption("tormentedStyle") end,
+                                width = 0.7,
+                                order = 170,
+                                values = {
+                                    [1] = "|T"..Addon.TORCIRCLE..":16:16:0:0:32:32:0:32:0:32|t",
+                                    [2] = "|T"..Addon.TORSQUARE..":16:16:0:0:32:32:0:32:0:32|t",
+                                },
+                                hidden = function()
+                                    local disableInd = false
+                                    if C_MythicPlus.GetCurrentAffixes()[4].id ~= 128 then disableInd = true end
+
+                                    return disableInd
                                 end,
                             },
                         },
@@ -1499,14 +1574,11 @@ local function AddConfig()
                             },
                             keyColor = {
                                 type = "toggle",
-                                name = L["Raider.IO Keylevel color"],
-                                desc = L["Shows Raider.IO colors as Keylevel."],
+                                name = L["Dynamic Keylevel color"],
+                                desc = L["Shows dynamic colors as Keylevel. Disable to use custom Key Color."],
                                 set = function(_, val)
                                     Module:SetOption("keyColor", val)
                                     Module:KeyLevel()
-                                end,
-                                disabled = function()
-                                    return not IsAddOnLoaded("RaiderIO")
                                 end,
                                 get = function() return Module:GetOption("keyColor") end,
                                 width = 1,
@@ -1660,6 +1732,19 @@ local function AddConfig()
                                 get = function() return Module:GetOption("autoPost") end,
                                 width = 1.2,
                                 order = 70,
+                            },
+                            postComCov = {
+                                type = "toggle",
+                                name = L["Covenant Keypost"],
+                                desc = L["Adds your current covenant to your Keypost."],
+                                set = function(_, val)
+                                    Module:SetOption("postComCov", val)
+                                    MinimapUpdate()
+                                end,
+                                get = function() return Module:GetOption("postComCov") end,
+                                disabled = function() return db.profile.postCom == false end,
+                                width = 1.2,
+                                order = 80,
                             },
                             Minimap = {
                                 type = "toggle",
@@ -2495,11 +2580,6 @@ function SlashCmdList.LK(msg,editbox)
     elseif msg == "test" and db.profile.devtools then
         -- Do things
         print(L["Nothing to see here"])
-    elseif msg == "deaths" and db.profile.devtools then
-        -- Get Deaths Overall
-        print("Death Counter in M+")
-        print("Profile: "..db.profile.statistic.deaths) 
-        print("----------------------")
     elseif msg == "devtools" then
         -- Activate Devtools
         if db.profile.devtools then
@@ -2514,15 +2594,6 @@ function SlashCmdList.LK(msg,editbox)
         print("Deaths: "..db.profile.statistic.deaths)
         print("Height fallen due to Volcanic: ".. db.profile.statistic.volcanic*2 .." yard")
         print("-------------")
-    --[[elseif msg == "sendraid" and db.profile.devtools then
-        -- Test function - who uses the addon in raid
-        if db.profile.SendRaidTest then
-            db.profile.SendRaidTest = false
-            print("Addon msg Raid disabled")
-        else
-            db.profile.SendRaidTest = true
-            print("Addon msg Raid enabled")
-        end]]
     else
         -- Get Error Msg
         SendSystemMessage(L["Invalid Command. Type \"/lk help\" to see all Lucid Keystone Commands."])

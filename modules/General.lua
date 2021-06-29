@@ -13,7 +13,6 @@ local db
 --  General Tables
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-local SpamProtection = {}
 local ChestLoot = false
 
 local msgTable = {
@@ -26,29 +25,17 @@ local msgTable = {
     L["Leeeeeeeeeeeeeeeroy!"].."|r",
     L["Millions of years of evolution vs. your fist... lets go!"].."|r",
     L["Keep calm and blame it on the lag."].."|r",
-    L["If the key doesn't scare you, then it's too low."],
-    L["Don't stop until you're Proud."],
-    L["Keep in mind, you only fail when you wipe."],
-    L["Don't forget to stay hydrated."],
-    L["Play. Kill. Deplete. Repeat."],
+    L["If the key doesn't scare you, then it's too low."].."|r",
+    L["Don't stop until you're Proud."].."|r",
+    L["Keep in mind, you only fail when you wipe."].."|r",
+    L["Don't forget to stay hydrated."].."|r",
+    L["Play. Kill. Deplete. Repeat."].."|r",
+    L["Keys always offers you a second chance, it's called deplete."].."|r",
+    L["When you get tilted, stop being tilted and be awesome instead."].."|r",
+    L["Expect depleting a key and you will never be dissapointed."].."|r",
+    L["Sometimes a key is just a key."].."|r",
 }
 
-local loot = {
-    [2] = 187,
-    [3] = 190,
-    [4] = 194,
-    [5] = 194,
-    [6] = 197,
-    [7] = 200,
-    [8] = 200,
-    [9] = 200,
-    [10] = 203,
-    [11] = 203,
-    [12] = 207,
-    [13] = 207,
-    [14] = 207,
-    [15] = 210,
-}
 local ChatThrottle = {
     whisper = {},
     bnet    = {},
@@ -84,18 +71,25 @@ end
 -- Start Message for the Run
 local function GetStartMsg()
     if db.profile.history then
-        PlaySound(111365,"Master")
-        SELECTED_CHAT_FRAME:AddMessage("|cffff80ff[|cff4859A8Lucid Keystone|cffff80ff]: "..msgTable[math.random(1, #msgTable)])
+        local ultraRare = math.random(1,100000)
+        local rare = math.random(1,1000)
+        if ultraRare == 4597 then
+            PlaySound(167515,"Master")
+            SELECTED_CHAT_FRAME:AddMessage("|cffff80ff[|cff4859A8Lucid Keystone|cffff80ff]: |cffe22b2aBely, i love you!")
+        else
+            if rare == 777 then
+                PlaySound(15034,"Master")
+                SELECTED_CHAT_FRAME:AddMessage("|cffff80ff[|cff4859A8Lucid Keystone|cffff80ff]: |cffe2b007"..L["It must be your lucky day!"])
+            else
+                PlaySound(111365,"Master")
+                SELECTED_CHAT_FRAME:AddMessage("|cffff80ff[|cff4859A8Lucid Keystone|cffff80ff]: "..msgTable[math.random(1, #msgTable)])
+            end
+        end
     end
 end
 
 local function GetBusyMsg()
-    local level = ""
-    local dname = ""
-    local time = ""
-    local bosses = ""
-    local forces = ""
-    local deaths = ""
+    local level, dname, time, bosses, forces, deaths = "", "", "", "", "", ""
 
     local simple = {}
     for i = 1, 10 do
@@ -137,25 +131,24 @@ end
 
 -- Keypost Function
 ---- Find Keystone in Bags
-local keyID = {
-    [138019] = true, -- Legion
-    [158923] = true, -- BfA
-    [180653] = true, -- Shadowlands
-    [151086] = true, -- Tournament
-}
-
 local keystone = nil
-local function KeyPost(force,guild)
+local function KeyPost(force,guild,covenant)
+    local cov = ""
+    local name = ""
         for bag = 0, NUM_BAG_SLOTS do
             local numSlots = GetContainerNumSlots(bag)
             for slot = 1, numSlots do
                 local link, _, _, itemID = select(7, GetContainerItemInfo(bag, slot))
-                if keyID[itemID] then
+                if Addon.keyID[itemID] then
                     if force or (keystone and keystone ~= link) then
+                        if C_Covenants.GetCovenantData(C_Covenants.GetActiveCovenantID()) and covenant then
+                            cov = C_Covenants.GetCovenantData(C_Covenants.GetActiveCovenantID())
+                            name = " ("..cov.name..")"
+                        end
                         if guild then
-                            SendChatMessage(link, "GUILD")
+                            SendChatMessage(link..name, "GUILD")
                         else
-                            SendChatMessage(link, "PARTY")
+                            SendChatMessage(link..name, "PARTY")
                         end  
                     end
                     keystone = link
@@ -174,7 +167,7 @@ local function SkipString(num)
     return new
 end
 
---[[StaticPopupDialogs["EXAMPLE_HELLOWORLD"] = {
+--[[StaticPopupDialogs["Popup_Test"] = {
     text = "Lets gooooooooooo Lucid Keystone",
     button1 = "Yes",
     --button2 = "No",
@@ -186,38 +179,25 @@ end
     hideOnEscape = true,
 }]]
 
---[[local function OnTooltipSetItem(tooltip, ...)
-    name, link = GameTooltip:GetItem()
-    if (link == nil) then return end
-    local itemString = string.match(link, "item[%-?%d:]+")
-    local id = tonumber(string.match(link, "^.-:(%d+):"))
-
-    if id and id == 180653 then
-        if not lineAdded then
-            --tooltip:AddLine(" ") --blank line
-            --tooltip:AddLine("blablabla")
-            lineAdded = true
-        end
+local function SetBadge(self, event, msg, author, ...)
+    local icon = ""
+    if Addon.Supporter[author] then
+        icon = Addon.BadgeInfo(16,Addon.Supporter[author])
     end
+    return false, icon..msg, author, ...
 end
 
-local function OnTooltipCleared(tooltip, ...) lineAdded = false end
-
-local function SetHyperlink_Hook(self, hyperlink, text, button)
-
-    local itemString = string.match(hyperlink, "item[%-?%d:]+")
-    local id = tonumber(string.match(link, "^.-:(%d+):"))
-
-    if id and id == 180653 then
-        --ItemRefTooltip:AddLine(" ") --blank line
-        --ItemRefTooltip:AddLine("MyNoteTest")
-        ItemRefTooltip:Show()
-    end
-
-end
---GameTooltip:HookScript("OnTooltipSetItem", OnTooltipSetItem)
---GameTooltip:HookScript("OnTooltipCleared", OnTooltipCleared)
---hooksecurefunc("ChatFrame_OnHyperlinkShow", SetHyperlink_Hook)]]
+ChatFrame_AddMessageEventFilter("CHAT_MSG_SAY", SetBadge)
+ChatFrame_AddMessageEventFilter("CHAT_MSG_DND", SetBadge)
+ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD", SetBadge)
+ChatFrame_AddMessageEventFilter("CHAT_MSG_PARTY", SetBadge)
+ChatFrame_AddMessageEventFilter("CHAT_MSG_PARTY_LEADER", SetBadge)
+ChatFrame_AddMessageEventFilter("CHAT_MSG_RAID", SetBadge)
+ChatFrame_AddMessageEventFilter("CHAT_MSG_RAID_LEADER", SetBadge)
+ChatFrame_AddMessageEventFilter("CHAT_MSG_RAID_WARNING", SetBadge)
+ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", SetBadge)
+ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", SetBadge)
+ChatFrame_AddMessageEventFilter("CHAT_MSG_YELL", SetBadge)
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --  Event Section
@@ -245,7 +225,7 @@ local function eventHandler(self, e, ...)
             local time = GetTime()
             if not ChatThrottle.keypostParty or time-ChatThrottle.keypostParty > 30 then
                 ChatThrottle.keypostParty = time
-                KeyPost(true)
+                KeyPost(true, false, db.profile.postComCov)
             end
         end
     end
@@ -255,7 +235,7 @@ local function eventHandler(self, e, ...)
         end
     end
     if e == "LOOT_OPENED" and ChestLoot then
-        KeyPost(true)
+        KeyPost(true, false, db.profile.postComCov)
         ChestLoot = false
     end
     if e == "CHAT_MSG_GUILD" then
@@ -263,7 +243,7 @@ local function eventHandler(self, e, ...)
             local time = GetTime()
             if not ChatThrottle.keypostGuild or time-ChatThrottle.keypostGuild > 30 then
                 ChatThrottle.keypostGuild = time
-                KeyPost(true, true)
+                KeyPost(true, true, db.profile.postComCov)
             end
         end
     end
@@ -284,7 +264,7 @@ local function eventHandler(self, e, ...)
         local bnSenderID = select(13,...)
         local time = GetTime()
         local msg = GetBusyMsg()
-        if not ChatThrottle.bnet[bnSenderID] or time-ChatThrottle.bnet[bnSenderID] >= 20 then
+        if not ChatThrottle.bnet[bnSenderID] or time-ChatThrottle.bnet[bnSenderID] >= db.profile.SendMSGDelay*60 then
             ChatThrottle.bnet[bnSenderID] = time
             BNSendWhisper(bnSenderID, msg)
         end
@@ -331,10 +311,6 @@ local function eventHandler(self, e, ...)
                 total = totalKeys,
                 totalShare = tonumber(string.match(msg, "Total:"..SkipString(8).."(%d+):"))
             }
-            --[[if not ChatThrottle.Update or time-ChatThrottle.Update >= 0.3 then
-                ChatThrottle.Update = time
-                Module.Config:UpdateConfig(true)
-            end]]
         end
         if prefix == AddonName and db.profile.SendRaidTest and IsInRaid() then
             SELECTED_CHAT_FRAME:AddMessage("|cff009dd5["..sender.."]|r uses Lucid Keystone")
@@ -400,12 +376,6 @@ local function eventHandler(self, e, ...)
             db.profile.KeyComm = {}
             db.profile.msgCount = 0
         end
-    --elseif e == "GROUP_LEFT" then
-        --Module.Config:UpdateConfig(true)
-    end
-    if e == "PLAYER_STARTED_MOVING" then
-        -- do stuff
-        print(Addon.GetScoreColor(100)..100)
     end
 end
 
@@ -431,7 +401,6 @@ local function ToggleGeneralFrame()
     general:RegisterEvent("LOOT_OPENED")
     general:RegisterEvent("GROUP_ROSTER_UPDATE")
     general:RegisterEvent("PARTY_LEADER_CHANGED")
-    --general:RegisterEvent("GROUP_LEFT")
     --general:RegisterEvent("PLAYER_STARTED_MOVING")
 end
 

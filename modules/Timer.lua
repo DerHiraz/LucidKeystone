@@ -19,6 +19,7 @@ local previewSettings = {
     deaths      = 7,
     mobPerc     = 89.72,
     mobCurPerc  = 2.64,
+    tormCount   = 3,
     bosses      = {
                 "|cff777777"..L["Johnny Awesome defeated"].."   1/1   |cff4cff00|r", 
                 "|cff777777"..L["Innocent Cat defeated"].."   1/1   |cff4cff00|r", 
@@ -43,9 +44,16 @@ local previewSettings = {
                 "|r|r"..L["Pink fluffy Unicorn defeated"].."   0/1", 
                 "|r"..L["Hello Kitty defeated"].."   0/1",
                 },
+    deathlog    = {
+                [CreateAtlasMarkup("UI-Frame-HealerIcon").." |cff006fdc"..L["Thrall"].."|r"] = 2,
+                [CreateAtlasMarkup("UI-Frame-DpsIcon").." |cffa9d271"..L["Sylvanas"].."|r"] = 1,
+                [CreateAtlasMarkup("UI-Frame-TankIcon").." |cffc59a6c"..L["Garrosh"].."|r"] = 1,
+                [CreateAtlasMarkup("UI-Frame-DpsIcon").." |cffc31d39"..L["Arthas"].."|r"] = 2,
+                [CreateAtlasMarkup("UI-Frame-DpsIcon").." |cff3ec6ea"..L["Jaina"].."|r"] = 1,
+                },
     dungeonName = Addon.MapID,
     affixIcon   = {
-                [1]   = {icon = 463570},  --Overflowing
+                [1]   = {icon = 463570,},  --Overflowing
                 [2]   = {icon = 135994},  --Skittish
                 [3]   = {icon = 451169},  --Volcanic
                 [4]   = {icon = 1029009}, --Necrotic
@@ -68,6 +76,7 @@ local previewSettings = {
                 [122] = {icon = 135946},  --Inspiring
                 [123] = {icon = 135945},  --Spiteful
                 [124] = {icon = 136018},  --Storming
+                [128] = {icon = 3528304}, --Tormented
                 },
     AffixNil    = {
                 [1]={
@@ -94,6 +103,7 @@ local previewSettings = {
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 local imgfile = {
+    --Normal
     [1] = "lk_bg_None",
     [2] = "lk_bg_Blizzard",
     [3] = "lk_bg_Horde",
@@ -101,9 +111,12 @@ local imgfile = {
     [5] = "lk_bg_Marble",
     [6] = "lk_bg_Color",
     [7] = "lk_bg_DarkGlass",
+    [10] = "lk_bg_Paradox",
+    --Affix
     [21] = "lk_bg_Awakened",
     [22] = "lk_bg_Prideful",
-    [10] = "lk_bg_Paradox",
+    [23] = "lk_bg_Tormented",
+    --Covenants
     [31] = "lk_bg_Kyrian",
     [32] = "lk_bg_Necrolord",
     [33] = "lk_bg_NightFae",
@@ -134,7 +147,19 @@ end
 -- Deaths in active Run
 local function GetDeaths()
     local deaths = C_ChallengeMode.GetDeathCount()
-    return deaths or 0
+    local names = {}
+    local num = {}
+
+    if not db.profile.holdStart then
+        Addon.DeathLog = previewSettings.deathlog
+    end
+    for k,v in Addon.spairs(Addon.DeathLog, function(t,a,b) return t[b] < t[a] end) do
+        if k then
+            table.insert(names, k)
+            table.insert(num, v)
+        end
+    end
+    return deaths or 0, names, num
 end
 
 -- Mob Count for active Run
@@ -215,6 +240,12 @@ local function UpdateBosses()
     end
 end
 
+-- Update Season Adds
+
+function Addon.UpdateSeasonAdds()
+    Module.Config:SeasonMobs()
+end
+
 -- Update mobs in Mobcount
 local function UpdateMobs()
     local current, total = GetMobCount()
@@ -224,21 +255,22 @@ local function UpdateMobs()
     local colorBefore, colorInd, colorRed = "FFffffff", "ff4cff00", "ffe22b2a"
     local strBefore = string.format("|c%s%.2f%%|r", colorBefore, before)
 
-    if (before < 20 and db.profile.PullCheck+before >= 20) or
+    -- Turn Color to red for prideful
+    if ((before < 20 and db.profile.PullCheck+before >= 20) or
     (before < 40 and db.profile.PullCheck+before >= 40) or
     (before < 60 and db.profile.PullCheck+before >= 60) or
     (before < 80 and db.profile.PullCheck+before >= 80) or
-    (before < 100 and db.profile.PullCheck+before >= 100) then
+    (before < 100 and db.profile.PullCheck+before >= 100)) and affix[4] == 121 then
         cur = string.format("\n|c%s+%.2f%%|r", colorRed, db.profile.currentPullCount)
         cur2 = string.format("\n|c%s%.2f%%|r", colorRed, db.profile.currentPullCount+before)
-        db.profile.DoubleCheck = true
-        if not db.profile.sound and db.profile.pridefulAlertT and IsAddOnLoaded("MythicDungeonTools") and affix[4] == 121 and db.profile.DoubleCheck and db.profile.DoubleCheckCount >= 2 then
+        Addon.DoubleCheck = true
+        if not db.profile.sound and db.profile.pridefulAlertT and IsAddOnLoaded("MythicDungeonTools") --[[and affix[4] == 121]] and Addon.DoubleCheck and Addon.DoubleCheckCount >= 2 then
             if not timeThrottle or time-timeThrottle > 90 then
                 timeThrottle = time
                 db.profile.sound = true
                 PlaySoundFile(AceGUIWidgetLSMlists.sound[db.profile.pridefulAlertSound], "Master")
-                db.profile.DoubleCheck = false
-                db.profile.DoubleCheckCount = 0
+                Addon.DoubleCheck = false
+                Addon.DoubleCheckCount = 0
             end
         end
 
@@ -291,14 +323,15 @@ local function bootlegRepeatingTimer()
     if db.profile.start then
         local time = GetElapsedTime()
         local _,_,maxTime = C_ChallengeMode.GetMapUIInfo(db.profile.GetActiveChallengeMapID)
-        if db.profile.DoubleCheck == true then
-            db.profile.DoubleCheckCount = db.profile.DoubleCheckCount + 1
+        if Addon.DoubleCheck == true then
+            Addon.DoubleCheckCount = Addon.DoubleCheckCount + 1
             UpdateMobs()
-            if db.profile.DoubleCheckCount >= 3 then
-                db.profile.DoubleCheck = false
+            if Addon.DoubleCheckCount >= 3 then
+                Addon.DoubleCheck = false
             end
         end
         db.profile.GetCurrentTime = Addon.TimeFormat(time).."/"..Addon.TimeFormat(maxTime)
+        --Addon.UpdateSeasonAdds()
 
         if not maxTime then
             return
@@ -357,7 +390,7 @@ local function bootlegRepeatingTimer()
             elseif db.profile.mainTimer == 2 then
                 bar:SetValue(maxTime-timeSmall)
             end
-            f.textLevel:SetText(Addon.GetScoreColor(Addon.GetBaseScore(level))..level)
+            f.textLevel:SetText(Addon.GetScoreColor(level*100)..level.."|r")
             f.textTimer:SetText(Addon.TimeFormat(time))
             f.textTimerSmall:SetText(Addon.TimeFormat(timeSmall))
             f.textDeaths:SetText(grave.." "..GetDeaths().."\n-"..Addon.TimeFormat(GetDeaths()*5))
@@ -450,11 +483,14 @@ local function eventHandler(self, e, ...)
     end
     if (e == "SCENARIO_CRITERIA_UPDATE" or e == "CHALLENGE_MODE_START") and db.profile.start then
         UpdateMobs()
+        --Addon.UpdateSeasonAdds()
         UpdateBosses()
     end
     if e == "ZONE_CHANGED_NEW_AREA" then
         if db.profile.start then
             db.profile.start = false
+            db.profile.holdStart = nil
+            Addon.DeathLog = {}
             ObjectiveTrackerFrame:Show()
             LucidKeystoneFrame:Hide()
         end
@@ -465,6 +501,7 @@ local function eventHandler(self, e, ...)
             LucidKeystoneFrame:Show()
             bootlegRepeatingTimer()
             UpdateMobs()
+            --Addon.UpdateSeasonAdds()
             UpdateDungeonName()
             UpdateBosses()
         end
@@ -474,6 +511,8 @@ local function eventHandler(self, e, ...)
                 ObjectiveTrackerFrame:Show()
             end
             LucidKeystoneFrame:Hide()
+            db.profile.holdStart = nil
+            Addon.DeathLog = {}
         end
     end
     if e == "CHALLENGE_MODE_COMPLETED" then
@@ -485,7 +524,7 @@ local function eventHandler(self, e, ...)
         bar:SetMinMaxValues(0,maxTime)
         bar:SetValue(maxTime-time)
         f.textMobs:SetText("100.00%")
-        f.textLevel:SetText(Addon.GetScoreColor(Addon.GetBaseScore(level))..level) 
+        f.textLevel:SetText(Addon.GetScoreColor(level*100)..level.."|r")
         f.textTimer:SetText(Addon.TimeFormat(time))
         f.textTimerSmall:SetText(Addon.TimeFormat(maxTime-time))
         f.textTimerOne:SetText("+1\n"..Addon.TimeFormat(maxTime))
@@ -496,7 +535,7 @@ local function eventHandler(self, e, ...)
     if e == "COMBAT_LOG_EVENT_UNFILTERED" and db.profile.start and db.profile.MobPullConf ~= 1 and IsAddOnLoaded("MythicDungeonTools") then
         db.profile.currentPull = 0.0
         db.profile.PullCheck = 0.0
-    
+        
         for i = 1, 40 do
             local unit = "nameplate"..i
             if UnitExists(unit) and UnitAffectingCombat(unit) then
@@ -532,8 +571,8 @@ local function eventHandler(self, e, ...)
         UpdateMobs()
     end
     if e == "PLAYER_REGEN_ENABLED" and db.profile.start and db.profile.MobPullConf then
-            db.profile.currentPull = 0.0
-            db.profile.PullCheck = 0.0
+        db.profile.currentPull = 0.0
+        db.profile.PullCheck = 0.0
     end
 
     --Test Event
@@ -641,6 +680,11 @@ local function ToggleLucidKeystoneFrame()
     bg.textAffix = bg:CreateFontString()
     bg.textAffix:SetTextColor(1, 1, 1, 1)
     bg.textAffix:SetJustifyH("CENTER")
+    bg.SeasonAdds = bg:CreateFontString()
+    bg.SeasonAdds:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 12, "OUTLINE")
+    bg.SeasonAdds:SetTextColor(0.3, 0.3, 0.3, 1)
+    --bg.SeasonAdds:SetTextColor(1, 1, 1, 1)
+    bg.SeasonAdds:SetPoint("CENTER",-117,-13)
 
     bg.textTimerOne = bg:CreateFontString()
     bg.textTimerOne:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 14, "OUTLINE")
@@ -654,6 +698,23 @@ local function ToggleLucidKeystoneFrame()
     bg.textTimerThree:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 14, "OUTLINE")
     bg.textTimerThree:SetTextColor(1, 1, 1, 1)
     bg.textTimerThree:SetPoint("CENTER",48,-5)
+
+    LucidKeystoneFrameDeaths = CreateFrame("Frame", "LucidKeystoneFrameDeaths", LucidKeystoneFrame)
+    local dFrame = LucidKeystoneFrameDeaths
+    dFrame:SetPoint("CENTER",111,30)
+    dFrame:SetWidth(55)
+    dFrame:SetHeight(30)
+    dFrame:SetMovable(false)
+    dFrame:EnableMouse(true)
+    dFrame:SetScript("OnEnter", function() 
+        GameTooltip:SetOwner(dFrame, "ANCHOR_TOPLEFT",55,-40)
+        GameTooltip:AddLine(L["Detailed deaths"].."\n ")
+        GameTooltip:AddDoubleLine(table.concat(select(2,GetDeaths()),"\n"),table.concat(select(3,GetDeaths()),"\n"),1,1,1,1,1,1)
+        GameTooltip:Show()
+    end)
+    dFrame:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
 
     maxTime = select(3, C_ChallengeMode.GetMapUIInfo(previewSettings.ZoneID))
 
@@ -737,7 +798,32 @@ function Module.Config:KeyLevel()
     local level = previewSettings.level
     local f = LucidKeystoneFrame
     if db.profile.start == false then
-        f.textLevel:SetText(Addon.GetScoreColor(Addon.GetBaseScore(level))..level)
+        f.textLevel:SetText(Addon.GetScoreColor(level*100)..level.."|r")
+    end
+end
+
+function Module.Config:SeasonMobs()
+    if db.profile.tormentedInd and C_MythicPlus.GetCurrentAffixes()[4].id == 128 then
+        local count = previewSettings.tormCount
+        if db.profile.start then count = Addon.TormentedKilled end
+        local new = ""
+        for i = 1, 4 do
+            if count >= i then
+                new = new..Addon.GetIcon(8,db.profile.tormentedStyle,true)
+            else
+                new = new..Addon.GetIcon(8,db.profile.tormentedStyle)
+            end
+        end
+        
+        local f = LucidKeystoneFrame
+        if db.profile.start == false or (db.profile.start and C_ChallengeMode.GetActiveKeystoneInfo() >= 10) then
+            f.SeasonAdds:SetText(new)
+        else
+            f.SeasonAdds:SetText("")
+        end
+    else
+        local f = LucidKeystoneFrame
+        f.SeasonAdds:SetText("")
     end
 end
 
@@ -844,17 +930,18 @@ function Module.Config:BossesText()
     local f = LucidKeystoneFrame
     local offset = 0
     local xof = 1
-    local yof = -85
+    local yof = -195
 
     if db.profile.mobCount == 1 then
         offset = 15
     end
     if db.profile.affix == 2 or db.profile.affix == 3 then
-        offset = offset-15
+        offset = offset-10
     end
 
     if db.profile.bosses == 2 then
-        f.textBosses:SetPoint("CENTER",60,39)
+        --f.textBosses:SetPoint("CENTER",60,39)
+        f.textBosses:SetPoint("TOP",60,-83)
         if db.profile.start == false then
             f.textBosses:SetText("2/4")
         else
@@ -863,7 +950,8 @@ function Module.Config:BossesText()
     elseif db.profile.bosses == 3 and db.profile.timeStamp then
         xof = -4
         yof = yof+offset
-        f.textBosses:SetPoint("CENTER",xof,yof)
+        --f.textBosses:SetPoint("CENTER",xof,yof)
+        f.textBosses:SetPoint("TOP",xof,yof)
         if db.profile.start == false then
             if db.profile.bestBefore == 2 or db.profile.bestBefore == 4 then
                 f.textBosses:SetText(table.concat(previewSettings.bossesAbs, "|r\n"))
@@ -878,7 +966,8 @@ function Module.Config:BossesText()
     elseif db.profile.bosses == 3 and not db.profile.timeStamp then
         xof = -4
         yof = yof+offset
-        f.textBosses:SetPoint("CENTER",xof,yof)
+        --f.textBosses:SetPoint("CENTER",xof,yof)
+        f.textBosses:SetPoint("TOP",xof,yof)
         if db.profile.start == false then
             f.textBosses:SetText(table.concat(previewSettings.bosses, "|r\n"))
         else
@@ -893,14 +982,18 @@ end
 function Module.Config:AffixText()
     local f = LucidKeystoneFrame
     local offset = 0
-    local wAffix = {}
+    local wAffix = C_MythicPlus.GetCurrentAffixes()
     local affixTable = {}
 
-    if C_ChallengeMode.IsChallengeModeActive() then
+    if not wAffix then
+        wAffix = previewSettings.AffixNil
+    end
+
+    --[[if C_ChallengeMode.IsChallengeModeActive() then
 		wAffix = C_MythicPlus.GetCurrentAffixes()
 	elseif not C_ChallengeMode.IsChallengeModeActive() then
 		wAffix = previewSettings.AffixNil
-	end
+	end]]
 
     if db.profile.mobCount == 1 then
         offset = 15
@@ -1048,6 +1141,7 @@ function Module.Config:UpdateFonts()
     f.textTimerOne:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 14, "OUTLINE")
     f.textTimerTwo:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 14, "OUTLINE")
     f.textTimerThree:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 14, "OUTLINE")
+    f.SeasonAdds:SetFont(AceGUIWidgetLSMlists.font[db.profile.FontStyle], 12, "OUTLINE")
     Module.Config:AffixText()
 end
 
@@ -1063,7 +1157,8 @@ function Module.Config:BackgroundUpdate()
         -- 3 = Night Fae
         -- 4 = Necrolord
     if db.profile.background == 20 then
-        LucidKeystoneFrame.texture:SetTexture(Addon[imgfile[22]..db.profile.mobCount]) --Prideful
+        LucidKeystoneFrame.texture:SetTexture(Addon[imgfile[23]..db.profile.mobCount]) --Tormented
+        LucidKeystoneFrame.texture:SetVertexColor(1,1,1,1)
     elseif db.profile.background == 30 then
         local covenant = C_Covenants.GetActiveCovenantID()
         local num = 31
@@ -1075,6 +1170,7 @@ function Module.Config:BackgroundUpdate()
             num = 32
         end
         LucidKeystoneFrame.texture:SetTexture(Addon[imgfile[num]..db.profile.mobCount])
+        LucidKeystoneFrame.texture:SetVertexColor(1,1,1,1)
     else
         LucidKeystoneFrame.texture:SetTexture(Addon[imgfile[db.profile.background]..db.profile.mobCount])
         if Module.Config:GetOption("background") == 6 then
@@ -1102,6 +1198,7 @@ function Module.Config.ToggleFrames()
     Module.Config:UpdateBars()
     Module.Config:UpdateFonts()
     Module.Config:TimerText()
+    Module.Config:SeasonMobs()
 end
 
 -- Frame toggle for Preview
@@ -1127,6 +1224,7 @@ function Module.Timer:OnInitialize()
         LucidKeystoneFrame:Show()
         ObjectiveTrackerFrame:Hide()
         UpdateMobs()
+        Addon.UpdateSeasonAdds()
         UpdateBosses()
         GetMobCount()
         GetDeaths()

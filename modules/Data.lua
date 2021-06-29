@@ -8,21 +8,25 @@ Addon.fontColor = {
     red     = "|cffe22b2a%s|r",
     lucid   = "|cff71478E%s|r",
     grey    = "|cff787878%s|r",
+    black   = "|cff000000%s|r",
+    orange  = "|cffff7d0a%s|r", 
 }
 
 Addon.sparkleEffect = {
-    [1]  = {animation = 165433},
-    [2]  = {animation = 1097298},
-    [3]  = {animation = 1004197},
-    [4]  = {animation = 1522788},
-    [5]  = {animation = 1384104},
-    [6]  = {animation = 654238},
-    [7]  = {animation = 841273}, --240950
-    [8]  = {animation = 1322288},
-    [9]  = {animation = 978543},
-    [10] = {animation = 310425},
-    [11] = {animation = 1135053},
+    [1]  = {animation = 165433},    -- None
+    [2]  = {animation = 1097298},   -- Low Sparkle
+    [3]  = {animation = 1004197},   -- High Sparkle
+    [4]  = {animation = 1522788},   -- Thunder
+    [5]  = {animation = 1384104},   -- Fairy
+    [6]  = {animation = 654238},    -- Meteor
+    [7]  = {animation = 841273},    -- Fire
+    [8]  = {animation = 1322288},   -- Digital
+    [9]  = {animation = 978543},    -- Awakened
+    [10] = {animation = 310425},    -- Prideful
+    [11] = {animation = 165880},    -- Tormented
 }
+
+Addon.TormentedMobs = {179446, 179892, 179891, 179890}
 
 Addon.Delimiter = {
     [1] = ".",
@@ -53,57 +57,147 @@ Addon.MapID = {
     [380] = {ShortName = L["SD"]},
     [381] = {ShortName = L["SoA"]},
     [382] = {ShortName = L["ToP"]}, 
+    --[possible 383] = {ShortName = L["Upper"]},
+    --[possible 384] = {ShortName = L["Lower"]},
 }
 
-Addon.MDTdungeon = {
-    [1663] = 30, -- Halls of Atonement
-    [1664] = 30, -- Halls of Atonement
-    [1665] = 30, -- Halls of Atonement
-    [1666] = 35, -- The Necrotic Wake
-    [1667] = 35, -- The Necrotic Wake
-    [1668] = 35, -- The Necrotic Wake
-    [1669] = 31, -- Mists Of Tirna Scithe
-    [1674] = 32, -- Plaguefall
-    [1697] = 32, -- Plaguefall
-    [1675] = 33, -- Sanguine Depths
-    [1676] = 33, -- Sanguine Depths
-    [1677] = 29, -- De Other Side
-    [1678] = 29, -- De Other Side
-    [1679] = 29, -- De Other Side
-    [1680] = 29, -- De Other Side
-    [1683] = 36, -- Theater Of Pain
-    [1684] = 36, -- Theater Of Pain
-    [1685] = 36, -- Theater Of Pain
-    [1686] = 36, -- Theater Of Pain
-    [1687] = 36, -- Theater Of Pain
-    [1692] = 34, -- Spires Of Ascension
-    [1693] = 34, -- Spires Of Ascension
-    [1694] = 34, -- Spires Of Ascension
-    [1695] = 34, -- Spires Of Ascension
+Addon.keyID = {
+    [138019] = true, -- Legion
+    [158923] = true, -- BfA
+    [180653] = true, -- Shadowlands
+    [151086] = true, -- Tournament
 }
 
--- Get Base Score by Raider.IO
-function Addon.GetBaseScore(level)
-    local score
-    if level <= 10 then
-        score = level * 10
+Addon.ScoreColors = {
+    [0]    = {r = 0.68, g = 0.68, b = 0.68, hex = "afafaf"},
+    [100]  = {r = 1.00, g = 1.00, b = 1.00, hex = "ffffff"}, 
+    [200]  = {r = 0.90, g = 1.00, b = 0.88, hex = "e5ffe0"},
+    [300]  = {r = 0.81, g = 1.00, b = 0.78, hex = "ceffc7"}, 
+    [400]  = {r = 0.72, g = 1.00, b = 0.68, hex = "b8ffae"},  
+    [500]  = {r = 0.63, g = 1.00, b = 0.58, hex = "a0ff95"},  
+    [600]  = {r = 0.55, g = 1.00, b = 0.48, hex = "8bff7b"},  
+    [700]  = {r = 0.45, g = 1.00, b = 0.38, hex = "74ff61"}, 
+    [800]  = {r = 0.37, g = 1.00, b = 0.28, hex = "5eff48"},  
+    [900]  = {r = 0.28, g = 1.00, b = 0.18, hex = "47ff2e"}, 
+    [1000] = {r = 0.12, g = 1.00, b = 0.00, hex = "1eff00"}, 
+    [1100] = {r = 0.09, g = 0.88, b = 0.19, hex = "18e030"}, 
+    [1200] = {r = 0.07, g = 0.76, b = 0.36, hex = "11c35c"}, 
+    [1300] = {r = 0.05, g = 0.65, b = 0.54, hex = "0ca689"}, 
+    [1400] = {r = 0.02, g = 0.54, b = 0.71, hex = "058ab5"}, 
+    [1500] = {r = 0.00, g = 0.44, b = 0.87, hex = "0070dd"},
+    [1600] = {r = 0.22, g = 0.36, b = 0.89, hex = "395ce3"}, 
+    [1700] = {r = 0.44, g = 0.28, b = 0.91, hex = "7148e8"}, 
+    [1800] = {r = 0.64, g = 0.21, b = 0.93, hex = "a335ee"},
+    [1900] = {r = 0.74, g = 0.29, b = 0.66, hex = "bd4ba9"}, 
+    [2000] = {r = 0.84, g = 0.38, b = 0.40, hex = "d76066"}, 
+    [2100] = {r = 0.95, g = 0.45, b = 0.14, hex = "f17424"}, 
+    [2200] = {r = 1.00, g = 0.50, b = 0.00, hex = "ff8000"},
+}
+
+Addon.Loot = {
+    Mplus = {
+        [2]  = 226,
+        [3]  = 226,
+        [4]  = 226,
+        [5]  = 229,
+        [6]  = 229,
+        [7]  = 233,
+        [8]  = 236,
+        [9]  = 236,
+        [10] = 239,
+        [11] = 242,
+        [12] = 246,
+        [13] = 246,
+        [14] = 249,
+        [15] = 252,
+    },
+    Raid = {
+        [14] = 226, -- normal
+        [15] = 239, -- heroic
+        [16] = 252, -- mythic
+        [17] = 213, -- lfr
+    },
+    PvP = {
+        [0] = 220, -- unranked
+        [1] = 226, -- combatant
+        [2] = 233, -- challenger
+        [3] = 240, -- rival
+        [4] = 246, -- duelist
+    },
+}
+
+Addon.Supporter = {
+    --====Developer
+    ["Hiraz-Thrall"]            = "dev",
+    ["Hirazhunt-Thrall"]        = "dev",
+    ["Hiraz-Blackrock"]         = "dev",
+    ["Derhiraz-Blackrock"]      = "dev",
+    ["Derhiraz-Kazzak"]         = "dev",
+    ["Hiraz-Kazzak"]            = "dev",
+    --====Special
+    -- Panix
+    ["Panixdh-Thrall"]          = "special",
+    ["Panìx-Thrall"]            = "special",
+    ["Panixdk-Thrall"]          = "special",
+    -- Psei
+    ["Psei-Thrall"]             = "special",
+    ["Davada-Thrall"]           = "special",
+    ["Skyhorn-Thrall"]          = "special",
+    -- Deralja
+    ["Deralja-Thrall"]          = "special",
+    ["Lenahja-Thrall"]          = "special",
+    ["Sinahja-Thrall"]          = "special",
+    -- Sinchi
+    ["Drumms-Thrall"]           = "special",
+    ["Sinchi-Thrall"]           = "special",
+    ["Cazari-Thrall"]           = "special",
+    -- Mero
+    ["Merorida-Thrall"]         = "special",
+    ["Merotasty-Thrall"]        = "special",
+    ["Meromorphsis-Thrall"]     = "special",
+    -- Para
+    ["Pararog-Kazzak"]          = "special",
+    ["Purplerog-Kazzak"]        = "special",
+    ["Páradôx-Kazzak"]          = "special",
+    -- Raiby
+    ["Raibsen-Blackrock"]       = "special",
+    ["Yarnandil-Blackrock"]     = "special",
+    --====Translator
+    -- Neo
+    ["灵魂复苏-血色十字军"]       = "translator", -- CN and TW translation
+    ["Lhfs-Illidan"]            = "translator",
+}
+
+-- Get Score Color
+function Addon.GetScoreColor(score,force)
+    local scoreC = score
+    local wrap
+    if score >= 2200 then scoreC = 2200 end
+    if db.profile.keyColor or force then
+        local color = Addon.ScoreColors[scoreC-scoreC % 100]
+        wrap = string.format("|cff%.2X%.2X%.2X", color.r*255, color.g*255, color.b*255)
     else
-        score = 1.1^(level-10)*100
+        wrap = string.format("|cff%.2X%.2X%.2X", db.profile.customKeyColor.r*255, db.profile.customKeyColor.g*255, db.profile.customKeyColor.b*255)
     end
-    return score
+    return wrap
 end
 
--- Get Score Color by Raider.IO
-function Addon.GetScoreColor(score)
-    local ScoreColor
-    if (IsAddOnLoaded("RaiderIO")) and db.profile.keyColor then
-        local zone = C_ChallengeMode.GetMapTable()
-        local rR, rG, rB = RaiderIO.GetScoreColor(score*#zone)
-        ScoreColor = string.format("|cff%.2X%.2X%.2X", rR*255, rG*255, rB*255)
+-- Sort function for Arrays
+function Addon.spairs(t, order)
+    local keys = {}
+    for k in pairs(t) do keys[#keys+1] = k end
+    if order then
+        table.sort(keys, function(a,b) return order(t, a, b) end)
     else
-        ScoreColor = string.format("|cff%.2X%.2X%.2X", db.profile.customKeyColor.r*255, db.profile.customKeyColor.g*255, db.profile.customKeyColor.b*255)
+        table.sort(keys)
     end
-    return ScoreColor
+    local i = 0
+    return function()
+        i = i + 1
+        if keys[i] then
+            return keys[i], t[keys[i]]
+        end
+    end
 end
 
 -- Get Stars for Runs
@@ -135,6 +229,34 @@ function Addon.GetUtilInfo(column,row,IsInText,Size)
         local c = 0.25
         return {column*c-c,column*c,row*c-c,row*c}
     end
+end
+
+function Addon.BadgeInfo(Size,badge)
+    local icon = ""
+    local setting = ":"..Size..":"..Size..":0:0:0:64:64:0:1:0:1|t "
+    if badge == "dev" then
+        icon = "|T"..Addon.badge_dev..setting
+    elseif badge == "special" then
+        icon = "|T"..Addon.badge_special..setting
+    elseif badge == "translator" then
+        icon = "|T"..Addon.badge_translator..setting
+    end
+    return icon
+end
+
+function Addon.GetIcon(Size,num,kill)
+    local icon = ""
+    local c = "86:86:86"
+    if kill then 
+        c = db.profile.tormentedColor.r*255 .. ":" .. db.profile.tormentedColor.g*255 .. ":" .. db.profile.tormentedColor.b*255
+    end
+    local setting = ":"..Size..":"..Size..":0:0:32:32:0:32:0:32:"..c.."|t "
+    if num == 1 then
+        icon = "|T"..Addon.TORCIRCLE..setting
+    elseif num == 2 then
+        icon = "|T"..Addon.TORSQUARE..setting
+    end
+    return icon
 end
 
 -- Addon Msg Keyinfos

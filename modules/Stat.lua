@@ -31,8 +31,11 @@ local function eventHandler(self, e, ...)
         db.profile.GetActiveChallengeMapID = C_ChallengeMode.GetActiveChallengeMapID()
         db.profile.StartDeaths = 0
         db.profile.StartVolcanic = 0
-        db.profile.DoubleCheckCount = 0
-        db.profile.DoubleCheck = false
+        db.profile.holdStart = true
+        Addon.DoubleCheckCount = 0
+        Addon.DoubleCheck = false
+        Addon.DeathLog = {}
+        Addon.TormentedKilled = 0
         local _, affix = C_ChallengeMode.GetActiveKeystoneInfo()
         if affix[3] == 3 then
             db.profile.VolcanicCheck = true
@@ -85,15 +88,46 @@ local function eventHandler(self, e, ...)
         db.profile.StartVolcanic = nil
         db.profile.VolcanicCheck = nil
     end
-    if e == "COMBAT_LOG_EVENT_UNFILTERED" and db.profile.start and db.profile.VolcanicCheck then
-        local _, message, _, _, _, _, _, _, destName, _, _, spellid = CombatLogGetCurrentEventInfo()
+    if e == "COMBAT_LOG_EVENT_UNFILTERED" and db.profile.start then
+        local _, subEvent, _, _, _, _, _, guid, destName, _, _, spellid = CombatLogGetCurrentEventInfo()
         local name = ""
         local char = UnitName("player")
-        if destName then
+        local mobID = select(6, strsplit("-", guid))
+        if destName and db.profile.VolcanicCheck then
             name = Ambiguate(destName, "short")
-            if message == "SPELL_DAMAGE" and spellid == 209862 and name == char then
+            if subEvent == "SPELL_DAMAGE" and spellid == 209862 and name == char then
                 db.profile.StartVolcanic = db.profile.StartVolcanic + 1
             end
+        end
+        if subEvent == "UNIT_DIED" and destName and strfind(guid, "Player") and not UnitIsFeignDeath(destName) then
+            name = Ambiguate(destName, "short")
+            local role = UnitGroupRolesAssigned(name)
+            if role == "TANK" then
+                role = CreateAtlasMarkup("UI-Frame-TankIcon")
+            elseif role == "HEALER" then
+                role = CreateAtlasMarkup("UI-Frame-HealerIcon")
+            elseif role == "DAMAGER" then
+                role = CreateAtlasMarkup("UI-Frame-DpsIcon")
+            else 
+                role = ""
+            end
+            local _,_,_,color = GetClassColor(select(2, UnitClass(name)))
+            name = role.." |c"..color..name.."|r"
+            if not Addon.DeathLog[name] then
+                Addon.DeathLog[name] = 1
+            else
+                Addon.DeathLog[name] = Addon.DeathLog[name] + 1
+            end
+            
+            SendSystemMessage(destName.." "..L["died."])
+        end
+        if subEvent == "UNIT_DIED" and mobID then
+            for i = 1, #Addon.TormentedMobs do
+                if Addon.TormentedMobs[i] == tonumber(mobID) then
+                    Addon.TormentedKilled = Addon.TormentedKilled + 1
+                end
+            end
+            Addon.UpdateSeasonAdds()
         end
     end
 end

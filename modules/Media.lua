@@ -8,6 +8,8 @@ Addon.LOGO              = media.."Textures\\logo"
 
 --Textures
 Addon.TEX_UTILS         = media.."Textures\\utils.blp"
+Addon.TORCIRCLE         = media.."Textures\\torStyleCircle"
+Addon.TORSQUARE         = media.."Textures\\torStyleSquare"
 
 --Fonts
 Addon.FONT_KOZUKA       = media.."Fonts\\KozGoPr6N-Light.ttf"
@@ -41,16 +43,21 @@ Addon.lk_bg_Prideful1   = media.."Textures\\lk_Prideful"
 Addon.lk_bg_Prideful2   = media.."Textures\\lk_Prideful2"
 Addon.lk_bg_Paradox1    = media.."Textures\\lk_Paradox"
 Addon.lk_bg_Paradox2    = media.."Textures\\lk_Paradox2"
---Addon.lk_bg_Domination1 = media.."Textures\\lk_Domination"
---Addon.lk_bg_Domination2 = media.."Textures\\lk_Domination2"
-Addon.lk_bg_Kyrian1      = media.."Textures\\lk_Kyrian"
-Addon.lk_bg_Kyrian2      = media.."Textures\\lk_Kyrian2"
-Addon.lk_bg_Necrolord1   = media.."Textures\\lk_Necrolord"
-Addon.lk_bg_Necrolord2   = media.."Textures\\lk_Necrolord2"
-Addon.lk_bg_NightFae1    = media.."Textures\\lk_NightFae"
-Addon.lk_bg_NightFae2    = media.."Textures\\lk_NightFae2"
-Addon.lk_bg_Venthyr1     = media.."Textures\\lk_Venthyr"
-Addon.lk_bg_Venthyr2     = media.."Textures\\lk_Venthyr2"
+Addon.lk_bg_Tormented1  = media.."Textures\\lk_Tormented"
+Addon.lk_bg_Tormented2  = media.."Textures\\lk_Tormented2"
+Addon.lk_bg_Kyrian1     = media.."Textures\\lk_Kyrian"
+Addon.lk_bg_Kyrian2     = media.."Textures\\lk_Kyrian2"
+Addon.lk_bg_Necrolord1  = media.."Textures\\lk_Necrolord"
+Addon.lk_bg_Necrolord2  = media.."Textures\\lk_Necrolord2"
+Addon.lk_bg_NightFae1   = media.."Textures\\lk_NightFae"
+Addon.lk_bg_NightFae2   = media.."Textures\\lk_NightFae2"
+Addon.lk_bg_Venthyr1    = media.."Textures\\lk_Venthyr"
+Addon.lk_bg_Venthyr2    = media.."Textures\\lk_Venthyr2"
+
+--Badges
+Addon.badge_dev         = media.."Textures\\Badges\\badge_dev"
+Addon.badge_special     = media.."Textures\\Badges\\badge_special"
+Addon.badge_translator  = media.."Textures\\Badges\\badge_translator"
 
 local LSM = LibStub("LibSharedMedia-3.0")
 LSM:Register("font", "Kozuka Gothic Light", Addon.FONT_KOZUKA, LSM.LOCALE_BIT_ruRU + LSM.LOCALE_BIT_western + LSM.LOCALE_BIT_zhCN + LSM.LOCALE_BIT_zhTW + LSM.LOCALE_BIT_koKR)
