@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.1.2
+
+- fixed display info for unloaded season affix
+
 ## 1.1.1
 
 - fixed nil value for party keys
