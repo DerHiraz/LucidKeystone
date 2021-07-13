@@ -331,7 +331,6 @@ local function bootlegRepeatingTimer()
             end
         end
         db.profile.GetCurrentTime = Addon.TimeFormat(time).."/"..Addon.TimeFormat(maxTime)
-        --Addon.UpdateSeasonAdds()
 
         if not maxTime then
             return
@@ -483,7 +482,6 @@ local function eventHandler(self, e, ...)
     end
     if (e == "SCENARIO_CRITERIA_UPDATE" or e == "CHALLENGE_MODE_START") and db.profile.start then
         UpdateMobs()
-        --Addon.UpdateSeasonAdds()
         UpdateBosses()
     end
     if e == "ZONE_CHANGED_NEW_AREA" then
@@ -501,9 +499,9 @@ local function eventHandler(self, e, ...)
             LucidKeystoneFrame:Show()
             bootlegRepeatingTimer()
             UpdateMobs()
-            --Addon.UpdateSeasonAdds()
             UpdateDungeonName()
             UpdateBosses()
+            Module.Config:SeasonMobs()
         end
 
         if db.profile.start == false then

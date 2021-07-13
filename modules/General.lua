@@ -312,26 +312,21 @@ local function eventHandler(self, e, ...)
                 totalShare = tonumber(string.match(msg, "Total:"..SkipString(8).."(%d+):"))
             }
         end
-        if prefix == AddonName and db.profile.SendRaidTest and IsInRaid() then
-            SELECTED_CHAT_FRAME:AddMessage("|cff009dd5["..sender.."]|r uses Lucid Keystone")
-        end
-    elseif e == "READY_CHECK" then
-        if IsInRaid() then
-            C_ChatInfo.SendAddonMessage(AddonName, " uses Lucid Keystone in Raid", "Raid")
-        end
     end
     if (e == "GROUP_ROSTER_UPDATE" or e == "PARTY_LEADER_CHANGED") and not IsInRaid() then
         KeyPost()
         local time = GetTime()
         local zoneTable = {375,376,377,378,379,380,381,382}
-        local bl, to, season, expansion = {}, {}, C_MythicPlus.GetCurrentSeason(), GetExpansionLevel()
+        --local bl, to, season, expansion = {}, {}, C_MythicPlus.GetCurrentSeason(), GetExpansionLevel()
+        local bl, to = {}, {}
+        local season, expansion = Addon.GetSeasonInfo()
         local best = 0
         local total = 0
         local id, level = 0,0
         local _,_,_,class = GetClassColor(select(2, UnitClass("player")))
-        if season == 5 then
+        --[[if season >= 5 then
             season = season-4
-        end
+        end]]
         for i = 1, 12 do
             if zoneTable[i] then
                 best = db.profile.bestIntime[expansion][season][zoneTable[i]].level
@@ -356,7 +351,6 @@ local function eventHandler(self, e, ...)
 
         if not ChatThrottle.party or time-ChatThrottle.party >= 0.3 then
             ChatThrottle.party = time
-            --C_ChatInfo.SendAddonMessage(AddonName, keystone.."H:", "PARTY")
             C_ChatInfo.SendAddonMessage(AddonName, "Key:"..id..":"..level..":Best:"
             ..bl[1]..":"..bl[2]..":"
             ..bl[3]..":"..bl[4]..":"

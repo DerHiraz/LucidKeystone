@@ -528,11 +528,12 @@ local function TimeSpend(cmd)
     local runs = 0
     local resultPer = 0
     if cmd then
-        if C_MythicPlus.GetCurrentSeason() >= 5 then
+        --[[if C_MythicPlus.GetCurrentSeason() >= 5 then
             season = C_MythicPlus.GetCurrentSeason()-4
         else
             season = C_MythicPlus.GetCurrentSeason()
-        end
+        end]]
+        season = Addon.GetSeasonInfo()
     end
 
     for i = 1, #zones do

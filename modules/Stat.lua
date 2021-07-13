@@ -40,16 +40,19 @@ local function eventHandler(self, e, ...)
         if affix[3] == 3 then
             db.profile.VolcanicCheck = true
         end
+        Addon.UpdateSeasonAdds()
     end
     if e == "CHALLENGE_MODE_COMPLETED" then
         local _, level, time, onTime = C_ChallengeMode.GetCompletionInfo()
-        local expansion = GetExpansionLevel()
-        local season = C_MythicPlus.GetCurrentSeason()
-        local seasonNew
+        --local expansion = GetExpansionLevel()
+        --local season = C_MythicPlus.GetCurrentSeason()
+        local season, expansion = Addon.GetSeasonInfo()
+
+        --[[local seasonNew
         if season >= 5 then
             seasonNew = season - 4
             season = seasonNew
-        end
+        end]]
         local runs = db.profile.runs[expansion][season]
         local today = C_DateAndTime.GetCurrentCalendarTime()
         time = time/1000

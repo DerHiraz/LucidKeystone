@@ -341,3 +341,19 @@ function Addon.TimeFormat(time,plus,dayInd)
         return prefix .. string.format(format_days, days, hours, minutes, seconds)
     end
 end
+
+-- Season Info
+function Addon.GetSeasonInfo()
+    -- seasonID, expansionID, affixID
+    local expansionID = GetExpansionLevel()
+    local seasonID = C_MythicPlus.GetCurrentSeason()
+    local affixID = C_MythicPlus.GetCurrentAffixes()[4].id
+
+    if seasonID >= 9 then
+        seasonID = seasonID-8
+    elseif seasonID >= 5 then
+        seasonID = seasonID-4
+    end
+
+    return seasonID, expansionID, affixID
+end
