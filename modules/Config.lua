@@ -1444,7 +1444,7 @@ local function AddConfig()
                                 hidden = function()
                                     local disableSound = false
                                     if not IsAddOnLoaded("MythicDungeonTools") then disableSound = true end
-                                    if C_MythicPlus.GetCurrentAffixes()[4].id ~= 121 then disableSound = true end
+                                    if Addon.GetSeasonInfo() ~= 1 then disableSound = true end
 
                                     return disableSound
                                 end,
@@ -1459,7 +1459,7 @@ local function AddConfig()
                                 hidden = function()
                                     local disableSound = false
                                     if not IsAddOnLoaded("MythicDungeonTools") then disableSound = true end
-                                    if C_MythicPlus.GetCurrentAffixes()[4].id ~= 121 then disableSound = true end
+                                    if Addon.GetSeasonInfo() ~= 1 then disableSound = true end
 
                                     return disableSound
                                 end,
@@ -1479,7 +1479,7 @@ local function AddConfig()
                                 hidden = function()
                                     local disableSound = false
                                     if not Module:GetOption("pridefulAlertT") then disableSound = true end
-                                    if C_MythicPlus.GetCurrentAffixes()[4].id ~= 121 then disableSound = true end
+                                    if Addon.GetSeasonInfo() ~= 1 then disableSound = true end
                                     return disableSound
                                 end,
                             },
@@ -1491,7 +1491,7 @@ local function AddConfig()
                                 hidden = function()
                                     local disableSound = false
                                     if not IsAddOnLoaded("MythicDungeonTools") then disableSound = true end
-                                    if C_MythicPlus.GetCurrentAffixes()[4].id ~= 121 then disableSound = true end
+                                    if Addon.GetSeasonInfo() ~= 1 then disableSound = true end
 
                                     return disableSound
                                 end,
@@ -1507,7 +1507,7 @@ local function AddConfig()
                                 get = function() return Module:GetOption("tormentedInd") end,
                                 hidden = function()
                                     local disableInd = false
-                                    if C_MythicPlus.GetCurrentAffixes()[4].id ~= 128 then disableInd = true end
+                                    if Addon.GetSeasonInfo() ~= 2 then disableInd = true end
 
                                     return disableInd
                                 end,
@@ -1529,7 +1529,7 @@ local function AddConfig()
                                 end,
                                 hidden = function()
                                     local disableInd = false
-                                    if C_MythicPlus.GetCurrentAffixes()[4].id ~= 128 then disableInd = true end
+                                    if Addon.GetSeasonInfo() ~= 2 then disableInd = true end
 
                                     return disableInd
                                 end,
@@ -1553,7 +1553,7 @@ local function AddConfig()
                                 },
                                 hidden = function()
                                     local disableInd = false
-                                    if C_MythicPlus.GetCurrentAffixes()[4].id ~= 128 then disableInd = true end
+                                    if Addon.GetSeasonInfo() ~= 2 then disableInd = true end
 
                                     return disableInd
                                 end,

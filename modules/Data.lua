@@ -168,6 +168,10 @@ Addon.Supporter = {
     ["Lhfs-Illidan"]            = "translator",
 }
 
+local function ForceUI() 
+    LoadAddOn("Blizzard_ChallengesUI")
+end
+
 -- Get Score Color
 function Addon.GetScoreColor(score,force)
     local scoreC = score
@@ -344,10 +348,9 @@ end
 
 -- Season Info
 function Addon.GetSeasonInfo()
-    -- seasonID, expansionID, affixID
+    -- seasonID, expansionID
     local expansionID = GetExpansionLevel()
     local seasonID = C_MythicPlus.GetCurrentSeason()
-    local affixID = C_MythicPlus.GetCurrentAffixes()[4].id
 
     if seasonID >= 9 then
         seasonID = seasonID-8
@@ -355,5 +358,5 @@ function Addon.GetSeasonInfo()
         seasonID = seasonID-4
     end
 
-    return seasonID, expansionID, affixID
+    return seasonID, expansionID
 end

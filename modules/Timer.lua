@@ -801,7 +801,8 @@ function Module.Config:KeyLevel()
 end
 
 function Module.Config:SeasonMobs()
-    if db.profile.tormentedInd and C_MythicPlus.GetCurrentAffixes()[4].id == 128 then
+    --if db.profile.tormentedInd and C_MythicPlus.GetCurrentAffixes() and C_MythicPlus.GetCurrentAffixes()[4].id == 128 then
+    if db.profile.tormentedInd and Addon.GetSeasonInfo() == 2 then
         local count = previewSettings.tormCount
         if db.profile.start then count = Addon.TormentedKilled end
         local new = ""
