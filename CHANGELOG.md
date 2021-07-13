@@ -1,6 +1,12 @@
 # CHANGELOG
 
-## 1.0.8
+## 1.1.1
+
+- fixed nil value for party keys
+- implemented improved season detection
+- set default season to season 2
+
+## 1.1.0
 
 - fixed position Bug for Bossnames
 - fixed auto msg delay for bnet whispers
